@@ -1,17 +1,17 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateChimeraThreatenSteal : public CStateMonsterMoveToPointEx<_Object> {
-	typedef CStateMonsterMoveToPointEx<_Object>		inherited;
+class CStateChimeraThreatenSteal : public CStateMonsterMoveToPointEx {
+protected:
+	using inherited = CStateMonsterMoveToPointEx;
 
 public:
-	IC					CStateChimeraThreatenSteal	(_Object *obj) : inherited(obj){}
-	virtual	void		initialize					();	
-	virtual void		finalize					();
-	virtual	void		execute						();
-	virtual bool		check_completion			();
-	virtual bool		check_start_conditions		();
-};
+	CStateChimeraThreatenSteal(CBaseMonster* object);
+	virtual ~CStateChimeraThreatenSteal() override;
 
-#include "chimera_state_threaten_steal_inline.h"
+	virtual	void		initialize					() override;
+	virtual void		finalize					() override;
+	virtual	void		execute						() override;
+	virtual bool		check_completion			() override;
+	virtual bool		check_start_conditions		() override;
+};

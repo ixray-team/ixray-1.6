@@ -39,7 +39,7 @@ void CBaseMonster::Think()
 
 void CBaseMonster::update_fsm()
 {
-	StateMan->update				();
+	pStateManagerBase->update				();
 	
 	// завершить обработку установленных в FSM параметров
 	post_fsm_update					();
@@ -58,13 +58,11 @@ void CBaseMonster::post_fsm_update()
 {
 	if (!EnemyMan.get_enemy()) return;
 	
-	EMonsterState state = StateMan->get_state_type();
-
+	EMonsterState state = pStateManagerBase->get_state_type();
 
 	// Look at enemy while running
 	m_bRunTurnLeft = m_bRunTurnRight = false;
 	
-
 	Fvector direction;
 	if ( is_state(state, eStateAttack) && 
 		 control().path_builder().is_moving_on_path() &&
@@ -91,7 +89,7 @@ void CBaseMonster::squad_notify()
 	CMonsterSquad	*squad = monster_squad().get_squad(this);
 	SMemberGoal		goal;
 
-	EMonsterState state = StateMan->get_state_type();
+	EMonsterState state = pStateManagerBase->get_state_type();
 
 	if (is_state(state, eStateAttack)) {
 		

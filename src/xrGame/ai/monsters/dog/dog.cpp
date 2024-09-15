@@ -16,27 +16,41 @@
 #include "../../../ai_object_location.h"
 #include "../../../Actor.h"
 
-CAI_Dog::CAI_Dog()
+CDogBase::CDogBase()
 {
-	StateMan = new CStateManagerDog(this);
+	pStateManagerBase = new CDogBaseStateManager(this);
 	
 	min_move_dist		= u32(5);
 	max_move_dist		= u32(7);
 	m_start_smelling	= u32(-1);
 	m_smelling_count	= Random.randI(3);
+
+	b_end_state_eat = false;
+	b_state_check = false;
+	b_state_end = false;
+	enemy_position = {};
+	saved_state = u32(-1);;
+	m_anim_factor = u32(-1);;
+	m_corpse_use_timeout = u32(-1);;
+	m_min_life_time = u32(-1);;
+	m_drive_out_time = u32(-1);;
+	m_min_sleep_time = u32(-1);;
+	b_state_anim = false;
+	b_anim_end = false;
+	current_anim = u32(-1);;
+
 	CControlled::init_external	(this);
 
 	com_man().add_ability(ControlCom::eControlJump);
     com_man().add_ability(ControlCom::eControlRotationJump);
-//	com_man().add_ability(ControlCom::eControlMeleeJump);
 }
 
-CAI_Dog::~CAI_Dog()
+CDogBase::~CDogBase()
 {
-	xr_delete(StateMan);
+	xr_delete(pStateManagerBase);
 }
 
-void CAI_Dog::Load(LPCSTR section)
+void CDogBase::Load(LPCSTR section)
 {
 	inherited::Load	(section);
 	if(pSettings->line_exist(section,"anim_factor"))
@@ -192,7 +206,7 @@ void CAI_Dog::Load(LPCSTR section)
 	PostLoad					(section);
 }
 
-void CAI_Dog::reinit()
+void CDogBase::reinit()
 {
 	inherited::reinit();
 
@@ -214,8 +228,12 @@ void CAI_Dog::reinit()
 	Home->set_move_dists(min_move_dist, max_move_dist);
 }
 
+namespace detail
+{ // helper function implemented in file alife_simulator.cpp
+	bool object_exists_in_alife_registry(u32 id);
+} // namespace detail
 
-void CAI_Dog::UpdateCL()
+void CDogBase::UpdateCL()
 {
 	inherited::UpdateCL();
 
@@ -227,11 +245,11 @@ void CAI_Dog::UpdateCL()
 	if ( b_anim_end )
 	{
 		b_anim_end = false;
-		StateMan->update();
+		pStateManagerBase->update();
 	}
 }
 
-bool CAI_Dog::is_night()
+bool CDogBase::is_night()
 {
 	u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
 	split_time(Level().GetGameTime(), year, month, day, hours, mins, secs, milisecs);
@@ -242,7 +260,7 @@ bool CAI_Dog::is_night()
 	return false;
 }
 
-void CAI_Dog::CheckSpecParams(u32 spec_params)
+void CDogBase::CheckSpecParams(u32 spec_params)
 {
 	if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
 		com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
@@ -257,12 +275,12 @@ void CAI_Dog::CheckSpecParams(u32 spec_params)
 	}
 }
 
-u32 CAI_Dog::get_number_animation()
+u32 CDogBase::get_number_animation()
 {
 	return current_anim;
 }
 
-u32 CAI_Dog::random_anim()
+u32 CDogBase::random_anim()
 {
 	if (m_anim_factor > u32(Random.randI(100)))
 	{
@@ -272,14 +290,14 @@ u32 CAI_Dog::random_anim()
 	return Random.randI(4);
 }
 
-void CAI_Dog::set_current_animation(u32 curr_anim)
+void CDogBase::set_current_animation(u32 curr_anim)
 {
 	b_state_check = true;
 	b_state_end = false;
 	current_anim = curr_anim;
 }
 
-bool CAI_Dog::check_start_conditions (ControlCom::EControlType type)
+bool CDogBase::check_start_conditions (ControlCom::EControlType type)
 {
 	if ( type == ControlCom::eControlJump )
 	{
@@ -304,7 +322,7 @@ bool CAI_Dog::check_start_conditions (ControlCom::EControlType type)
 	return inherited::check_start_conditions(type);
 }
 
-void CAI_Dog::start_animation()
+void CDogBase::start_animation()
 {
 	// Lain: check if animation is captured
 	CControl_Com* capturer = control().get_capturer(ControlCom::eControlAnimation);
@@ -319,32 +337,32 @@ void CAI_Dog::start_animation()
 	b_state_end = true;
 }
 
-void CAI_Dog::animation_end(CBlend* B)
+void CDogBase::animation_end(CBlend* B)
 {
-	((CAI_Dog*)B->CallbackParam)->b_state_anim = false;
-	((CAI_Dog*)B->CallbackParam)->b_anim_end = true;
-	((CAI_Dog*)B->CallbackParam)->com_man().script_release(ControlCom::eControlAnimation);
-	((CAI_Dog*)B->CallbackParam)->b_state_end = false;
+	((CDogBase*)B->CallbackParam)->b_state_anim = false;
+	((CDogBase*)B->CallbackParam)->b_anim_end = true;
+	((CDogBase*)B->CallbackParam)->com_man().script_release(ControlCom::eControlAnimation);
+	((CDogBase*)B->CallbackParam)->b_state_end = false;
 }
 
-void CAI_Dog::anim_end_reinit()
+void CDogBase::anim_end_reinit()
 {
 	b_state_anim = false;
 	b_anim_end = true;
 	com_man().script_release(ControlCom::eControlAnimation);
 }
 
-bool CAI_Dog::get_custom_anim_state()
+bool CDogBase::get_custom_anim_state()
 {
 	return b_state_anim;
 }
 
-void CAI_Dog::set_custom_anim_state(bool b_state_animation)
+void CDogBase::set_custom_anim_state(bool b_state_animation)
 {
 	b_state_anim = b_state_animation;
 }
 
-LPCSTR CAI_Dog::get_current_animation()
+LPCSTR CDogBase::get_current_animation()
 {
 	switch(current_anim)
 	{
@@ -368,7 +386,7 @@ LPCSTR CAI_Dog::get_current_animation()
 	}
 }
 
-void CAI_Dog::reload(LPCSTR section)
+void CDogBase::reload(LPCSTR section)
 {
 	inherited::reload (section);
 	com_man().load_jump_data(0, "jump_ataka_01", "jump_ataka_02", "jump_ataka_03",
@@ -376,7 +394,7 @@ void CAI_Dog::reload(LPCSTR section)
 						     MonsterMovement::eVelocityParameterRunNormal, 0);
 }
 
-void CAI_Dog::HitEntityInJump (const CEntity *pEntity) 
+void CDogBase::HitEntityInJump (const CEntity *pEntity)
 {
 	SAAParam &params = anim().AA_GetParams("jump_ataka_02");
 	
@@ -384,13 +402,13 @@ void CAI_Dog::HitEntityInJump (const CEntity *pEntity)
 }
 
 // Lain: added
-u32 CAI_Dog::get_attack_rebuild_time ()
+u32 CDogBase::get_attack_rebuild_time ()
 {
 	float dist = EnemyMan.get_enemy()->Position().distance_to(Position());
 	return 100 + u32(25*dist);
 }
 
-bool  CAI_Dog::can_use_agressive_jump (const CObject* enemy) 
+bool  CDogBase::can_use_agressive_jump (const CObject* enemy)
 {
 	float delta_y = 0.8f;
 	if ( enemy == Actor() )
@@ -403,31 +421,4 @@ bool  CAI_Dog::can_use_agressive_jump (const CObject* enemy)
 
 	return enemy->Position().y - Position().y > delta_y; 
 }
-
-
-#ifdef _DEBUG
-void CAI_Dog::debug_on_key(int key)
-{
-	IKinematicsAnimated *skel = smart_cast<IKinematicsAnimated *>(Visual());
-
-	switch (key){
-	case SDL_SCANCODE_1:
-		Msg("Ohhhhhhhhhhhhhhh! Here it is!");
-		// strafe left
-		//com_man().seq_run(skel->ID_Cycle_Safe("stand_turn_ls_0"));
-		break;
-	case SDL_SCANCODE_2:
-		// strafe right
-		com_man().seq_run(skel->ID_Cycle_Safe("stand_turn_ls_0"));
-		break;
-	case SDL_SCANCODE_3:
-		// threaten
-		com_man().seq_run(skel->ID_Cycle_Safe("stand_threaten_0"));
-		break;
-	case SDL_SCANCODE_0:
-		Msg("Ohhhhhhhhhhhhhhh! Here it is!");
-		break;
-	}
-}
-#endif
 

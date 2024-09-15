@@ -3,14 +3,14 @@
 #include "../state.h"
 #include "../states/monster_state_attack.h"
 
-template<typename _Object>
-class	CStateBurerAttackMelee : public CStateMonsterAttack<_Object> {
-	typedef CStateMonsterAttack<_Object>	inherited;
+class	CStateBurerAttackMelee : public CStateMonsterAttack {
+protected:
+	using inherited = CStateMonsterAttack;
 
 public:
-						CStateBurerAttackMelee			(_Object *obj);
-	virtual	bool		check_start_conditions			();
-	virtual	bool		check_completion				();
-};
+						CStateBurerAttackMelee			(CBaseMonster *object);
+						virtual ~CStateBurerAttackMelee() override;
 
-#include "burer_state_attack_melee_inline.h"
+	virtual	bool		check_start_conditions			() override;
+	virtual	bool		check_completion				() override;
+};

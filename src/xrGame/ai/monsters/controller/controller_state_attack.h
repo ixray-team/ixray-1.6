@@ -3,25 +3,23 @@
 #include "../state.h"
 #include "../../../ai_debug.h"
 
-template<typename _Object>
-class	CStateControllerAttack : public CState<_Object> {
+class	CStateControllerAttack : public CState {
 protected:
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+	using inherited = CState		;
+	using state_ptr = CState*	;
 
 public:
-						CStateControllerAttack	(_Object *obj);
-	virtual				~CStateControllerAttack	() {}
+						CStateControllerAttack	(CBaseMonster *object);
+						virtual				~CStateControllerAttack() override;
 
-	virtual void		initialize				();
-	virtual void		finalize				();
-	virtual void		critical_finalize		();
+	virtual void		initialize				() override;
+	virtual void		finalize				() override;
+	virtual void		critical_finalize		() override;
 	
-	virtual void		execute					();
-	virtual void		setup_substates			();
-	virtual void		check_force_state		();
-	virtual void		remove_links			(CObject * ) {}
+	virtual void		execute					() override;
+	virtual void		setup_substates			() override;
+	virtual void		check_force_state		() override;
+	virtual void		remove_links(CObject* object) override { inherited::remove_links(object); }
+
 			bool		check_home_point		();
 };
-
-#include "controller_state_attack_inline.h"

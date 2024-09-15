@@ -5,11 +5,11 @@
 using namespace luabind;
 
 #pragma optimize("s",on)
-void CFracture::script_register(lua_State *L)
+void CFractureBase::script_register(lua_State *L)
 {
 	module(L)
 	[
-		class_<CFracture,CGameObject>("CFracture")
+		class_<CFractureBase,CGameObject>("CFractureBase")
 			.def(constructor<>())
 	];
 }

@@ -1,14 +1,18 @@
 #pragma once
 #include "../monster_state_manager.h"
 
-class CAI_PseudoDog;
+class CPseudoDogBase;
 
-class CStateManagerPseudodog : public CMonsterStateManager<CAI_PseudoDog> {
-	typedef CMonsterStateManager<CAI_PseudoDog> inherited;
+class CPseudoDogBaseStateManager : public CMonsterStateManager
+{
+protected:
+	using inherited = CMonsterStateManager;
 	
 public:
 
-					CStateManagerPseudodog	(CAI_PseudoDog *monster); 
-	virtual void	execute					();
-	virtual void	remove_links			(CObject* object_) { inherited::remove_links(object_);}
+	CPseudoDogBaseStateManager(CBaseMonster* object);
+					virtual ~CPseudoDogBaseStateManager() override;
+
+	virtual void	execute					() override;
+	virtual void	remove_links			(CObject* object) override { inherited::remove_links(object);}
 };

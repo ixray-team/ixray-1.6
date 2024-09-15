@@ -1,15 +1,20 @@
 #pragma once
 #include "../monster_state_manager.h"
 
-class CAI_Boar;
+class CBoarBase;
 
-class CStateManagerBoar : public CMonsterStateManager<CAI_Boar> {
-	typedef CMonsterStateManager<CAI_Boar> inherited;
+class CBoarBaseStateManager : public CMonsterStateManager
+{
+protected:
+	using inherited = CMonsterStateManager;
+
+	CBoarBase* pBoarBase;
 
 public:
 
-					CStateManagerBoar	(CAI_Boar *monster); 
+	CBoarBaseStateManager(CBaseMonster* object);
+					virtual ~CBoarBaseStateManager();
 
 	virtual void	execute				();
-	virtual void	remove_links		(CObject* object_) { inherited::remove_links(object_);}
+	virtual void	remove_links		(CObject* object) { inherited::remove_links(object);}
 };

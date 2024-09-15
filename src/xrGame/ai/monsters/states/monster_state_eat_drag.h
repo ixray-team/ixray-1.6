@@ -1,8 +1,9 @@
 #pragma once
 
-template<typename _Object>
-class CStateMonsterDrag : public CState<_Object> {
-	typedef CState<_Object>		inherited;
+#include "../state.h"
+
+class CStateMonsterDrag : public CState {
+	typedef CState		inherited;
 
 	Fvector				m_cover_position;
 	u32					m_cover_vertex_id;
@@ -11,7 +12,7 @@ class CStateMonsterDrag : public CState<_Object> {
 	Fvector				m_corpse_start_position;
 
 public:
-						CStateMonsterDrag		(_Object *obj);
+						CStateMonsterDrag		(CBaseMonster *obj);
 	virtual				~CStateMonsterDrag		();
 
 	virtual void		initialize				();
@@ -23,5 +24,3 @@ public:
 	virtual bool		check_completion		();
 };
 
-
-#include "monster_state_eat_drag_inline.h"

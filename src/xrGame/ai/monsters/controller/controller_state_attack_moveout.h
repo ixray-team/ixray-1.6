@@ -1,14 +1,18 @@
 #pragma once
 
-template<typename _Object>
-class CStateControlMoveOut : public CState<_Object> {
-	typedef	CState<_Object>		inherited;
-	typedef	CState<_Object>*	state_ptr;
+#include "../state.h"
+
+class CStateControlMoveOut : public CState {
+protected:
+	using	inherited = CState		;
+	using	state_ptr = CState*;
 
 	Fvector			m_look_point;
 	
 	u32				m_last_time_look_point_updated;
 	u32				m_current_delay;
+
+	CControllerBase* m_pController;
 
 	enum {
 		eMoveToNodeEnemyLastSeen,
@@ -22,21 +26,17 @@ class CStateControlMoveOut : public CState<_Object> {
 
 public:
 
-					CStateControlMoveOut	(_Object *obj) : inherited(obj) {}
-	virtual			~CStateControlMoveOut	() {}
+	CStateControlMoveOut(CBaseMonster* object);
+	virtual			~CStateControlMoveOut() override;
 
-	virtual void	initialize				();
-	virtual void	execute					();
-	virtual bool 	check_completion		();
-	virtual bool 	check_start_conditions	();
+	virtual void	initialize				() override;
+	virtual void	execute					() override;
+	virtual bool 	check_completion		() override;
+	virtual bool 	check_start_conditions	() override;
 
-	virtual void	remove_links			(CObject* object) {}
+	virtual void	remove_links(CObject* object) override { inherited::remove_links(object); }
 
 private:
 			void	update_target_point		();	
 			void	update_look_point		();
-
 };
-
-#include "controller_state_attack_moveout_inline.h"
-

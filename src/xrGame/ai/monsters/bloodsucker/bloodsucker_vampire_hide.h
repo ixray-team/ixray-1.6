@@ -1,18 +1,19 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateBloodsuckerVampireHide : public CState<_Object> {
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+class CustomBloodsuckerStateVampireHide : public CState 
+{
+protected:
+	using inherited = CState;
+	using state_ptr = CState*;
 
 public:
-						CStateBloodsuckerVampireHide	(_Object *obj);
+	CustomBloodsuckerStateVampireHide(CBloodsuckerBase* object);
+	virtual ~CustomBloodsuckerStateVampireHide() override;
 
-	virtual	void		reselect_state					();
-	virtual void		setup_substates					();
-	virtual bool		check_completion				();
-	virtual void		remove_links					(CObject* object) { inherited::remove_links(object);}
+	virtual	void		reselect_state() override;
+	virtual void		setup_substates() override;
+	virtual bool		check_completion() override;
+	virtual void		remove_links(CObject* object) override { inherited::remove_links(object); }
 };
 
-#include "bloodsucker_vampire_hide_inline.h"

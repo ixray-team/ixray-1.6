@@ -12,18 +12,19 @@
 #include "../control_path_builder_base.h"
 
 
-CChimera::CChimera ()
+CChimeraBase::CChimeraBase ()
 {
-	StateMan							=	new CStateManagerChimera	(this);
+	m_attack_params = {};
+	pStateManagerBase =	new CChimeraBaseStateManager(this);
 	com_man().add_ability					(ControlCom::eControlJump);
 }
 
-CChimera::~CChimera ()
+CChimeraBase::~CChimeraBase ()
 {
-	xr_delete								(StateMan);
+	xr_delete								(pStateManagerBase);
 }
 
-void   CChimera::Load (LPCSTR section)
+void   CChimeraBase::Load (LPCSTR section)
 {
 	inherited::Load							(section);
 
@@ -116,7 +117,7 @@ void   CChimera::Load (LPCSTR section)
 	PostLoad								(section);
 }
 
-EAction   CChimera::CustomVelocityIndex2Action (u32 velocity_index) 
+EAction   CChimeraBase::CustomVelocityIndex2Action (u32 velocity_index) 
 {
 	switch ( velocity_index ) 
 	{
@@ -127,7 +128,7 @@ EAction   CChimera::CustomVelocityIndex2Action (u32 velocity_index)
 	return ACT_STAND_IDLE;
 }
 
-void   CChimera::reinit ()
+void   CChimeraBase::reinit ()
 {
 	inherited::reinit						();
 
@@ -144,32 +145,20 @@ void   CChimera::reinit ()
 											 0);
 }
 
-void   CChimera::CheckSpecParams (u32 spec_params)
-{
-// 	if ( (spec_params & ASP_THREATEN) == ASP_THREATEN )
-// 	{
-// 		anim().SetCurAnim(eAnimThreaten);
-// 	}
-// 	if ( (spec_params & ASP_ATTACK_RUN) == ASP_ATTACK_RUN ) 
-// 	{
-// 		anim().SetCurAnim(eAnimAttackRun);
-// 	}
-}
-
-void   CChimera::HitEntityInJump (const CEntity *pEntity)
+void   CChimeraBase::HitEntityInJump (const CEntity *pEntity)
 {
 	SAAParam &params					=	anim().AA_GetParams("jump_attack_1");
 	
 	HitEntity								(pEntity, params.hit_power, params.impulse, params.impulse_dir);
 }
 
-void   CChimera::jump (Fvector const &position, float const factor)
+void   CChimeraBase::jump (Fvector const &position, float const factor)
 {
 	com_man().script_jump					(position, factor);
 	sound().play							(MonsterSound::eMonsterSoundAggressive);
 }
 
-void CChimera::UpdateCL()
+void CChimeraBase::UpdateCL()
 {
 	inherited::UpdateCL						();
 }

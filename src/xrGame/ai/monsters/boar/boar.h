@@ -4,35 +4,33 @@
 #include "../controlled_entity.h"
 #include "../../../../xrScripts/script_export_space.h"
 
-class CAI_Boar : public CBaseMonster,
-				 public CControlledEntity<CAI_Boar> {
-
-	typedef		CBaseMonster	inherited;
-	typedef		CControlledEntity<CAI_Boar>	CControlled;
+class CBoarBase : public CBaseMonster,
+				 public CControlledEntity {
+protected:
+	using		inherited = CBaseMonster	;
+	using		CControlled = CControlledEntity;
 
 public:
-					CAI_Boar			();
-	virtual			~CAI_Boar			();	
+	CBoarBase();
+	virtual			~CBoarBase() override;
 
-	virtual void	Load				(LPCSTR section);
-	virtual BOOL	net_Spawn			(CSE_Abstract* DC);
-	virtual void	reinit				();
+	virtual void	Load				(LPCSTR section) override;
+	virtual BOOL	net_Spawn			(CSE_Abstract* DC) override;
+	virtual void	reinit				() override;
 
-	virtual void	UpdateCL			();
-
-	virtual bool	CanExecRotationJump	() {return true;}
-	virtual void	CheckSpecParams		(u32 spec_params);
+	virtual void	UpdateCL			() override;
 
 	// look at enemy
 	static void	_BCL	BoneCallback	(CBoneInstance *B);
 	
-			float	_velocity;
-			float	_cur_delta, _target_delta;
+			float	velocity;
+			float	cur_delta, target_delta;
+
 			bool	look_at_enemy;
 	
-	virtual bool	ability_can_drag	() {return true;}
+	virtual bool	ability_can_drag	() override {return true;}
 
-	virtual	char*	get_monster_class_name () { return (char*) "boar"; }
+	virtual	char*	get_monster_class_name () override { return (char*) "boar"; }
 	
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 

@@ -1,16 +1,15 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateMonsterEating : public CState<_Object> {
+class CStateMonsterEating : public CState {
 protected:
-	typedef CState<_Object>		inherited;
+	typedef CState		inherited;
 
 	CEntityAlive	*corpse;
 	u32				time_last_eat;
 
 public:
-						CStateMonsterEating		(_Object *obj);
+						CStateMonsterEating		(CBaseMonster *obj);
 	virtual				~CStateMonsterEating	();
 
 	virtual void		initialize				();
@@ -20,5 +19,3 @@ public:
 	virtual bool		check_start_conditions	();
 	virtual bool		check_completion		();
 };
-
-#include "monster_state_eat_eat_inline.h"

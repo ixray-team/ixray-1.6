@@ -16,21 +16,23 @@
 
 #include "../../../EntityCondition.h"
 
-CStateManagerFracture::CStateManagerFracture(CFracture *obj) : inherited(obj)
+CFractureBaseStateManager::CFractureBaseStateManager(CFractureBase* object) : inherited(object)
 {
-	add_state(eStateRest,					new CStateMonsterRest<CFracture>				(obj));
-	add_state(eStateAttack,					new CStateMonsterAttack<CFracture>				(obj));
-	add_state(eStateEat,					new CStateMonsterEat<CFracture> 				(obj));
-	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CFracture> 	(obj));
-	add_state(eStatePanic,					new CStateMonsterPanic<CFracture> 				(obj));
-	add_state(eStateHitted,					new CStateMonsterHitted<CFracture> 				(obj));
+    add_state(eStateRest, new CStateMonsterRest(object));
+    add_state(eStateAttack, new CStateMonsterAttack(object));
+    add_state(eStateEat, new CStateMonsterEat(object));
+    add_state(eStateHearDangerousSound, new CStateMonsterHearDangerousSound(object));
+    add_state(eStatePanic, new CStateMonsterPanic(object));
+    add_state(eStateHitted, new CStateMonsterHitted(object));
 }
 
-CStateManagerFracture::~CStateManagerFracture()
+
+CFractureBaseStateManager::~CFractureBaseStateManager()
 {
+
 }
 
-void CStateManagerFracture::execute()
+void CFractureBaseStateManager::execute()
 {
 	u32 state_id = u32(-1);
 	const CEntityAlive* enemy	= object->EnemyMan.get_enemy();

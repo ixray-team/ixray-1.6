@@ -14,7 +14,21 @@
 #include "../../../ActorCondition.h"
 #include "../../../HUDManager.h"
 
+CControllerPsyHit::CControllerPsyHit()
+{
+	m_sound_state = {};
+	m_min_tube_dist = {};
+	m_blocked = {};
+	m_time_last_tube = {};
+	m_current_index = {};;
+	m_effector_cam = {};;
+	m_effector_pp = {};;
+}
 
+CControllerPsyHit::~CControllerPsyHit()
+{
+
+}
 
 void CControllerPsyHit::load(LPCSTR section)
 {
@@ -36,11 +50,10 @@ void CControllerPsyHit::reinit()
 	m_sound_state		= eNone;
 }
 
-
 bool CControllerPsyHit::tube_ready () const
 {
 	u32 tube_condition_min_delay	=	5000;
-	if ( CController* controller = smart_cast<CController*>(m_object) )
+	if ( CControllerBase* controller = smart_cast<CControllerBase*>(m_object) )
 		tube_condition_min_delay	=	controller->m_tube_condition_min_delay;
 
 	return m_time_last_tube + tube_condition_min_delay < time();
@@ -134,7 +147,7 @@ void CControllerPsyHit::activate()
 	m_blocked						= false;
 
 	if (!IsGameTypeSingle()) {
-		NET_Packet	tmp_packet;
+		NET_Packet	tmp_packet{};
 		CGameObject::u_EventGen(tmp_packet, GE_CONTROLLER_PSY_FIRE, m_object->ID());
 		tmp_packet.w_u16(pActor->ID());
 		tmp_packet.w_u8(0);
@@ -151,7 +164,7 @@ void CControllerPsyHit::deactivate()
 	m_man->unsubscribe				(this, ControlCom::eventAnimationEnd);
 
 	if (m_blocked) {
-		NET_Packet			P;
+		NET_Packet			P{};
 
 		if (IsGameTypeSingle()) {
 			pActor->u_EventGen(P, GEG_PLAYER_WEAPON_HIDE_STATE, pActor->ID());
@@ -216,11 +229,11 @@ bool check_actor_visibility (const Fvector trace_from,
 {
 	CActor* pActor = Actor();
 	const float dist = trace_from.distance_to(trace_to);
-	Fvector trace_dir;
+	Fvector trace_dir{};
 	trace_dir.sub(trace_to, trace_from);
 
 
-	collide::rq_result l_rq;
+	collide::rq_result l_rq{};
 	l_rq.O = nullptr;
 	Level().ObjectSpace.RayPick(trace_from,
 								trace_dir, 
@@ -235,16 +248,6 @@ bool check_actor_visibility (const Fvector trace_from,
 } // namespace detail
 
 extern CActor* g_actor;
-
-
-/*
-bool CControllerPsyHit::see_enemy ()
-{
-	CActor* pActor = smart_cast<CActor*>(Level().CurrentControlEntity());
-	return	m_object->EnemyMan.see_enemy_now(pActor);
-}
-
-*/
 
 bool CControllerPsyHit::see_enemy(CActor* pA)
 {
@@ -316,7 +319,7 @@ void CControllerPsyHit::death_glide_start()
 
 		HUD().SetRenderable(false);
 
-	if ( CController* controller = smart_cast<CController*>(m_object) )
+	if ( CControllerBase* controller = smart_cast<CControllerBase*>(m_object) )
 		{
 			controller->CControlledActor::install	();
 			controller->CControlledActor::dont_need_turn();
@@ -330,7 +333,7 @@ void CControllerPsyHit::death_glide_start()
 	Fvector target_pos	= m_object->Position();
 	target_pos.y		+= 1.2f;
 
-		Fvector				dir;
+		Fvector				dir{};
 	dir.sub				(target_pos,src_pos);
 
 	float dist			= dir.magnitude();
@@ -349,11 +352,11 @@ void CControllerPsyHit::death_glide_start()
 			m_man->animation().motion_time(m_stage[1], m_object->Visual()),
 			base_fov, dest_fov));
 
-	smart_cast<CController *>(m_object)->draw_fire_particles();
+	smart_cast<CControllerBase *>(m_object)->draw_fire_particles();
 
 	dir.sub(src_pos,target_pos);
 		dir.normalize();
-	float h,p;
+		float h{}, p{};
 	dir.getHP(h,p);
 	dir.setHP(h,p+PI_DIV_3);
 		pActor->character_physics_support()->movement()->ApplyImpulse(dir, pActor->GetMass() * 530.f);
@@ -362,7 +365,7 @@ void CControllerPsyHit::death_glide_start()
 
 	}
 	else {
-		NET_Packet	tmp_packet;
+		NET_Packet	tmp_packet{};
 		CGameObject::u_EventGen(tmp_packet, GE_CONTROLLER_PSY_FIRE, m_object->ID());
 		tmp_packet.w_u16(pActor->ID());
 		tmp_packet.w_u8(1);
@@ -371,14 +374,14 @@ void CControllerPsyHit::death_glide_start()
 
 	if (IsGameTypeSingle())
 	{
-		NET_Packet			P;
+		NET_Packet			P{};
 	pActor->u_EventGen	(P, GEG_PLAYER_WEAPON_HIDE_STATE, pActor->ID());
 	P.w_u16				(INV_STATE_BLOCK_ALL);
 	P.w_u8				(u8(true));
 		pActor->u_EventSend(P);
 	}
 	else {
-		NET_Packet			P;
+		NET_Packet			P{};
 		pActor->u_EventGen(P, GEG_PLAYER_WEAPON_HIDE_STATE, pActor->ID());
 		P.w_u16(INV_STATE_BLOCK_ALL);
 		P.w_u8(u8(true));
@@ -404,7 +407,7 @@ void CControllerPsyHit::death_glide_end()
 {
 	CActor* pActor = Actor();
 	if (IsGameTypeSingle()) {
-	CController *monster = smart_cast<CController *>(m_object);
+	CControllerBase *monster = smart_cast<CControllerBase *>(m_object);
 	monster->draw_fire_particles();
 
 	monster->m_sound_tube_hit_left.play_at_pos(pActor, Fvector().set(-1.f, 0.f, 1.f), sm_2D);
@@ -414,7 +417,7 @@ void CControllerPsyHit::death_glide_end()
 	}	
 	else
 	{
-		CController* monster = smart_cast<CController*>(m_object);
+		CControllerBase* monster = smart_cast<CControllerBase*>(m_object);
 		CActor* pActor = smart_cast<CActor*>(Level().Objects.net_Find(m_curent_actor_id));
 		if (pActor)
 		{
@@ -428,12 +431,13 @@ void CControllerPsyHit::death_glide_end()
 
 void CControllerPsyHit::update_frame()
 {
+	
 }
 
 void CControllerPsyHit::set_sound_state(ESoundState state)
 {
 	CActor* pActor = Actor();
-	CController *monster = smart_cast<CController *>(m_object);
+	CControllerBase *monster = smart_cast<CControllerBase *>(m_object);
 	if (state == ePrepare) {
 		monster->m_sound_tube_prepare.play_at_pos(pActor, Fvector().set(0.f, 0.f, 0.f), sm_2D);
 	} else 
@@ -463,7 +467,7 @@ void CControllerPsyHit::hit()
 		CActor* pActor = smart_cast<CActor*>(Level().Objects.net_Find(m_curent_actor_id));
 		if (pActor)
 		{
-			NET_Packet	tmp_packet;
+			NET_Packet	tmp_packet{};
 			CGameObject::u_EventGen(tmp_packet, GE_CONTROLLER_PSY_FIRE, m_object->ID());
 			tmp_packet.w_u16(pActor->ID());
 			tmp_packet.w_u8(3);
@@ -481,7 +485,7 @@ void CControllerPsyHit::stop ()
 	{
 	HUD().SetRenderable(true);
 
-	if ( CController* controller = smart_cast<CController*>(m_object) )
+	if ( CControllerBase* controller = smart_cast<CControllerBase*>(m_object) )
 		if ( controller->CControlledActor::is_controlling() )
 			controller->CControlledActor::release();
 
@@ -495,7 +499,7 @@ void CControllerPsyHit::stop ()
 		CActor* pActor = smart_cast<CActor*>(Level().Objects.net_Find(m_curent_actor_id));
 		if (pActor)
 		{
-			NET_Packet	tmp_packet;
+			NET_Packet	tmp_packet{};
 			CGameObject::u_EventGen(tmp_packet, GE_CONTROLLER_PSY_FIRE, m_object->ID());
 			tmp_packet.w_u16(pActor->ID());
 			tmp_packet.w_u8(2);

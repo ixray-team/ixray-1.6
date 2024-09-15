@@ -1,17 +1,19 @@
 #pragma once
 #include "../monster_state_manager.h"
 
-class CSnork;
+class CSnorkBase;
 
-class CStateManagerSnork : public CMonsterStateManager<CSnork> 
+class CSnorkBaseStateManager : public CMonsterStateManager 
 {
-private:
-	typedef				CMonsterStateManager<CSnork>	inherited;
+protected:
+	using				inherited = CMonsterStateManager;
+
+	CSnorkBase* pSnorkBase;
 
 public:
-						CStateManagerSnork		(CSnork *obj);
-	virtual				~CStateManagerSnork		();
+	CSnorkBaseStateManager(CBaseMonster* object);
+	virtual				~CSnorkBaseStateManager() override;
 
-	virtual	void		execute					();
-	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
+	virtual	void		execute					() override;
+	virtual void		remove_links			(CObject* object) override { inherited::remove_links(object); }
 };

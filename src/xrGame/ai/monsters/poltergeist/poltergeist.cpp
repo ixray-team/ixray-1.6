@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "poltergeist.h"
+#include "poltergeist_special_ability.h"
+#include "poltergeist_flame.h"
+#include "poltergeist_tele.h"
 #include "poltergeist_state_manager.h"
 #include "../../../CharacterPhysicsSupport.h"
 #include "../../../PHMovementControl.h"
@@ -22,27 +25,62 @@
 
 void SetActorVisibility(u16 who, float value);
 
-CPoltergeist::CPoltergeist()
+CPoltergeistBase::CPoltergeistBase()
 {
-	StateMan					= new CStateManagerPoltergeist(this);
+	pStateManagerBase = new CPoltergeistBaseStateManager(this);
 	
 	invisible_vel.set			(0.1f, 0.1f);
 	
 	m_flame						= 0;
 	m_tele						= 0;
 	m_actor_ignore				= false;
+
+	m_height = {};
+	m_disable_hide = {};
+
+	invisible_vel = {};
+
+	m_last_detection_time = {};
+	m_last_actor_pos = {};
+	m_detection_pp_effector_name = {};
+	m_detection_pp_type_index = {};
+	m_detection_near_range_factor = {};
+	m_detection_far_range_factor = {};
+	m_detection_far_range = {};
+	m_detection_speed_factor = {};
+	m_detection_loose_speed = {};
+	m_current_detection_level = {};
+	m_detection_success_level = {};
+	m_detection_max_level = {};
+
+	m_detect_without_sight = {};
+
+	m_height_change_velocity = {};
+	m_height_change_min_time = {};
+	m_height_change_max_time = {};
+	m_height_min = {};
+	m_height_max = {};
+
+	m_fly_around_level = {};
+	m_fly_around_distance = {};
+	m_fly_around_change_direction_time = {};
+
+	m_current_position = {};
+
+	time_height_updated = {};
+	target_height = {};
 }
 
-CPoltergeist::~CPoltergeist()
+CPoltergeistBase::~CPoltergeistBase()
 {
 	remove_pp_effector	();
 
-	xr_delete		(StateMan);
+	xr_delete		(pStateManagerBase);
 	xr_delete		(m_flame);
 	xr_delete		(m_tele);
 }
 
-void CPoltergeist::Load(LPCSTR section)
+void CPoltergeistBase::Load(LPCSTR section)
 {
 	inherited::Load	(section);
 
@@ -139,21 +177,21 @@ void CPoltergeist::Load(LPCSTR section)
 	PostLoad					(section);	
 }
 
-float   CPoltergeist::get_post_process_factor () const
+float   CPoltergeistBase::get_post_process_factor () const
 {
 	float 	factor						=	m_current_detection_level / m_detection_success_level;
 	clamp									(factor, 0.f, 1.f);
 	return									factor;
 }
 
-bool   CPoltergeist::check_work_condition () const
+bool   CPoltergeistBase::check_work_condition () const
 {
 	return									g_Alive() && 
 											Actor()				&&
 											Actor()->g_Alive();
 }
 
-void   CPoltergeist::remove_pp_effector ()
+void   CPoltergeistBase::remove_pp_effector ()
 {
 	if ( m_detection_pp_type_index != 0 && Actor() )
 	{
@@ -162,7 +200,7 @@ void   CPoltergeist::remove_pp_effector ()
 	}
 }
 
-void   CPoltergeist::update_detection ()
+void   CPoltergeistBase::update_detection ()
 {
 	if ( !check_work_condition() ) 
 	{
@@ -217,7 +255,7 @@ void   CPoltergeist::update_detection ()
 					++m_detection_pp_type_index ) { ; }
 	
 			AddEffector						(Actor(), m_detection_pp_type_index, m_detection_pp_effector_name, 
-											xr_make_delegate(this, &CPoltergeist::get_post_process_factor));
+											xr_make_delegate(this, &CPoltergeistBase::get_post_process_factor));
 		}
 	}
 	else if ( m_detection_pp_type_index != 0 )
@@ -227,18 +265,18 @@ void   CPoltergeist::update_detection ()
 	}
 }
 
-bool CPoltergeist::detected_enemy ()
+bool CPoltergeistBase::detected_enemy ()
 {
 	return		get_current_detection_level() > m_fly_around_level;
 }
 
-void CPoltergeist::reload(LPCSTR section)
+void CPoltergeistBase::reload(LPCSTR section)
 {
 	inherited::reload(section);
 	Energy::reload(section,"Invisible_");
 }
 
-void CPoltergeist::reinit()
+void CPoltergeistBase::reinit()
 {
 	inherited::reinit();
 	Energy::reinit();
@@ -266,7 +304,7 @@ void CPoltergeist::reinit()
 	DisableHide								();
 }
 
-void CPoltergeist::Hide()
+void CPoltergeistBase::Hide()
 {
 	if (state_invisible) return;
 	
@@ -279,7 +317,7 @@ void CPoltergeist::Hide()
 	ability()->on_hide	();
 }
 
-void CPoltergeist::Show()
+void CPoltergeistBase::Show()
 {
 	if (!state_invisible) return;
 
@@ -296,13 +334,13 @@ void CPoltergeist::Show()
 	ability()->on_show	();
 }
 
-void CPoltergeist::renderable_Render()
+void CPoltergeistBase::renderable_Render()
 {
 	Visual()->getVisData().hom_frame = Device.dwFrame;
 	inherited::renderable_Render();
 }
 
-void CPoltergeist::UpdateCL()
+void CPoltergeistBase::UpdateCL()
 {
 	update_detection();
 	inherited::UpdateCL();
@@ -320,14 +358,13 @@ void CPoltergeist::UpdateCL()
 	//	Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 
-void CPoltergeist::ForceFinalAnimation()
+void CPoltergeistBase::ForceFinalAnimation()
 {
 	if (state_invisible) 
 		anim().SetCurAnim(eAnimMiscAction_01);
 }
 
-
-void CPoltergeist::shedule_Update(u32 dt)
+void CPoltergeistBase::shedule_Update(u32 dt)
 {
 	if ( !check_work_condition() ) 
 	{
@@ -343,8 +380,7 @@ void CPoltergeist::shedule_Update(u32 dt)
 	ability()->update_schedule();
 }
 
-
-BOOL CPoltergeist::net_Spawn (CSE_Abstract* DC) 
+BOOL CPoltergeistBase::net_Spawn (CSE_Abstract* DC) 
 {
 	if (!inherited::net_Spawn(DC)) 
 		return(FALSE);
@@ -358,7 +394,7 @@ BOOL CPoltergeist::net_Spawn (CSE_Abstract* DC)
 	return			(TRUE);
 }
 
-void CPoltergeist::net_Destroy()
+void CPoltergeistBase::net_Destroy()
 {
 	inherited::net_Destroy();
 	Energy::disable();
@@ -366,29 +402,15 @@ void CPoltergeist::net_Destroy()
 	ability()->on_destroy();
 }
 
-void CPoltergeist::Die(CObject* who)
+void CPoltergeistBase::Die(CObject* who)
 {
-// 	if (m_tele) {
-// 		if (state_invisible) {
-// 			setVisible(true);
-// 
-// 			if (PPhysicsShell()) {
-// 				Fmatrix M;
-// 				M.set							(XFORM());
-// 				M.translate_over				(m_current_position);
-// 				PPhysicsShell()->SetTransform	(M);
-// 			} else 
-// 				Position() = m_current_position;
-// 		}
-// 	}
-
 	inherited::Die				(who);
 	Energy::disable				();
 
 	ability()->on_die			();
 }
 
-void CPoltergeist::Hit(SHit* pHDS)
+void CPoltergeistBase::Hit(SHit* pHDS)
 {
 	ability()->on_hit(pHDS);
 	
@@ -400,7 +422,7 @@ void CPoltergeist::Hit(SHit* pHDS)
 	inherited::Hit(pHDS);
 }
 
-void CPoltergeist::UpdateHeight()
+void CPoltergeistBase::UpdateHeight()
 {
 	if (!state_invisible) return;
 	
@@ -412,7 +434,7 @@ void CPoltergeist::UpdateHeight()
 	}
 }
 
-void CPoltergeist::on_activate()
+void CPoltergeistBase::on_activate()
 {
 	if (m_disable_hide) return;
 
@@ -422,14 +444,14 @@ void CPoltergeist::on_activate()
 	time_height_updated = 0;
 }
 
-void CPoltergeist::on_deactivate()
+void CPoltergeistBase::on_deactivate()
 {
 	if (m_disable_hide) return;
 
 	Show();
 }
 
-CMovementManager *CPoltergeist::create_movement_manager	()
+CMovementManager *CPoltergeistBase::create_movement_manager	()
 {
 	m_movement_manager				= new CPoltergeisMovementManager(this);
 
@@ -440,45 +462,44 @@ CMovementManager *CPoltergeist::create_movement_manager	()
 	return							(m_movement_manager);
 }
 
-
-void CPoltergeist::net_Relcase(CObject *O)
+void CPoltergeistBase::net_Relcase(CObject *O)
 {
 	inherited::net_Relcase		(O);
 	CTelekinesis::remove_links	(O);
 }
 
-float	CPoltergeist::get_detection_near_range_factor ()
+float	CPoltergeistBase::get_detection_near_range_factor ()
 {
 	return override_if_debug("detection_near_range_factor", m_detection_near_range_factor);
 }
 
-float	CPoltergeist::get_detection_far_range_factor	() 
+float	CPoltergeistBase::get_detection_far_range_factor	() 
 {
 	return override_if_debug("detection_far_range_factor", m_detection_far_range_factor);
 }
 
-float	CPoltergeist::get_detection_speed_factor	() 
+float	CPoltergeistBase::get_detection_speed_factor	() 
 {
 	return override_if_debug("detection_speed_factor", m_detection_speed_factor);
 }
 
-float	CPoltergeist::get_detection_loose_speed () 
+float	CPoltergeistBase::get_detection_loose_speed () 
 {
 	return override_if_debug("detection_loose_speed", m_detection_loose_speed);
 }
 
-float	CPoltergeist::get_detection_far_range() 
+float	CPoltergeistBase::get_detection_far_range() 
 {
 	return override_if_debug("detection_far_range", m_detection_far_range);
 }
 
-float	CPoltergeist::get_detection_success_level () 
+float	CPoltergeistBase::get_detection_success_level () 
 {
 	return override_if_debug("detection_success_level", m_detection_success_level);
 }
 
 #ifdef DEBUG
-CBaseMonster::SDebugInfo CPoltergeist::show_debug_info()
+CBaseMonster::SDebugInfo CPoltergeistBase::show_debug_info()
 {
 	CBaseMonster::SDebugInfo info = inherited::show_debug_info();
 	if (!info.active) return CBaseMonster::SDebugInfo();

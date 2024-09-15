@@ -18,29 +18,37 @@
 #include "../states/monster_state_help_sound.h"
 #include "../group_states/group_state_home_point_attack.h"
 
-CStateManagerFlesh::CStateManagerFlesh(CAI_Flesh* monster) : inherited(monster)
+#include "../states/monster_state_home_point_attack.h"
+
+CFleshBaseStateManager::CFleshBaseStateManager(CFleshBase* object) : inherited(object)
 {
-	add_state(eStateRest, new CStateMonsterRest<CAI_Flesh>(monster));
-	add_state(eStatePanic, new CStateMonsterPanic<CAI_Flesh>(monster));
+	pFleshBase = smart_cast<CFleshBase*>(object);
 
-	CStateMonsterAttackMoveToHomePoint<CAI_Flesh>* move2home =
-		new CStateMonsterAttackMoveToHomePoint<CAI_Flesh>(monster);
+    add_state(eStateRest, new CStateMonsterRest(object));
+    add_state(eStatePanic, new CStateMonsterPanic(object));
 
-	add_state(eStateAttack, new CStateMonsterAttack<CAI_Flesh>(monster, move2home));
+    CStateMonsterAttackMoveToHomePoint* move2home =
+        new CStateMonsterAttackMoveToHomePoint(object);
 
-	add_state(eStateEat, new CStateMonsterEat<CAI_Flesh>(monster));
-	add_state(eStateHearInterestingSound, new CStateMonsterHearInterestingSound<CAI_Flesh>(monster));
-	add_state(eStateHearDangerousSound, new CStateMonsterHearDangerousSound<CAI_Flesh>(monster));
-	add_state(eStateHitted, new CStateMonsterHitted<CAI_Flesh>(monster));
-	add_state(eStateControlled, new CStateMonsterControlled<CAI_Flesh>(monster));
-	add_state(eStateHearHelpSound, new CStateMonsterHearHelpSound<CAI_Flesh>(monster));
+    add_state(eStateAttack, new CStateMonsterAttack(object, move2home));
+
+    add_state(eStateEat, new CStateMonsterEat(object));
+    add_state(eStateHearInterestingSound, new CStateMonsterHearInterestingSound(object));
+    add_state(eStateHearDangerousSound, new CStateMonsterHearDangerousSound(object));
+    add_state(eStateHitted, new CStateMonsterHitted(object));
+    add_state(eStateControlled, new CStateMonsterControlled(object));
+    add_state(eStateHearHelpSound, new CStateMonsterHearHelpSound(object));
 }
 
-void CStateManagerFlesh::execute()
+CFleshBaseStateManager::~CFleshBaseStateManager()
+{
+}
+
+void CFleshBaseStateManager::execute()
 {
 	u32 state_id = u32(-1);
 
-	if (!object->is_under_control()) {
+	if (!pFleshBase->is_under_control()) {
 		
 		const CEntityAlive* enemy	= object->EnemyMan.get_enemy();
 

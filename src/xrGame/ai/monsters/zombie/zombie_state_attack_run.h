@@ -2,27 +2,25 @@
 
 #include "../state.h"
 
-template<typename _Object>
-class CStateZombieAttackRun : public CState<_Object> {
-	typedef CState<_Object> inherited;
+class CStateZombieAttackRun : public CState 
+{
+protected:
+	using inherited = CState;
 
 	TTime				m_time_action_change;
 	EAction				action;
 
 public:
-						CStateZombieAttackRun	(_Object *obj);
-	virtual				~CStateZombieAttackRun	();
+						CStateZombieAttackRun	(CBaseMonster* object);
+	virtual				~CStateZombieAttackRun	() override;
 
-	virtual void		initialize				();
-	virtual	void		execute					();
+	virtual void		initialize				() override;
+	virtual	void		execute					() override;
 
-	virtual bool 		check_completion		();
-	virtual bool 		check_start_conditions	();
-	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
+	virtual bool 		check_completion		() override;
+	virtual bool 		check_start_conditions	() override;
+	virtual void		remove_links			(CObject* object) override { inherited::remove_links(object);}
 
 private:
 			void		choose_action			();
-
 };
-
-#include "zombie_state_attack_run_inline.h"

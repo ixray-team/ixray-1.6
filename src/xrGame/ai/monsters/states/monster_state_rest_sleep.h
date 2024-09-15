@@ -3,11 +3,10 @@
 #include "../state.h"
 #include "../../../ai_debug.h"
 
-template<typename _Object>
-class CStateMonsterRestSleep : public CState<_Object> {
-	typedef CState<_Object> inherited;
+class CStateMonsterRestSleep : public CState {
+	typedef CState inherited;
 public:
-						CStateMonsterRestSleep	(_Object *obj);
+						CStateMonsterRestSleep	(CBaseMonster *obj);
 	virtual				~CStateMonsterRestSleep	();
 
 	virtual	void		initialize				();
@@ -16,5 +15,3 @@ public:
 	virtual	void		critical_finalize		();
 	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
 };
-
-#include "monster_state_rest_sleep_inline.h"
