@@ -4,7 +4,7 @@
 #include "FS_internal.h"
 #include "lzhuf.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 XRCORE_API size_t g_file_mapped_memory = 0;
 size_t g_file_mapped_count = 0;
 
@@ -39,23 +39,6 @@ void unregister_file_mapping(void* address, const size_t& size)
 	--g_file_mapped_count;
 
 	g_file_mappings.erase(I);
-}
-
-XRCORE_API void dump_file_mappings	()
-{
-#if 0
-	Msg								("* active file mappings (%d):",g_file_mappings.size());
-
-	FILE_MAPPINGS::const_iterator	I = g_file_mappings.begin();
-	FILE_MAPPINGS::const_iterator	E = g_file_mappings.end();
-	for ( ; I != E; ++I)
-		Msg							(
-			"* [0x%08x][%d][%s]",
-			(*I).first,
-			(*I).second.first,
-			(*I).second.second.c_str()
-		);
-#endif
 }
 #endif // DEBUG
 //////////////////////////////////////////////////////////////////////
@@ -417,7 +400,7 @@ CTempReader::~CTempReader()
 // pack stream
 CPackReader::~CPackReader()
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	unregister_file_mapping	(base_address,Size);
 #endif // DEBUG
 
@@ -457,14 +440,14 @@ CVirtualFileRW::CVirtualFileRW(const char *cFileName)
 	data = (char*)Platform::MapFile(hSrcMap, Size);
 	R_ASSERT3(data, cFileName, Debug.error2string(GetLastError()));
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	register_file_mapping	(data,Size,cFileName);
 #endif // DEBUG
 }
 
 CVirtualFileRW::~CVirtualFileRW() 
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	unregister_file_mapping	(data,Size);
 #endif // DEBUG
 
@@ -494,7 +477,7 @@ CVirtualFileReader::CVirtualFileReader(const char *cFileName)
     data = (char*)Platform::MapFile(hSrcMap, Size, true);
     R_ASSERT3(data, cFileName, Debug.error2string(GetLastError()));
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	register_file_mapping	(data,Size,cFileName);
 #endif // DEBUG
 }
@@ -504,7 +487,7 @@ CVirtualFileReader::~CVirtualFileReader()
 	if (Size == 0) {
 		return;
 	}
-#ifdef DEBUG
+#ifdef _DEBUG
 	unregister_file_mapping	(data,Size);
 #endif // DEBUG
 
