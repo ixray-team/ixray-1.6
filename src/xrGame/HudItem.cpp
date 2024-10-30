@@ -716,7 +716,7 @@ bool CHudItem::HudAnimationExist(LPCSTR anim_name)
 	{
 		string256 anim_name_r;
 		bool is_16x9 = UI().is_widescreen();
-		u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
+		u16 attach_place_idx = READ_IF_EXISTS(pSettings, r_u16, HudItemData()->m_sect_name, "attach_place_idx", 0);
 		xr_sprintf(anim_name_r, "%s%s", anim_name, ((attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
 		player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
 		if (anm)
