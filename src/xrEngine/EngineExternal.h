@@ -24,7 +24,8 @@ enum class EEngineExternalGame
 	EnableWeaponInertion,
 	EnableWeaponCollision,
 	EnableArtefactDegradation,
-	DisableSprintWhileOverweight
+	DisableSprintWhileOverweight,
+	Enable3DPDA
 };
 
 enum class EEngineExternalRender {
