@@ -46,7 +46,9 @@ float4 main(vf I, float4 pos2d : SV_POSITION) : SV_Target
 	float3 envd1 = env_s1.SampleLevel(smp_rtlinear, Nw, 0).xyz;
 	
 	float3 envd = lerp(envd0, envd1, L_ambient.w) * L_hemi_color.xyz;
-	float3 color = I.c0.xyz + envd * envd * I.c0.w;
+
+
+	float3 color = I.c0.xyz + pow(envd, 2.2) * I.c0.w  * 3.0f;
 	base.xyz *= color;
 			
 	float3 v2point = normalize(I.v2point);
@@ -73,6 +75,7 @@ float4 main(vf I, float4 pos2d : SV_POSITION) : SV_Target
 	float3 env1 = s_env1.SampleLevel(smp_rtlinear, vreflect, 0).xyz;
 	
 	float3 env = lerp(env0, env1, L_ambient.w) * L_sky_color.xyz;
+	env = pow(env, 2.2f) * 3.0f;
 
 #ifdef USE_SSLR_ON_WATER
 	env = lerp(env, sslr.xyz, sslr.w);

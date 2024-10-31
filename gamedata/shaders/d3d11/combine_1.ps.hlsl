@@ -27,7 +27,7 @@ float4 main(_input I) : SV_Target
     float3 Color = Ambient + Light;
 
     float Fog = saturate(O.ViewDist * fog_params.w + fog_params.x);
-    Color = lerp(Color, fog_color.xyz, Fog);
+    Color = lerp(Color, pow(fog_color.rgb, 2.2f), saturate(Fog * Fog));
 
     return float4(Color, Fog * Fog);
 }

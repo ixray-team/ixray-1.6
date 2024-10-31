@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "../xrRender/ResourceManager.h"
 #include "blender_light_occq.h"
@@ -15,6 +15,9 @@
 #include "blender_scale.h"
 #include "blender_cas.h"
 #include "blender_gtao.h"
+#include "blender_bloom_downsample.h"
+#include "blender_bloom_upsample.h"
+#include "blender_new_adaptation.h"
 #include "../xrRenderDX10/DX10 Rain/dx10RainBlender.h"
 #include "../xrRender/blender_fxaa.h"
 #include "../xrRender/blender_smaa.h"
@@ -604,6 +607,7 @@ CRenderTarget::CRenderTarget()
 		s_accum_reflected.create(b_accum_reflected, "r2\\accum_refl");
 	}
 
+
 	// BLOOM
 	{
 		DxgiFormat	fmt = DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM;			//;		// D3DFMT_X8R8G8B8
@@ -641,6 +645,55 @@ CRenderTarget::CRenderTarget()
 
 		u_setrt(Device.TargetWidth, Device.TargetHeight, RTarget, nullptr, nullptr, nullptr);
 	}
+
+
+	// New BLOOM and LUM
+	{
+		DxgiFormat	fmt = DxgiFormat::DXGI_FORMAT_R11G11B10_FLOAT;
+		u32 BW_A = Device.TargetWidth / 2,  BH_A = Device.TargetHeight / 2;
+		u32 BW_B = BW_A / 2,	BH_B = BH_A / 2;
+		u32 BW_C = BW_A / 4,	BH_C = BH_A / 4;
+		u32 BW_D = BW_A / 8,	BH_D = BH_A / 8;
+		u32 BW_E = BW_A / 16,	BH_E = BH_A / 16;
+		u32 BW_F = BW_A / 32,	BH_F = BH_A / 32;
+		b_bloom_downsample = new CBlender_bloom_downsample();
+		b_bloom_upsample = new CBlender_bloom_upsample();
+		//b_gtao = new CBlender_gtao();
+		s_bloom_downsample.create(b_bloom_downsample);
+		s_bloom_upsample.create(b_bloom_upsample);
+
+		rt_Bloom_A.create(	"$user$bloomA",		BW_A, BH_A, fmt);
+		rt_Bloom_A2.create(	"$user$bloomA2",	BW_A, BH_A, fmt);
+		rt_Bloom_B.create(	"$user$bloomB",		BW_B, BH_B, fmt);
+		rt_Bloom_B2.create(	"$user$bloomB2",	BW_B, BH_B, fmt);
+		rt_Bloom_C.create(	"$user$bloomC",		BW_C, BH_C, fmt);
+		rt_Bloom_C2.create(	"$user$bloomC2",	BW_C, BH_C, fmt);
+		rt_Bloom_D.create(	"$user$bloomD",		BW_D, BH_D, fmt);
+		rt_Bloom_D2.create(	"$user$bloomD2",	BW_D, BH_D, fmt);
+		rt_Bloom_E.create(	"$user$bloomE",		BW_E, BH_E, fmt);
+		rt_Bloom_E2.create(	"$user$bloomE2",	BW_E, BH_E, fmt);
+		rt_Bloom_F.create(	"$user$bloomF",		BW_F, BH_F, fmt);
+
+		fmt = DxgiFormat::DXGI_FORMAT_R32_FLOAT;
+		u32 LW_A = 1024, LH_A = 1024;
+		u32 LW_B = LW_A / 8, LH_B = LH_A / 8;	// 128x128
+		u32 LW_C = LW_B / 8, LH_C = LH_B / 8;	// 16x16
+		u32 LW_D = 1, LH_D = 1;					// 1x1
+
+		b_new_adaptation = new CBlender_new_adaptation();
+		s_lum_copy.create(b_new_adaptation);
+
+		rt_LUM_A.create("$user$lum_A", LW_A, LH_A, fmt);
+		rt_LUM_B.create("$user$lum_B", LW_B, LH_B, fmt);
+		rt_LUM_C.create("$user$lum_C", LW_C, LH_C, fmt);
+		rt_LUM_D.create("$user$lum_D", LW_D, LH_D, fmt);
+		rt_LUM_Prev.create("$user$lum_Prev", LW_D, LH_D, fmt);
+
+		FLOAT ColorRGBA[4] = {127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f, 127.0f / 255.0f}; // хуйня - исправить, нужен 1мерный вектор, а не 4
+		RContext->ClearRenderTargetView(rt_LUM_D->pRT, ColorRGBA);
+		RContext->ClearRenderTargetView(rt_LUM_Prev->pRT, ColorRGBA);
+	}
+
 
 	// HBAO
 	{
@@ -903,7 +956,9 @@ CRenderTarget::~CRenderTarget	()
 	xr_delete(b_occq);
 	xr_delete(b_cas);
 	xr_delete(b_gtao);
-
+	xr_delete(b_bloom_downsample);
+	xr_delete(b_bloom_upsample);
+	xr_delete(b_new_adaptation);
 	g_Fsr2Wrapper.Destroy();
 	g_DLSSWrapper.Destroy();
 
