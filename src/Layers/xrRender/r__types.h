@@ -1,18 +1,13 @@
 #pragma once
 
+
 // r3xx code-path (MRT)
-#if USE_DX11
 #define		r2_RT_P				"$user$position"		      // MRT
 #define		r2_RT_N				"$user$normal"			      // MRT
 #define		r2_RT_S				"$user$surface"			      // MRT
 #define		r2_RT_albedo		"$user$albedo"			      // MRT
 #define		r2_RT_velocity		"$user$velocity"			  // MRT
-#else
-#define		r2_RT_depth			"$user$depth"			// MRT
-#define		r2_RT_P				"$user$position"		// MRT
-#define		r2_RT_N				"$user$normal"			// MRT
-#define		r2_RT_albedo		"$user$albedo"			// MRT
-#endif //USE_DX11
+
 // other
 #define		r2_RT_accum			"$user$accum"			// ---	16 bit fp or 16 bit fx
 #define		r2_RT_accum_temp	"$user$accum_temp"		// ---	16 bit fp - only for HW which doesn't feature fp16 blend
@@ -23,18 +18,17 @@
 #define		r2_T_sky0			"$user$sky0" 
 #define		r2_T_sky1			"$user$sky1" 
 
+#define		r2_RT_ssao_temp		"$user$ssao_temp"		//temporary rt for ssao calculation
+#define		r2_RT_half_depth	"$user$half_depth"		//temporary rt for ssao calculation
+
 #define		r2_RT_generic0		"$user$generic0"		// ---
 #define		r2_RT_generic1		"$user$generic1"		// ---
 #define		r2_RT_generic2		"$user$generic2"		// ---	//	Igor: for volumetric lights
 
-#define		r2_RT_ssao_temp		"$user$ssao_temp"		//temporary rt for ssao calculation
-#define		r2_RT_half_depth	"$user$half_depth"		//temporary rt for hbao calculation
-
-#if USE_DX11
 #define		r2_RT_generic		"$user$generic"		// ---
+
 #define		r2_RT_backbuffer_final "$user$backbuffer"
 #define		r2_RT_backbuffer_AA "$user$backbuffer_aa"
-#endif //USE_DX11
 
 #define		r2_RT_bloom1		"$user$bloom1"			// ---
 #define		r2_RT_bloom2		"$user$bloom2"			// ---
@@ -68,13 +62,9 @@ const		u32					SMAP_adapt_max		= 1536	;
 
 const		u32					TEX_material_LdotN	= 128	;	// diffuse,		X, almost linear = small res
 const		u32					TEX_material_LdotH	= 256	;	// specular,	Y
-
-#if USE_DX11
 const		u32					TEX_material_Count	= 4		;	// Number of materials,	Z
-#endif //USE_DX11
-
-const		u32					TEX_jitter = 64;
-const		u32					TEX_jitter_count = 3;	// for HBAO
+const		u32					TEX_jitter			= 64	;
+const		u32					TEX_jitter_count	= 5		;	// for HBAO
 
 const		u32					BLOOM_size_X = 256;
 const		u32					BLOOM_size_Y = 256;
@@ -84,11 +74,10 @@ const		u32					LUMINANCE_size = 16;
 #define		SE_R2_NORMAL_HQ		0	// high quality/detail
 #define		SE_R2_NORMAL_LQ		1	// low quality
 #define		SE_R2_SHADOW		2	// shadow generation
+#define		SE_R2_SHADOW_CSM	3	// shadow generation
 
-#if USE_DX11
 #define		SE_R2_DETAIL_SHADOW_HQ 2	 // shadow generation (Wind)
 #define		SE_R2_DETAIL_SHADOW_LQ 3	 // shadow generation (Stil)
-#endif //USE_DX11
 
 // spot
 #define		SE_L_FILL			0
@@ -110,10 +99,8 @@ const		u32					LUMINANCE_size = 16;
 #define		SE_SUN_MIDDLE		1
 #define		SE_SUN_FAR			2
 
-#if USE_DX11
 //	For rain R3 rendering
 #define		SE_SUN_RAIN_SMAP	3
-#endif //USE_DX11
 
 extern		float	ps_r2_gloss_factor;
 IC	float	u_diffuse2s	(float x, float y, float z)	{ float	v = (x+y+z)/3.f;	return ps_r2_gloss_factor * ((v<1)?powf(v,2.f/3.f):v); }
