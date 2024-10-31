@@ -50,5 +50,7 @@ Texture2D s_bloom; //
 Texture2D s_image; // used in various post-processing
 Texture2D s_velocity; // used in various post-processing
 Texture2D s_tonemap; // actually MidleGray / exp(Lw + eps)
+Texture3D s_tonemap_lut; // lookup table for tonemapper ()
+
 
 #endif //	#ifndef	common_samplers_h_included

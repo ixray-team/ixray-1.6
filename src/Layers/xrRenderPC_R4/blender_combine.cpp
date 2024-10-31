@@ -52,9 +52,11 @@ void	CBlender_combine::Compile(CBlender_Compile& C)
 
 		C.r_dx10Texture		("s_position",		r2_RT_P);
 		C.r_dx10Texture		("s_normal",		r2_RT_N);
-		C.r_dx10Texture		("s_bloom",			r2_RT_bloom1);
+		//C.r_dx10Texture		("s_bloom",			r2_RT_bloom1);
+		C.r_dx10Texture		("n_bloom",			r2_RT_bloomA2);
 		C.r_dx10Texture		("s_image",			r2_RT_generic);
-		C.r_dx10Texture		("s_tonemap",		r2_RT_luminance_cur);
+		C.r_dx10Texture		("s_tonemap",		r2_RT_lumD);
+		C.r_dx10Texture		("s_tonemap_lut",	r2_tonemap_lut);
 
 		C.r_dx10Sampler		("smp_nofilter");
 		C.r_dx10Sampler		("smp_rtlinear");

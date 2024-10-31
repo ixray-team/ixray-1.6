@@ -290,7 +290,19 @@ void	CRenderTarget::phase_combine	()
 	// HDR RT invalidated here
 	// Perform blooming filter and distortion if needed
 	RCache.set_Stencil(FALSE);
-	phase_bloom();
+	//phase_bloom();
+
+	{
+		PIX_EVENT(new_bloom);
+		phase_bloom_downsample();
+		phase_bloom_upsample();
+	}
+
+	{
+		PIX_EVENT(new_adapt);
+		phase_new_luminance();
+	}
+
 
 	u_setrt(rt_Back_Buffer, 0, 0, 0);			// LDR RT
 

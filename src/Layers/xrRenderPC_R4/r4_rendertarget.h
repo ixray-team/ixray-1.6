@@ -45,6 +45,15 @@ public:
 	IBlender*					b_cas;
 	IBlender*					b_gtao;
 
+	//============== new bloom and lum ============
+	IBlender* b_bloom_downsample;
+	IBlender* b_bloom_upsample;
+	IBlender* b_new_adaptation;
+	//=============================================
+
+	//LV mipchain
+	IBlender* b_mipchain;
+
     // compute shader for hdao
     IBlender*                   b_hdao_cs;
 
@@ -74,11 +83,30 @@ public:
 	ref_rt						rt_Generic_1;		// 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
 	//	Igor: for volumetric lights
 	ref_rt						rt_Generic_2;		// 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+	//============= old ================================
 	ref_rt						rt_Bloom_1;			// 32bit, dim/4	(r,g,b,?)
 	ref_rt						rt_Bloom_2;			// 32bit, dim/4	(r,g,b,?)
 	ref_rt						rt_LUM_64;			// 64bit, 64x64,	log-average in all components
 	ref_rt						rt_LUM_8;			// 64bit, 8x8,		log-average in all components
-
+	//==================================================
+	ref_rt						rt_Bloom_A;			// 32bit, dim		(r,g,b,?)
+	ref_rt						rt_Bloom_B;			// 32bit, dim/2		(r,g,b,?)
+	ref_rt						rt_Bloom_C;			// 32bit, dim/4		(r,g,b,?)
+	ref_rt						rt_Bloom_D;			// 32bit, dim/8		(r,g,b,?)
+	ref_rt						rt_Bloom_E;			// 32bit, dim/16	(r,g,b,?)
+	ref_rt						rt_Bloom_F;			// 32bit, dim/32	(r,g,b,?)
+	ref_rt						rt_Bloom_A2;			// 32bit, dim		(r,g,b,?)
+	ref_rt						rt_Bloom_B2;			// 32bit, dim/2		(r,g,b,?)
+	ref_rt						rt_Bloom_C2;			// 32bit, dim/4		(r,g,b,?)
+	ref_rt						rt_Bloom_D2;			// 32bit, dim/8		(r,g,b,?)
+	ref_rt						rt_Bloom_E2;			// 32bit, dim/16	(r,g,b,?)
+	ref_rt						rt_Bloom_F2;			// 32bit, dim/32	(r,g,b,?)
+	ref_rt						rt_LUM_A;			// 32bit, 1024x1024,log-average in all components
+	ref_rt						rt_LUM_B;			// 32bit, 128x128,	log-average in all components
+	ref_rt						rt_LUM_C;			// 32bit, 16x16,	log-average in all components
+	ref_rt						rt_LUM_D;			// 64bit, 1x1,		log-average in all components
+	ref_rt						rt_LUM_Prev;		// 64bit, 1x1,		prev frame log-average in all components
+	//==================================================
 	ref_rt						rt_LUM_pool[CHWCaps::MAX_GPUS*2]	;	// 1xfp32,1x1,		exp-result -> scaler
 	ref_texture				t_LUM_src		;	// source
 	ref_texture				t_LUM_dest		;	// destination & usage for current frame
@@ -167,6 +195,17 @@ private:
 	// Luminance
 	ref_shader			s_luminance;
 	float						f_luminance_adapt;
+
+	//================= new bloom and lum =================
+	ref_shader					s_bloom_downsample;
+	ref_shader					s_bloom_upsample;
+	ref_shader					s_lum_copy;
+	ref_shader					s_lum_downsample;
+	ref_shader					s_lum_calc;
+	//=====================================================
+
+	//================= mipchain ==========================
+	ref_shader					s_mipchain;
 
 	// Combine
 	ref_geom					g_combine;
@@ -291,9 +330,20 @@ public:
 	void						accum_volumetric		(light* L);
 	void						phase_bloom				();
 	void						phase_luminance			();
+	//==========================================================
+	void						phase_bloom_downsample	();
+	void						phase_bloom_upsample	();
+	void						phase_new_luminance		();
+	//==========================================================
 	void						phase_combine			();
 	void						phase_combine_volumetric();
 	void						phase_pp				();
+	//======================LV mipchain====================
+	void						phase_miptest();
+	ID3DTexture2D*				miptest_tex;
+	ref_texture					miptest_access;
+	ID3DRenderTargetView*		miptest_rtv;
+	ID3DShaderResourceView*		miptest_srv;
 
 	virtual void				set_blur				(float	f)		{ param_blur=f;						}
 	virtual void				set_gray				(float	f)		{ param_gray=f;						}

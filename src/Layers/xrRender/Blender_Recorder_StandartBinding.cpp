@@ -451,6 +451,19 @@ static class cl_inv_v : public R_constant_setup
 	}
 } binder_inv_v;
 
+static class cl_inv_p : public R_constant_setup
+{
+	Fmatrix result;
+	virtual void setup(R_constant* C)
+	{
+		Fmatrix vp, invvp;
+		vp.mul(Device.mProject, Device.mView);
+		invvp.invert44(vp);
+		RCache.set_c(C, invvp);
+	}
+} binder_inv_p;
+
+
 // Standart constant-binding
 void	CBlender_Compile::SetMapping	()
 {
@@ -499,6 +512,7 @@ void	CBlender_Compile::SetMapping	()
 
 	//	Igor	temp solution for the texgen functionality in the shader
 	r_Constant				("m_invV",				&binder_invv);
+	r_Constant				("m_inv_VP",			&binder_inv_p);
 	r_Constant				("m_texgen",			&binder_texgen);
 	r_Constant				("mVPTexgen",			&binder_VPtexgen);
 

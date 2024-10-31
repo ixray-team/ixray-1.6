@@ -20,6 +20,13 @@ float ComputeLightAttention(float3 PointToLight, float MinAttention)
     return saturate(1.0f - dot(PointToLight, PointToLight) * MinAttention);
 }
 
+float getSquareFalloffAttenuation(float3 PointToLight, float lightInvRadius) {
+    float distanceSquare = dot(PointToLight, PointToLight);
+    float factor = distanceSquare * lightInvRadius;
+    float smoothFactor = max(1.0 - factor * factor, 0.0);
+    return (smoothFactor * smoothFactor) / max(distanceSquare, 1e-4);
+}
+
 float GeometrySmithD(float NdotL, float NdotV, float Roughness)
 {
     float R = Roughness + 1.0f;
@@ -48,6 +55,10 @@ float3 DirectLight(float4 Radiance, float3 Light, float3 Normal, float3 Point, f
     float NdotL = max(0.0f, dot(N, L));
     float NdotH = max(0.0f, dot(N, H));
 
+    //Radiance.xyz = pow(Radiance.xyz, 2.2);
+    Color.xyz = pow(Color.xyz, 2.2);
+    Radiance.xyz = 3.0 * lerp(Radiance.xyz, dot(Radiance, 0.333), 0.15);
+
 #ifndef USE_LEGACY_LIGHT
     float NdotV = max(0.0f, dot(N, V));
     float HdotV = max(0.0f, dot(H, V));
@@ -58,6 +69,8 @@ float3 DirectLight(float4 Radiance, float3 Light, float3 Normal, float3 Point, f
 
     float3 Specular = D * F * G;
     float3 Diffuse = Color * (1.0f - Metalness) * (1.0f - F);
+
+
 
     float3 BRDF = Specular + Diffuse;
     return Radiance.xyz * NdotL * BRDF;

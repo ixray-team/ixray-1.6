@@ -7,7 +7,7 @@
 #define F0 float3(0.04, 0.04, 0.04)
 
 // Use legacy lighting pipeline
-#define USE_LEGACY_LIGHT
+//#define USE_LEGACY_LIGHT
 
 struct IXrayMaterial
 {

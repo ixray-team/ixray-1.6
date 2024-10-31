@@ -36,6 +36,26 @@
 #define		r2_RT_luminance_t64	"$user$lum_t64"			// --- temp
 #define		r2_RT_luminance_t8	"$user$lum_t8"			// --- temp
 
+//===================================================================
+#define		r2_RT_bloomA		"$user$bloomA"			// ---
+#define		r2_RT_bloomB		"$user$bloomB"			// ---
+#define		r2_RT_bloomC		"$user$bloomC"			// ---
+#define		r2_RT_bloomD		"$user$bloomD"			// ---
+#define		r2_RT_bloomE		"$user$bloomE"			// ---
+#define		r2_RT_bloomF		"$user$bloomF"			// ---
+#define		r2_RT_bloomA2		"$user$bloomA2"			// ---
+#define		r2_RT_bloomB2		"$user$bloomB2"			// ---
+#define		r2_RT_bloomC2		"$user$bloomC2"			// ---
+#define		r2_RT_bloomD2		"$user$bloomD2"			// ---
+#define		r2_RT_bloomE2		"$user$bloomE2"			// ---
+
+#define		r2_RT_lumA			"$user$lum_A"			// --- temp
+#define		r2_RT_lumB			"$user$lum_B"			// --- temp
+#define		r2_RT_lumC			"$user$lum_C"			// --- temp
+#define		r2_RT_lumD			"$user$lum_D"			// --- temp
+#define		r2_RT_lumPrev		"$user$lum_Prev"		// --- temp
+//===================================================================
+
 #define		r2_RT_luminance_src	"$user$tonemap_src"		// --- prev-frame-result
 #define		r2_RT_luminance_cur	"$user$tonemap"			// --- result
 #define		r2_RT_luminance_pool "$user$luminance"		// --- pool
@@ -49,6 +69,7 @@
 #define		r2_jitter			"$user$jitter_"			// --- dither
 #define		r2_jitter_mipped	"$user$jitter_mipped"			// --- dither
 #define		r2_sunmask			"shaders\\shaders_sunmask"
+#define		r2_tonemap_lut		"shaders\\tonemap_lut"
 
 #define		r2_RT_smaa_edgetex "$user$edgetex"
 #define		r2_RT_smaa_blendtex "$user$blendtex"

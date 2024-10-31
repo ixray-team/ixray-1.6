@@ -35,9 +35,10 @@ float4 main(_input I) : SV_Target
     float3 Ambient = Occ * AmbientLighting(O.PointReal, O.Normal, O.Color, O.Metalness, O.Roughness, O.Hemi);
     float3 Color = Ambient + Light.xyz;
 
-    // here should be distance fog
-    float Fog = saturate(length(O.PointReal) * fog_params.w + fog_params.x);
-    Color = lerp(Color, fog_color, Fog);
+    // here should be Distance fog
+    float Distance = length(O.Point);
+    float Fog = saturate(length(O.PointReal) * fog_params.w + fog_params.x); // 1.0 - exp(-Distance * fog_params.w) + fog_params.x; //
+    Color = lerp(Color, pow(fog_color, 2.2f), saturate(Fog * Fog));
 
     return float4(Color, Fog * Fog);
 }

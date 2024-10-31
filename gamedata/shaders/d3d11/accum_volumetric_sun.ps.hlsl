@@ -64,6 +64,7 @@ float4 main(v2p_TL I) : SV_Target
 
     [unroll] for(int i = 0; i < RAY_SAMPLES; ++i)
     {
+        //density = exp(-length(current) * 0.0001);
         if (depth > 0.3)
         {
 		#ifndef FILTER_LOW
@@ -76,17 +77,29 @@ float4 main(v2p_TL I) : SV_Target
         depth -= deltaDepth;
         current -= delta;
     }
-
+    
     float fSturation = dot(normalize(P), -Ldynamic_dir.xyz);
-
-    //	Normalize dot product to
     fSturation = 0.4f * fSturation + 0.6f;
+    float2 noise = J0.yz;
+    float2 fog = 1.0 - exp(-length(P.xyz) * float2(0.003, 0.01)); // fog param.xy
+    fog = saturate(fog);
+    float4 superfogcolor = lerp(fog_color, Ldynamic_color, (0.1 + 0.9 * res) * pow(fSturation, 8.0));
 
-    float fog = saturate(length(P.xyz) * fog_params.w + fog_params.x);
-    res = lerp(res, max_density, fog);
-    res *= fSturation;
+    float4 final_color = lerp(0.f, superfogcolor, fog.x + 0.0125 * noise.x) + res * Ldynamic_color * (fog.y + 0.0125 * noise.y);
 
-    return res * Ldynamic_color;
+//============== orig ======================================================================
+    //float fSturation = dot(normalize(P), -Ldynamic_dir.xyz);
+    //	Normalize dot product to
+    //fSturation = 0.4f * fSturation + 0.6f;
+    //fog = saturate(length(P.xyz) * fog_params.w + fog_params.x);
+    //res = lerp(res, max_density, fog);
+    //res *= fSturation;
+
+    //return res * Ldynamic_color;
+ //==========================================================================================   
+
+
+    return final_color;
 #endif // SUN_SHAFTS_QUALITY
 }
 

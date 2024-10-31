@@ -156,7 +156,7 @@ int opt_dynamic = 0;
 
 float		ps_r2_df_parallax_h			= 0.02f;
 float		ps_r2_df_parallax_range		= 60.f;
-float		ps_r2_tonemap_middlegray	= 1.f;			// r2-only
+float		ps_r2_tonemap_middlegray	= 1.f;				// r2-only
 float		ps_r2_tonemap_adaptation	= 3.f;				// r2-only
 float		ps_r2_tonemap_low_lum		= 0.01f;			// r2-only
 float		ps_r2_tonemap_amount		= 0.7f;				// r2-only
@@ -210,6 +210,9 @@ float		ps_r__test_exp_to_shaders_1	= 1.0f;
 float		ps_r__test_exp_to_shaders_2	= 1.0f;
 float		ps_r__test_exp_to_shaders_3	= 1.0f;
 float		ps_r__test_exp_to_shaders_4	= 1.0f;
+
+// New Params by Doenitz
+float		ps_r4_bloom_strength = 1.0f;
 
 BOOL		ps_r2_particle_dt			= FALSE;
 
@@ -863,6 +866,9 @@ void		xrRender_initconsole	()
 	CMD3(CCC_Mask, "r2_shadow_cascede_zcul", &ps_r2_ls_flags_ext, R2FLAGEXT_SUN_ZCULLING);
 	CMD3(CCC_Mask, "r2_exp_splitscene", &ps_r2_ls_flags, R2FLAG_EXP_SPLIT_SCENE);
 	CMD3(CCC_Mask, "r2_exp_donttest_uns", &ps_r2_ls_flags, R2FLAG_EXP_DONT_TEST_UNSHADOWED);
+
+	CMD4(CCC_Float, "r4_bloom_strength", &ps_r4_bloom_strength, 0.0f, 100.0f);
+
 #endif
 }
 

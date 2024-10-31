@@ -123,10 +123,14 @@ extern ECORE_API int			ps_r3_dyn_wet_surf_sm_res;	// 256
 extern ECORE_API float			ps_r4_cas_sharpening;
 
 // Test float exported to shaders for development
-extern  float					ps_r__test_exp_to_shaders_1;
-extern  float					ps_r__test_exp_to_shaders_2;
-extern  float					ps_r__test_exp_to_shaders_3;
-extern  float					ps_r__test_exp_to_shaders_4;
+extern ECORE_API float					ps_r__test_exp_to_shaders_1;
+extern ECORE_API float					ps_r__test_exp_to_shaders_2;
+extern ECORE_API float					ps_r__test_exp_to_shaders_3;
+extern ECORE_API float					ps_r__test_exp_to_shaders_4;
+
+// New Params by Doenitz
+extern ECORE_API float					ps_r4_bloom_strength;
+
 
 extern ECORE_API int opt_static;
 extern ECORE_API int opt_dynamic;

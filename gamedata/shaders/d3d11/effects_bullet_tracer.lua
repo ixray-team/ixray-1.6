@@ -1,5 +1,5 @@
 function normal(shader, t_base, t_second, t_detail)
-    shader:begin("stub_default", "stub_default")
+    shader:begin("stub_default", "effects_bullet_tracer")
         :zb(true, false)
         :blend(true, blend.one, blend.one)
 
@@ -8,4 +8,5 @@ function normal(shader, t_base, t_second, t_detail)
     --	TODO: DX10: move stub_default to smp_rtlinear
     shader:dx10texture("s_base", t_base)
     shader:dx10sampler("smp_base")
+    shader:dx10sampler("smp_rtlinear")
 end

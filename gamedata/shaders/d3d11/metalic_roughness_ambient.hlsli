@@ -26,11 +26,11 @@ float3 CompureDiffuseIrradance(float3 N, float Hemi)
 {
     float3 LightDirection = mul(m_invV, N).xyz;
 
-    float3 SampleLast = env_s0.SampleLevel(smp_rtlinear, LightDirection, 0.0f);
-    float3 SampleNext = env_s1.SampleLevel(smp_rtlinear, LightDirection, 0.0f);
+    float3 SampleLast = pow(env_s0.SampleLevel(smp_rtlinear, LightDirection, 0.0f),2.2);
+    float3 SampleNext = pow(env_s1.SampleLevel(smp_rtlinear, LightDirection, 0.0f),2.2);
 
     float3 Irradance = L_hemi_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);
-
+    Irradance = lerp(Irradance, dot(Irradance, LUMINANCE_VECTOR), 0.5);
     return Irradance * Irradance * Hemi;
 }
 
@@ -45,10 +45,11 @@ float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
     LightDirection.y = abs(LightDirection.y);
     RemapVector(LightDirection);
 
-    float3 SampleLast = sky_s0.SampleLevel(smp_rtlinear, LightDirection, Lod);
-    float3 SampleNext = sky_s1.SampleLevel(smp_rtlinear, LightDirection, Lod);
+    float3 SampleLast = pow(sky_s0.SampleLevel(smp_rtlinear, LightDirection, Lod), 2.2);
+    float3 SampleNext = pow(sky_s1.SampleLevel(smp_rtlinear, LightDirection, Lod), 2.2);
 
     float3 Irradance = L_sky_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);
+    Irradance = lerp(Irradance, dot(Irradance, LUMINANCE_VECTOR), 0.5);
     return Irradance * Hemi * 0.8f;
 }
 
@@ -58,6 +59,9 @@ float3 AmbientLighting(float3 Point, float3 Normal, float3 Color,
     float3 N = normalize(Normal);
     float3 V = normalize(-Point);
     float3 R = reflect(-V, N);
+
+    //Radiance.xyz = pow(Radiance.xyz, 2.2);
+    Color.xyz = pow(Color.xyz, 2.2);
 
 #ifndef USE_LEGACY_LIGHT
     float3 DiffuseIrradance = CompureDiffuseIrradance(N, Hemi) + L_ambient.xyz;

@@ -32,6 +32,7 @@ cbuffer shader_params
 cbuffer static_globals
 {
     uniform float3x4 m_invV;
+    uniform float4x4 m_inv_VP;
 
     uniform float3x4 m_V;
     uniform float4x4 m_P;
@@ -50,6 +51,7 @@ cbuffer static_globals
     uniform float4 L_ambient;
     uniform float3 L_sun_color;
     uniform float3 L_sun_dir_w;
+    //uniform float3 L_sun_dir_e;
     uniform float4 L_sky_color;
     uniform float4 L_hemi_color;
 
