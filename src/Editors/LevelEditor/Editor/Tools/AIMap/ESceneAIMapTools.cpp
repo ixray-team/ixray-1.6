@@ -574,6 +574,9 @@ void ESceneAIMapTool::FillProp(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU32	 	(items, PrepareKey(pref,"Params\\Brush Size"),			&m_BrushSize, 	1, 100);
     PHelper().CreateFloat 	(items, PrepareKey(pref,"Params\\Can Up"),				&m_Params.fCanUP, 	0.f, 10.f);
     PHelper().CreateFloat 	(items, PrepareKey(pref,"Params\\Can Down"),			&m_Params.fCanDOWN, 0.f, 10.f);
+
+    FloatValue *V = PHelper().CreateFloat(items, PrepareKey(pref,"Params\\Patch Size"), &m_Params.fPatchSize, 0.3f, 1.0f);
+    V->OnChangeEvent.bind(this, &ESceneAIMapTool::OnPatchSizeChanged);
 }
 
 void ESceneAIMapTool::GetBBox(Fbox& bb, bool bSelOnly)
@@ -593,3 +596,7 @@ void ESceneAIMapTool::GetBBox(Fbox& bb, bool bSelOnly)
     }
 }
 
+void ESceneAIMapTool::OnPatchSizeChanged(PropValue*)
+{
+	ELog.DlgMsg(mtInformation, "Patch size was changed, regenerate AI-Map");
+}
