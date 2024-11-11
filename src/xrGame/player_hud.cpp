@@ -638,6 +638,8 @@ void player_hud::load(const shared_str& player_hud_sect)
 	auto _b = _sect.Data.begin();
 	auto _e = _sect.Data.end();
 
+	m_ancors.clear();
+
 	for(; _b != _e; ++_b) 
 	{
 		if(strstr(_b->first.c_str(), "ancor_") == _b->first.c_str())
