@@ -158,6 +158,8 @@ void CPda::Load(LPCSTR section)
 	else
 	{
 		CInventoryItemObject::Load(section);
+
+		hud_sect = "";
 	}
 }
 
