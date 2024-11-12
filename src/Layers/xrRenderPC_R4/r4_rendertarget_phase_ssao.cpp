@@ -19,23 +19,6 @@ void CRenderTarget::phase_ssao() {
 
 	RCache.set_Stencil(FALSE);
 
-	/*RCache.set_Stencil					(TRUE,D3DCMP_LESSEQUAL,0x01,0xff,0x00);	// stencil should be >= 1
-	if (RImplementation.o.nvstencil)	{
-		u_stencil_optimize				(CRenderTarget::SO_Combine);
-		RCache.set_ColorWriteEnable		();
-	}*/
-
-	// Compute params
-	Fmatrix		m_v2w;			m_v2w.invert(Device.mView);
-
-	float		fSSAONoise = 2.0f;
-	fSSAONoise *= tan(deg2rad(67.5f));
-	fSSAONoise /= tan(deg2rad(Device.fFOV));
-
-	float		fSSAOKernelSize = 150.0f;
-	fSSAOKernelSize *= tan(deg2rad(67.5f));
-	fSSAOKernelSize /= tan(deg2rad(Device.fFOV));
-
 	// Fill VB
 	float	scale_X = RCache.get_width() * 0.5f / float(TEX_jitter);
 	float	scale_Y = RCache.get_height() * 0.5f / float(TEX_jitter);
@@ -57,13 +40,7 @@ void CRenderTarget::phase_ssao() {
 	RCache.set_Element(s_ssao->E[0]);
 	RCache.set_Geometry(g_combine);
 
-	RCache.set_c("m_v2w", m_v2w);
-	RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
-	RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
-	RCache.set_c("resolution", _w, _h, 1.0f / _w, 1.0f / _h);
-
 	RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-
 	set_viewport(RContext, RCache.get_width(), RCache.get_height());
 
 	RCache.set_Stencil(FALSE);
@@ -77,17 +54,12 @@ void CRenderTarget::phase_downsamp() {
 	u_setrt(rt_half_depth, 0, 0, 0);
 	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	RContext->ClearRenderTargetView(rt_half_depth->pRT, ColorRGBA);
+
 	u32 w = (u32)RCache.get_width();
 	u32 h = (u32)RCache.get_height();
 
-	if(RImplementation.SSAO.test(ESSAO_DATA::SSAO_HALF_DATA)) {
-		set_viewport(RContext, RCache.get_width() * 0.5f, RCache.get_height() * 0.5f);
-		w /= 2;
-		h /= 2;
-	}
-
+	RImplementation.rmNormal();
 	RCache.set_Stencil(FALSE);
-
 	{
 		Fmatrix		m_v2w; m_v2w.invert(Device.mView);
 
@@ -109,9 +81,5 @@ void CRenderTarget::phase_downsamp() {
 		RCache.set_c("m_v2w", m_v2w);
 
 		RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-	}
-
-	if(RImplementation.SSAO.test(ESSAO_DATA::SSAO_HALF_DATA)) {
-		set_viewport(RContext, RCache.get_width(), RCache.get_height());
 	}
 }

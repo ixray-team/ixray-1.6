@@ -70,8 +70,6 @@ public:
 	  u32		dx11_enable_tessellation : 1;
 	} o;
 
-	Flags16 SSAO;
-
 	struct _stats
 	{
 		u32		l_total,	l_visible;

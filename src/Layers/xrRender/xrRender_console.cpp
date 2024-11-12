@@ -28,9 +28,8 @@ u32			ps_r_ssao_mode			=	2;
 xr_token							qssao_mode_token						[ ]={
 	{ "st_opt_off",					0											},
 	{ "ui_mm_ssao",					1											},
-	{ "ui_mm_hdao",					2											},
 #ifdef USE_DX11
-	{ "ui_mm_gtao",					3											},
+	{ "ui_mm_gtao",					2											},
 #endif
 	{ 0,							0											}
 };
@@ -41,18 +40,6 @@ xr_token							qsun_shafts_token							[ ]={
 	{ "st_opt_low",					1												},
 	{ "st_opt_medium",				2												},
 	{ "st_opt_high",				3												},
-	{ 0,							0												}
-};
-
-u32			ps_r_ssao				=	3;
-xr_token							qssao_token									[ ]={
-	{ "st_opt_off",					0												},
-	{ "st_opt_low",					1												},
-	{ "st_opt_medium",				2												},
-	{ "st_opt_high",				3												},
-#ifdef USE_DX11
-	{ "st_opt_ultra",				4												},
-#endif //USE_DX11
 	{ 0,							0												}
 };
 
@@ -125,23 +112,19 @@ Fvector3	ps_r_taa_jitter = { 0,0,0 };
 Fvector3	ps_r_taa_jitter_scale = { 1,1,0 };
 
 // R2-specific
-Flags32		ps_r2_ls_flags				= { R2FLAG_SUN 
-	| R2FLAG_EXP_DONT_TEST_UNSHADOWED 
-	| R2FLAG_USE_NVSTENCIL | R2FLAG_EXP_SPLIT_SCENE 
+Flags32		ps_r2_ls_flags = {
+	R2FLAG_SUN
+	| R2FLAG_EXP_DONT_TEST_UNSHADOWED
+	| R2FLAG_USE_NVSTENCIL | R2FLAG_EXP_SPLIT_SCENE
 	| R2FLAG_EXP_MT_CALC | R3FLAG_DYN_WET_SURF
 	| R3FLAG_VOLUMETRIC_SMOKE
-	|R2FLAG_DETAIL_BUMP
-	|R2FLAG_SOFT_PARTICLES
-	|R2FLAG_SOFT_WATER
-	|R2FLAG_STEEP_PARALLAX
-	|R2FLAG_TONEMAP
-	|R2FLAG_VOLUMETRIC_LIGHTS
-	};	// r2-only
-
-Flags16 ps_r2_ls_flags_ssao = 
-{
-	ESSAO_DATA::SSAO_HALF_DATA
-};
+	| R2FLAG_DETAIL_BUMP
+	| R2FLAG_SOFT_PARTICLES
+	| R2FLAG_SOFT_WATER
+	| R2FLAG_STEEP_PARALLAX
+	| R2FLAG_TONEMAP
+	| R2FLAG_VOLUMETRIC_LIGHTS
+};	// r2-only
 
 Flags32 ps_r2_ls_flags_ext =
 {
@@ -330,61 +313,6 @@ public:
 	CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		RImplementation.Models->dump();
-	}
-};
-
-class	CCC_SSAO_Mode		: public CCC_Token
-{
-public:
-	CCC_SSAO_Mode(LPCSTR N, u32* V, xr_token* T) : CCC_Token(N,V,T)	{}	;
-
-	virtual void	Execute	(LPCSTR args)	{
-		CCC_Token::Execute	(args);
-				
-		switch	(*value)
-		{
-			case 0:
-			{
-				ps_r_ssao = 0;
-				ps_r2_ls_flags_ssao.set(SSAO_GTAO, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_HDAO, 0);
-				break;
-			}
-			case 1:
-			{
-				if (ps_r_ssao==0)
-				{
-					ps_r_ssao = 1;
-				}
-				ps_r2_ls_flags_ssao.set(SSAO_GTAO, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_HDAO, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_HALF_DATA, 0);
-				break;
-			}
-			case 2:
-			{
-				if (ps_r_ssao==0)
-				{
-					ps_r_ssao = 1;
-				}
-				ps_r2_ls_flags_ssao.set(SSAO_GTAO, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_HDAO, 1);
-				ps_r2_ls_flags_ssao.set(SSAO_OPT_DATA, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_HALF_DATA, 0);
-				break;
-			}
-			case 3:
-			{
-				if (ps_r_ssao==0)
-				{
-					ps_r_ssao = 1;
-				}
-				ps_r2_ls_flags_ssao.set(SSAO_GTAO, 1);
-				ps_r2_ls_flags_ssao.set(SSAO_HDAO, 0);
-				ps_r2_ls_flags_ssao.set(SSAO_OPT_DATA, 1);
-				break;
-			}
-		}
 	}
 };
 
@@ -778,19 +706,8 @@ void		xrRender_initconsole	()
 
 	CMD3(CCC_Mask,		"r2_volumetric_lights",			&ps_r2_ls_flags,			R2FLAG_VOLUMETRIC_LIGHTS);
 	CMD3(CCC_Token,		"r2_sun_shafts",				&ps_r_sun_shafts,			qsun_shafts_token);
-	CMD3(CCC_SSAO_Mode,	"r2_ssao_mode",					&ps_r_ssao_mode,			qssao_mode_token);
+	CMD3(CCC_Token,		"r2_ssao_mode",					&ps_r_ssao_mode,			qssao_mode_token);
 
-#ifdef DEBUG_DRAW
-	CMD3(CCC_Token,		"r2_ssao",						&ps_r_ssao,					qssao_token);
-#elif USE_DX11
-	ps_r_ssao = 4;
-#endif
-
-	CMD3(CCC_Mask16,	"r2_ssao_blur",                 &ps_r2_ls_flags_ssao,		SSAO_BLUR);//Need restart
-	//CMD3(CCC_Mask16,	"r2_ssao_opt_data",				&ps_r2_ls_flags_ssao,		SSAO_OPT_DATA);//Need restart
-	CMD3(CCC_Mask16,	"r2_ssao_half_data",			&ps_r2_ls_flags_ssao,		SSAO_HALF_DATA);//Need restart
-	CMD3(CCC_Mask16,	"r2_ssao_gtao",					&ps_r2_ls_flags_ssao,		SSAO_GTAO);//Need restart
-	CMD3(CCC_Mask16,	"r2_ssao_hdao",					&ps_r2_ls_flags_ssao,		SSAO_HDAO);//Need restart
 	CMD3(CCC_Mask,		"r2_steep_parallax",			&ps_r2_ls_flags,			R2FLAG_STEEP_PARALLAX);
 	CMD3(CCC_Mask,		"r2_detail_bump",				&ps_r2_ls_flags,			R2FLAG_DETAIL_BUMP);
 

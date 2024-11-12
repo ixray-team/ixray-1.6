@@ -189,14 +189,6 @@ void CRender::create()
 	o.distortion = o.distortion_enabled;
 	o.disasm = Core.ParamsData.test(ECoreParams::disasm);
 
-	if(ps_r_ssao) {
-		SSAO = ps_r2_ls_flags_ssao;
-
-		if(SSAO.test(ESSAO_DATA::SSAO_HDAO) || SSAO.test(ESSAO_DATA::SSAO_GTAO)) {
-			SSAO.set(ESSAO_DATA::SSAO_OPT_DATA, false);
-		}
-	}
-
 	o.dx11_enable_tessellation = RFeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 
 	// constants
@@ -858,23 +850,6 @@ HRESULT	CRender::shader_compile(
 	}
 	sh_name[len] = '0' + char(o.sunstatic); ++len;
 
-	bool HasBlur = SSAO.test(ESSAO_DATA::SSAO_BLUR);
-	bool HasHDAO = SSAO.test(ESSAO_DATA::SSAO_HDAO);
-
-	if(HasBlur) {
-		defines[def_it].Name = "USE_SSAO_BLUR";
-		defines[def_it].Definition = "1";
-		def_it++;
-	}
-	sh_name[len] = '0' + char(HasBlur); ++len;
-
-	if(HasHDAO) {
-		defines[def_it].Name = "HDAO";
-		defines[def_it].Definition = "1";
-		def_it++;
-	}
-	sh_name[len] = '0' + char(HasHDAO); ++len;
-
 	// skinning
 	if(m_skinning < 0) {
 		defines[def_it].Name = "SKIN_NONE";
@@ -996,18 +971,6 @@ HRESULT	CRender::shader_compile(
 
 		def_it++;
 		sh_name[len] = '0' + static_cast<char>(ps_r_sun_shafts); ++len;
-	}
-	else {
-		sh_name[len] = '0';	++len;
-	}
-
-	if(ps_r_ssao > 0) {
-		xr_sprintf(c_ssao, "%d", ps_r_ssao);
-		defines[def_it].Name = "SSAO_QUALITY";
-		defines[def_it].Definition = c_ssao;
-
-		def_it++;
-		sh_name[len] = '0' + static_cast<char>(ps_r_ssao); ++len;
 	}
 	else {
 		sh_name[len] = '0';	++len;
@@ -1167,7 +1130,7 @@ HRESULT	CRender::shader_compile(
 		);
 
 		if(SUCCEEDED(_result)) {
-			if(ps_r__common_flags.test(RFLAG_USE_CACHE)) {
+			if(/*ps_r__common_flags.test(RFLAG_USE_CACHE)*/1) {
 				IWriter* file = FS.w_open(file_name);
 				u32 const crc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
 				file->w_u32(crc);

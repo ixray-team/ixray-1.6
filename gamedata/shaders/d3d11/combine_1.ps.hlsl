@@ -16,23 +16,16 @@ float4 main(_input I) : SV_Target
 {
     IXrayGbuffer O;
     GbufferUnpack(I.tc0.xy, I.pos2d.xy, O);
-    float3 Light = s_accumulator.Sample(smp_nofilter, I.tc0.xy).xyz;
+    float3 Light = s_accumulator.Load(int3(I.pos2d.xy, 0)).xyz;
 
 #ifdef USE_R2_STATIC_SUN
     Light += O.SSS * DirectLight(Ldynamic_color, Ldynamic_dir.xyz, O.Normal, O.View.xyz, O.Color, O.Metalness, O.Roughness);
 #endif
 
-    //  Calculate SSAO
-    float Occ = 1.0f;
-
-#if SSAO_QUALITY > 0
-    Occ = s_occ.Sample(smp_nofilter, I.tc0.xy).x;
-#endif
-
+    float Occ = s_occ.SampleLevel(smp_rtlinear, I.tc0.xy, 0.0f).x;
     float3 Ambient = Occ * AmbientLighting(O.View, O.Normal, O.Color, O.Metalness, O.Roughness, O.Hemi);
     float3 Color = Ambient + Light;
 
-    // here should be distance fog
     float Fog = saturate(O.ViewDist * fog_params.w + fog_params.x);
     Color = lerp(Color, fog_color.xyz, Fog);
 

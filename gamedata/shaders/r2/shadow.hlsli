@@ -114,8 +114,7 @@ float shadow_hw_f4(float4 tc)
 uniform sampler2D jitter0;
 uniform sampler2D jitter1;
 uniform sampler2D jitter2;
-uniform sampler2D jitter3;
-uniform float4 jitterS;
+
 float4 test(float4 tc, float2 offset)
 {
     float4 tcx = float4(tc.xy + tc.w * offset, tc.zw);

@@ -8,7 +8,6 @@ uniform float3x4 m_v2w;
 
 #include "ssao_blur.ps.hlsl"
 #include "ssao.ps.hlsl"
-// #include "ssao_hbao.ps.hlsl"
 
 struct _input
 {
@@ -40,11 +39,7 @@ float4 main(_input I) : COLOR0
     //  Calculate SSAO
 // #ifdef USE_SSAO_BLUR
 //  float occ = ssao_blur_ps(I.tc0);
-#ifdef USE_HBAO
-    float occ = calc_hbao(P.z, N, I.tc0);
-#else
     float occ = calc_ssao(P, N, I.tc0, I.tcJ);
-#endif
 
     float3 hdiffuse, hspecular;
     hmodel(hdiffuse, hspecular, mtl, N.w, D.w, P.xyz, N.xyz);

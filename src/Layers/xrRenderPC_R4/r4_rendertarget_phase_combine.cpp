@@ -35,42 +35,44 @@ struct v_aa {
 	Fvector4 uv6;
 };
 
-void	CRenderTarget::phase_combine	()
+void CRenderTarget::phase_combine()
 {
 	PIX_EVENT(phase_combine);
 
 	//	TODO: DX10: Remove half poxel offset
-	bool	_menu_pp	= g_pGamePersistent?g_pGamePersistent->OnRenderPPUI_query():false;
+	bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
 
-	u32			Offset					= 0;
-	Fvector2	p0,p1;
+	u32 Offset = 0;
+	Fvector2 p0, p1;
 
 	//*** exposure-pipeline
-	u32			gpu_id	= Device.dwFrame % 1;
+	u32 gpu_id	= Device.dwFrame % 1;
 	{
 		t_LUM_src->surface_set		(rt_LUM_pool[gpu_id*2+0]->pSurface);
 		t_LUM_dest->surface_set		(rt_LUM_pool[gpu_id*2+1]->pSurface);
 	}
-
-	if (ps_r_ssao > 0)
 	{
 		PROF_EVENT("PHASE_AMBIENT_OCCLUSION");
-		phase_downsamp();
 
-		if (RImplementation.SSAO.test(ESSAO_DATA::SSAO_GTAO))
-		{
-			phase_gtao();
-		}
-		else if (RFeatureLevel >= D3D_FEATURE_LEVEL_11_0 && RImplementation.SSAO.test(ESSAO_DATA::SSAO_HDAO) && RImplementation.SSAO.test(ESSAO_DATA::SSAO_ULTRA_OPT))
-		{
-			phase_hdao();
-		}
-		else
-		{
-			phase_ssao();
+		switch(ps_r_ssao_mode) {
+			case 0:
+			{
+				FLOAT ColorRGBA[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+				RContext->ClearRenderTargetView(rt_ssao_temp->pRT, ColorRGBA);
+				break;
+			}
+			case 1:
+			{
+				phase_ssao();
+				break;
+			}
+			case 2:
+			{
+				phase_gtao();
+				break;
+			}
 		}
 	}
-
 
 	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	u_setrt(rt_Generic_0, 0, 0, RDepth);

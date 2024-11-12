@@ -45,9 +45,6 @@ public:
 	IBlender*					b_cas;
 	IBlender*					b_gtao;
 
-    // compute shader for hdao
-    IBlender*                   b_hdao_cs;
-
 #ifdef DEBUG
 	struct		dbg_line_t		{
 		Fvector	P0,P1;
@@ -262,7 +259,6 @@ public:
 	void						phase_scene_end			();
 	void						phase_occq				();
 	void						phase_ssao				();
-	void						phase_hdao				();
 	void						phase_downsamp			();
 	void						phase_wallmarks			();
 	void						phase_smap_direct		(light* L,	u32 sub_phase);

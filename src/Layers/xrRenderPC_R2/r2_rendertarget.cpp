@@ -328,33 +328,9 @@ CRenderTarget::CRenderTarget		()
 		f_bloom_factor				= 0.5f;
 	}
 
-	//HBAO
-	if (RImplementation.SSAO.test(ESSAO_DATA::SSAO_OPT_DATA))
-	{
-		u32		w = 0;
-		u32		h = 0;
-		if (RImplementation.SSAO.test(ESSAO_DATA::SSAO_HALF_DATA))
-		{
-			w = RCache.get_width() / 2;
-			h = RCache.get_height() / 2;
-		}
-		else
-		{
-			w = RCache.get_width();
-			h = RCache.get_height();
-		}
-
-		rt_half_depth.create		(r2_RT_half_depth, w, h, D3DFMT_R16F);
-		s_ssao.create				(b_ssao, "r2\\ssao");
-	}
-
-	//SSAO
-	if (RImplementation.SSAO.test(ESSAO_DATA::SSAO_BLUR))
-	{
-		u32		w = RCache.get_width(), h = RCache.get_height();
-		rt_ssao_temp.create			(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F);
-		s_ssao.create				(b_ssao, "r2\\ssao");
-	}
+	u32 w = RCache.get_width(), h = RCache.get_height();
+	rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F);
+	s_ssao.create(b_ssao, "r2\\ssao");
 
 	// Screen Post Process
 	{
@@ -433,132 +409,91 @@ CRenderTarget::CRenderTarget		()
 		// Build material(s)
 		{
 			// Surface
-			R_CHK(RDevice->CreateVolumeTexture(TEX_material_LdotN,TEX_material_LdotH,4,1,0,D3DFMT_A8L8,D3DPOOL_MANAGED,&t_material_surf, nullptr));
-			t_material					= dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-			t_material->surface_set		(t_material_surf);
+			R_CHK(RDevice->CreateVolumeTexture(TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8, D3DPOOL_MANAGED, &t_material_surf, nullptr));
+			t_material = dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
+			t_material->surface_set(t_material_surf);
 
 			// Fill it (addr: x=dot(L,N),y=dot(L,H))
 			D3DLOCKED_BOX R{};
-			R_CHK						(t_material_surf->LockBox	(0,&R,0,0));
-			for (u32 slice=0; slice<4; slice++)
-			{
-				for (u32 y=0; y<TEX_material_LdotH; y++)
-				{
-					for (u32 x=0; x<TEX_material_LdotN; x++)
-					{
-						u16*	p	=	(u16*)		(LPBYTE (R.pBits) + slice*R.SlicePitch + y*R.RowPitch + x*2);
-						float	ld	=	float(x)	/ float	(TEX_material_LdotN-1);
-						float	ls	=	float(y)	/ float	(TEX_material_LdotH-1) + EPS_S;
-						ls			*=	powf(ld,1/32.f);
-						float	fd,fs;
+			R_CHK(t_material_surf->LockBox(0, &R, 0, 0));
+			for(u32 slice = 0; slice < 4; slice++) {
+				for(u32 y = 0; y < TEX_material_LdotH; y++) {
+					for(u32 x = 0; x < TEX_material_LdotN; x++) {
+						u16* p = (u16*)(LPBYTE(R.pBits) + slice * R.SlicePitch + y * R.RowPitch + x * 2);
+						float	ld = float(x) / float(TEX_material_LdotN - 1);
+						float	ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
+						ls *= powf(ld, 1 / 32.f);
+						float	fd, fs;
 
-						switch	(slice)
-						{
-						case 0:	{ // looks like OrenNayar
-							fd	= powf(ld,0.75f);		// 0.75
-							fs	= powf(ls,16.f)*.5f;
-								}	break;
-						case 1:	{// looks like Blinn
-							fd	= powf(ld,0.90f);		// 0.90
-							fs	= powf(ls,24.f);
-								}	break;
-						case 2:	{ // looks like Phong
-							fd	= ld;					// 1.0
-							fs	= powf(ls*1.01f,128.f	);
-								}	break;
-						case 3:	{ // looks like Metal
-							float	s0	=	_abs	(1-_abs	(0.05f*_sin(33.f*ld)+ld-ls));
-							float	s1	=	_abs	(1-_abs	(0.05f*_cos(33.f*ld*ls)+ld-ls));
-							float	s2	=	_abs	(1-_abs	(ld-ls));
-							fd		=	ld;				// 1.0
-							fs		=	powf	(_max(_max(s0,s1),s2), 24.f);
-							fs		*=	powf	(ld,1/7.f);
-								}	break;
-						default:
-							fd	= fs = 0;
+						switch(slice) {
+							case 0:
+							{ // looks like OrenNayar
+								fd = powf(ld, 0.75f);		// 0.75
+								fs = powf(ls, 16.f) * .5f;
+							}	break;
+							case 1:
+							{// looks like Blinn
+								fd = powf(ld, 0.90f);		// 0.90
+								fs = powf(ls, 24.f);
+							}	break;
+							case 2:
+							{ // looks like Phong
+								fd = ld;					// 1.0
+								fs = powf(ls * 1.01f, 128.f);
+							}	break;
+							case 3:
+							{ // looks like Metal
+								float	s0 = _abs(1 - _abs(0.05f * _sin(33.f * ld) + ld - ls));
+								float	s1 = _abs(1 - _abs(0.05f * _cos(33.f * ld * ls) + ld - ls));
+								float	s2 = _abs(1 - _abs(ld - ls));
+								fd = ld;				// 1.0
+								fs = powf(_max(_max(s0, s1), s2), 24.f);
+								fs *= powf(ld, 1 / 7.f);
+							}	break;
+							default:
+							fd = fs = 0;
 						}
-						s32		_d	=	clampr	(iFloor	(fd*255.5f),	0,255);
-						s32		_s	=	clampr	(iFloor	(fs*255.5f),	0,255);
-						if ((y==(TEX_material_LdotH-1)) && (x==(TEX_material_LdotN-1)))	{ _d = 255; _s=255;	}
-						*p			=	u16		(_s*256 + _d);
+						s32		_d = clampr(iFloor(fd * 255.5f), 0, 255);
+						s32		_s = clampr(iFloor(fs * 255.5f), 0, 255);
+						if((y == (TEX_material_LdotH - 1)) && (x == (TEX_material_LdotN - 1))) {
+							_d = 255; _s = 255;
+						}
+						*p = u16(_s * 256 + _d);
 					}
 				}
 			}
-			R_CHK		(t_material_surf->UnlockBox	(0));
+			R_CHK(t_material_surf->UnlockBox(0));
 			// #ifdef DEBUG
 			// R_CHK	(D3DXSaveTextureToFile	("x:\\r2_material.dds",D3DXIFF_DDS,t_material_surf,0));
 			// #endif
 		}
 
 		// Build noise table
-		if (1)
-		{
-			// Surfaces
-			D3DLOCKED_RECT				R[TEX_jitter_count];
-			for (int it1=0; it1<TEX_jitter_count-1; it1++)
-			{
-				string_path					name;
-				xr_sprintf						(name,"%s%d",r2_jitter,it1);
-				R_CHK(RDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0, D3DFMT_Q8W8V8U8, D3DPOOL_MANAGED, &t_noise_surf[it1], nullptr));
-				t_noise[it1]					= dxRenderDeviceRender::Instance().Resources->_CreateTexture	(name);
-				t_noise[it1]->surface_set	(t_noise_surf[it1]);
-				R_CHK						(t_noise_surf[it1]->LockRect	(0,&R[it1],0,0));
-			}	
+		// Surfaces
+		D3DLOCKED_RECT R[TEX_jitter_count];
+		for(int it1 = 0; it1 < TEX_jitter_count; it1++) {
+			string_path					name;
+			xr_sprintf(name, "%s%d", r2_jitter, it1);
+			R_CHK(RDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0, D3DFMT_Q8W8V8U8, D3DPOOL_MANAGED, &t_noise_surf[it1], nullptr));
+			t_noise[it1] = dxRenderDeviceRender::Instance().Resources->_CreateTexture(name);
+			t_noise[it1]->surface_set(t_noise_surf[it1]);
+			R_CHK(t_noise_surf[it1]->LockRect(0, &R[it1], 0, 0));
+		}
 
-			// Fill it,
-			for (u32 y=0; y<TEX_jitter; y++)
-			{
-				for (u32 x=0; x<TEX_jitter; x++)
-				{
-					DWORD	data	[TEX_jitter_count-1];
-					generate_jitter	(data,TEX_jitter_count-1);
-					for (u32 it2=0; it2<TEX_jitter_count-1; it2++)
-					{
-						u32*	p	=	(u32*)	(LPBYTE (R[it2].pBits) + y*R[it2].Pitch + x*4);
-								*p	=	data	[it2];
-					}
+		// Fill it,
+		for(u32 y = 0; y < TEX_jitter; y++) {
+			for(u32 x = 0; x < TEX_jitter; x++) {
+				DWORD data[TEX_jitter_count];
+				generate_jitter(data, TEX_jitter_count);
+				for(u32 it2 = 0; it2 < TEX_jitter_count; it2++) {
+					u32* p = (u32*)(LPBYTE(R[it2].pBits) + y * R[it2].Pitch + x * 4);
+					*p = data[it2];
 				}
 			}
-			
-			for (int it3=0; it3<TEX_jitter_count-1; it3++)	{
-				R_CHK						(t_noise_surf[it3]->UnlockRect(0));
-			}		
+		}
 
-			// generate HBAO jitter texture (last)
-			int it = TEX_jitter_count - 1;
-			string_path					name;
-			xr_sprintf						(name,"%s%d",r2_jitter,it);
-			R_CHK(RDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_MANAGED, &t_noise_surf[it], nullptr));
-			t_noise[it]					= dxRenderDeviceRender::Instance().Resources->_CreateTexture	(name);
-			t_noise[it]->surface_set	(t_noise_surf[it]);
-			R_CHK						(t_noise_surf[it]->LockRect	(0,&R[it],0,0));
-			
-			// Fill it,
-			for (u32 y=0; y<TEX_jitter; y++)
-			{
-				for (u32 x=0; x<TEX_jitter; x++)
-				{
-					float numDir = 1.0f;
-					switch (ps_r_ssao)
-					{
-						case 1: numDir = 4.0f; break;
-						case 2: numDir = 6.0f; break;
-						case 3: numDir = 8.0f; break;
-					}
-					float angle = 2 * PI * ::Random.randF(0.0f, 1.0f) / numDir;
-					float dist = ::Random.randF(0.0f, 1.0f);
-					//float dest[4];
-					
-					float*	p	=	(float*)	(LPBYTE (R[it].pBits) + y*R[it].Pitch + x*4*sizeof(float));
-					*p = (float)(_cos(angle));
-					*(p+1) = (float)(_sin(angle));
-					*(p+2) = (float)(dist);
-					*(p+3) = 0;
-					
-					//generate_hbao_jitter	(data,TEX_jitter*TEX_jitter);
-				}
-			}			
-			R_CHK						(t_noise_surf[it]->UnlockRect(0));
+		for(int it3 = 0; it3 < TEX_jitter_count; it3++) {
+			R_CHK(t_noise_surf[it3]->UnlockRect(0));
 		}
 	}
 

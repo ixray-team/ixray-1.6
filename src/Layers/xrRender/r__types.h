@@ -53,7 +53,6 @@
 #define		r2_ds2_fade			"$user$ds2_fade"		// ---
 
 #define		r2_jitter			"$user$jitter_"			// --- dither
-#define		r2_jitter_mipped	"$user$jitter_mipped"			// --- dither
 #define		r2_sunmask			"shaders\\shaders_sunmask"
 
 #define		r2_RT_smaa_edgetex  "$user$edgetex"
@@ -76,12 +75,12 @@ const		u32					TEX_material_LdotH	= 256	;	// specular,	Y
 const		u32					TEX_material_Count	= 4		;	// Number of materials,	Z
 #endif //USE_DX11
 
-const		u32					TEX_jitter			= 64	;
-const		u32					TEX_jitter_count	= 5		;	// for HBAO
+const		u32					TEX_jitter = 64;
+const		u32					TEX_jitter_count = 3;	// for HBAO
 
-const		u32					BLOOM_size_X		= 256	;
-const		u32					BLOOM_size_Y		= 256	;
-const		u32					LUMINANCE_size		= 16	;
+const		u32					BLOOM_size_X = 256;
+const		u32					BLOOM_size_Y = 256;
+const		u32					LUMINANCE_size = 16;
 
 // deffer
 #define		SE_R2_NORMAL_HQ		0	// high quality/detail

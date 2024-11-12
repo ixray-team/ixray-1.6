@@ -9,9 +9,6 @@ extern ECORE_API	xr_token	qsun_shafts_token[];
 extern ECORE_API	u32			ps_r2_smapsize;
 extern ECORE_API	xr_token	qsmapsize_token[];
 
-extern ECORE_API	u32			ps_r_ssao;			//	=	0;
-extern ECORE_API	xr_token	qssao_token[];
-
 extern ENGINE_API	u32			ps_r_scale_mode;
 
 extern ECORE_API	u32			ps_r_ssao_mode;
@@ -76,7 +73,6 @@ extern ECORE_API	BOOL		ps_r2_particle_dt;
 // R2-specific
 extern ECORE_API Flags32		ps_r2_ls_flags;				// r2-only
 extern ECORE_API Flags32		ps_r2_ls_flags_ext;
-extern ECORE_API Flags16		ps_r2_ls_flags_ssao;
 extern ECORE_API float			ps_r2_df_parallax_h;		// r2-only
 extern ECORE_API float			ps_r2_df_parallax_range;	// r2-only
 extern ECORE_API float			ps_r2_gmaterial;			// r2-only
@@ -164,17 +160,6 @@ enum
 	R3FLAG_VOLUMETRIC_SMOKE		= (1<<27),
 	R2FLAG_LIGHTS_DETAILS		= (1<<28),
 	R2FLAG_FAST_DETAILS_UPDATE	= (1<<29)
-};
-
-enum ESSAO_DATA
-{
-	NONE,
-	SSAO_BLUR		 = (1<<0),
-	SSAO_OPT_DATA	 = (1<<1),
-	SSAO_HALF_DATA   = (1<<2),
-	SSAO_HDAO		 = (1<<3),
-	SSAO_GTAO		 = (1<<4),
-	SSAO_ULTRA_OPT   = (1<<5)
 };
 
 enum

@@ -226,11 +226,6 @@ void					CRender::create					()
 	o.distortion		= o.distortion_enabled;
 	o.disasm			= Core.ParamsData.test(ECoreParams::disasm);
 	o.forceskinw		= Core.ParamsData.test(ECoreParams::skinw);
-	
-	if (ps_r_ssao)
-	{
-		SSAO = ps_r2_ls_flags_ssao;
-	}
 
 	// constants
 	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("parallax",	&binder_parallax);
@@ -779,25 +774,6 @@ HRESULT	CRender::shader_compile			(
 	}
 	sh_name[len]='0'+char(o.forceskinw); ++len;
 
-	bool HasSSAOBlur = SSAO.test(ESSAO_DATA::SSAO_BLUR);
-	if (HasSSAOBlur)
-	{
-		defines[def_it].Name		=	"USE_SSAO_BLUR";
-		defines[def_it].Definition	=	"1";
-		def_it						++;
-	}
-	sh_name[len]='0'+char(HasSSAOBlur); ++len;
-
-	bool HasSSAOOpt = SSAO.test(ESSAO_DATA::SSAO_OPT_DATA);
-	bool HasSSAOOptHalf = SSAO.test(ESSAO_DATA::SSAO_HALF_DATA);
-	if (HasSSAOOpt)
-	{
-		defines[def_it].Name		= "SSAO_OPT_DATA";
-		defines[def_it].Definition  = HasSSAOOptHalf ? "2" : "1";
-		def_it++;
-	}
-	sh_name[len]='0'+char(HasSSAOOpt ? (HasSSAOOptHalf ? 2 : 1) : 0); ++len;
-
 	// skinning
 	if (m_skinning<0)		{
 		defines[def_it].Name		=	"SKIN_NONE";
@@ -895,30 +871,26 @@ HRESULT	CRender::shader_compile			(
 		sh_name[len]='0'; ++len;
 	}
 
-	if (ps_r_ssao)
-	{
-		xr_sprintf					(c_ssao,"%d",ps_r_ssao);
-		defines[def_it].Name		=	"SSAO_QUALITY";
-		defines[def_it].Definition	=	c_ssao;
-		def_it						++;
-		sh_name[len]='0'+char(ps_r_ssao); ++len;
+	if(ps_r_ssao_mode) {
+		xr_sprintf(c_ssao, "%d", ps_r_ssao_mode);
+		defines[def_it].Name = "SSAO_QUALITY";
+		defines[def_it].Definition = c_ssao;
+		def_it++;
+		sh_name[len] = '0' + char(ps_r_ssao_mode); ++len;
 	}
-	else
-	{
-		sh_name[len]='0'; ++len;
+	else {
+		sh_name[len] = '0'; ++len;
 	}
 
-	if (ps_r_sun_quality)
-	{
-		xr_sprintf					(c_sun_quality,"%d",ps_r_sun_quality);
-		defines[def_it].Name		=	"SUN_QUALITY";
-		defines[def_it].Definition	=	c_sun_quality;
-		def_it						++;
-		sh_name[len]='0'+char(ps_r_sun_quality); ++len;
+	if(ps_r_sun_quality) {
+		xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
+		defines[def_it].Name = "SUN_QUALITY";
+		defines[def_it].Definition = c_sun_quality;
+		def_it++;
+		sh_name[len] = '0' + char(ps_r_sun_quality); ++len;
 	}
-	else
-	{
-		sh_name[len]='0'; ++len;
+	else {
+		sh_name[len] = '0'; ++len;
 	}
 
 	if (ps_r2_ls_flags.test(R2FLAG_STEEP_PARALLAX))

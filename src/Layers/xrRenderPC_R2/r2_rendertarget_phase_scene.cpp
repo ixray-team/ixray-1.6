@@ -14,21 +14,9 @@ void	CRenderTarget::phase_scene_prepare	()
 
 	CEnvDescriptor&	E = *g_pGamePersistent->Environment().CurrentEnv;
 	float fValue = E.m_fSunShaftsIntensity;
-	//	TODO: add multiplication by sun color here
-	//if (fValue<0.0001) FlagSunShafts = 0;
 
-	if (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
-		((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) ||
-		(ps_r_ssao > 0))
-	{
-		u_setrt	( RCache.get_width(),RCache.get_height(),rt_Position->pRT,nullptr,nullptr,RDepth );
-		CHK_DX	( RDevice->Clear	( 0L, nullptr, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-	}
-	else
-	{
-		u_setrt	( RCache.get_width(),RCache.get_height(),RTarget,nullptr,nullptr,RDepth );
-		CHK_DX	( RDevice->Clear	( 0L, nullptr, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-	}
+	u_setrt(RCache.get_width(), RCache.get_height(), rt_Position->pRT, nullptr, nullptr, RDepth);
+	CHK_DX(RDevice->Clear(0L, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
 
 	//	Igor: for volumetric lights
 	m_bHasActiveVolumetric				= false;

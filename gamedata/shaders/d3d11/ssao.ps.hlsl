@@ -2,19 +2,12 @@
 #define SSAO_1231242112
 #include "common.hlsli"
 
-#ifndef SSAO_QUALITY
-
-float calc_ssao(float3 P, float3 N, float2 tc, float2 tcJ, float4 pos2d)
-{
-    return 1.0;
-}
-
-#else // SSAO_QUALITY
+#define SSAO_RADIUS 0.8
 
 Texture2D jitter0;
 sampler smp_jitter;
+
 float4 scaled_screen_res;
-#define SSAO_RADIUS 0.8
 
 float3 uv_to_eye(float2 uv, float eye_z)
 {
@@ -44,7 +37,7 @@ float doPBAO(float2 uv, float3 pos, float3 n, float invRad, float bias, float se
 	return max(-selfOcc, dot(n, v) - bias) * rcp(atten * atten + 1.0f);
 }
 
-float calc_ssao(float3 pos, float3 normal, float2 tc0, float2 tcJ, float4 pos2d)
+float calc_ssao(float3 pos, float3 normal, float2 tc0)
 {
 	// define kernel
 	float n = 0.0f;
@@ -103,6 +96,5 @@ float calc_ssao(float3 pos, float3 normal, float2 tc0, float2 tcJ, float4 pos2d)
 	ao = 1.0f - (ao * contrast + selfOcc);
 	return ao * ao * ao;
 }
-#endif
 #endif
 
