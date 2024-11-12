@@ -27,6 +27,9 @@
 #define		r2_RT_generic1		"$user$generic1"		// ---
 #define		r2_RT_generic2		"$user$generic2"		// ---	//	Igor: for volumetric lights
 
+#define		r2_RT_sslr "$user$sslr"		//temporary rt for ssao calculation
+#define		r2_RT_sslr_temp "$user$sslr_temp"		//temporary rt for ssao calculation
+
 #define		r2_RT_ssao_temp		"$user$ssao_temp"		//temporary rt for ssao calculation
 #define		r2_RT_half_depth	"$user$half_depth"		//temporary rt for hbao calculation
 

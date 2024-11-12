@@ -14,9 +14,11 @@ struct v2p
 
     float3 tc0 : TEXCOORD0;
     float3 tc1 : TEXCOORD1;
+	
+    float3 p : TEXCOORD2;
 
-    float4 hpos_curr : TEXCOORD2;
-    float4 hpos_old : TEXCOORD3;
+    float4 hpos_curr : TEXCOORD3;
+    float4 hpos_old : TEXCOORD4;
 
     float4 hpos : SV_POSITION;
 };
@@ -28,6 +30,7 @@ void main(in vi v, out v2p o)
     o.tc1 = v.tc1;
 
     o.factor = v.c;
+    o.p = mul(m_W, v.p.xyz).xyz;
 
     o.hpos_curr = o.hpos;
     o.hpos_old = mul(m_WVP_old, v.p);

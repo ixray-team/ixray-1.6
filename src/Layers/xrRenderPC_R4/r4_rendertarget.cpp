@@ -435,6 +435,9 @@ CRenderTarget::CRenderTarget()
 		DisplayRT(rt_Velocity);
 		DisplayRT(rt_ui_pda);
 
+		DisplayRT(rt_sslr);
+		DisplayRT(rt_sslr_temp);
+
 #undef DisplayRT
 
 		ImGui::End();
@@ -499,6 +502,11 @@ CRenderTarget::CRenderTarget()
 	
 		rt_ui_pda.create(r_ui_pda, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
+
+	
+	rt_sslr.create(r2_RT_sslr, s_dwWidth, s_dwHeight, DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
+	rt_sslr_temp1.create(r2_RT_sslr_temp"1", s_dwWidth, s_dwHeight, DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
+	rt_sslr_temp.create(r2_RT_sslr_temp, s_dwWidth, s_dwHeight, DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 	init_fsr();
 	init_dlss();

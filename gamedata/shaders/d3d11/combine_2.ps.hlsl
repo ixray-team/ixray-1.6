@@ -4,6 +4,8 @@
 
 float4 main(v2p_aa_AA I) : SV_Target
 {
+	// I.Tex0.x = 1.0f - I.Tex0.x;
+	
     float3 Color = dof(I.Tex0);
     float4 Bloom = s_bloom.Sample(smp_rtlinear, I.Tex0);
 

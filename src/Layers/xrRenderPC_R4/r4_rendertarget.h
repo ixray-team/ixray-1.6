@@ -121,6 +121,10 @@ private:
 	ref_rt						rt_smaa_blendtex;
 
 	// SSAO
+	ref_rt						rt_sslr;
+	ref_rt						rt_sslr_temp;
+	ref_rt						rt_sslr_temp1;
+
 	ref_rt						rt_ssao_temp;
 	ref_rt						rt_half_depth;
 	ref_shader					s_ssao;
@@ -246,6 +250,7 @@ public:
 
 	void						phase_cas				();
 	void						phase_gtao				();
+	void						phase_sslr				();
 
 	void						RenderEffect			(ScreenPostProcessType postProcessType);
 	void						PhaseAberration			();

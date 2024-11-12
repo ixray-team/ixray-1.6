@@ -12,14 +12,22 @@ float Contrast(float Input, float ContrastPower)
     return Output;
 }
 
+#define PushGamma(x) pow(x, 2.0f)
+#define PopGamma(x) pow(x, rcp(2.0f))
+
 float3 tonemap(float3 rgb, float scale)
 {
-    rgb = rgb * scale;
+   rgb = rgb * scale;
 
-    const float fWhiteIntensity = 1.7f;
-    const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
-
-    return rgb * (1.0f + rgb / fWhiteIntensitySQR) / (rgb + 1.0f);
+	// rgb /= 1.0f + rgb;
+   const float fWhiteIntensity = 1.7f;
+   const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
+   
+	// rgb /= (1.0f + rgb);
+    // rgb = PopGamma(rgb);
+	rgb = rgb * (1.0f + rgb / fWhiteIntensitySQR) / (rgb + 1.0f);
+	rgb = PopGamma(rgb);
+    return rgb;
 }
 
 // Функции генерации случайных чисел [0, 1]

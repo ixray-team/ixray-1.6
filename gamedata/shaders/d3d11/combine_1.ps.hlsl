@@ -23,7 +23,7 @@ float4 main(_input I) : SV_Target
 #endif
 
     float Occ = s_occ.SampleLevel(smp_rtlinear, I.tc0.xy, 0.0f).x;
-    float3 Ambient = Occ * AmbientLighting(O.View, O.Normal, O.Color, O.Metalness, O.Roughness, O.Hemi);
+    float3 Ambient = Occ * AmbientLighting(O.View, O.Normal, O.Color, O.Metalness, O.Roughness, O.Hemi, I.pos2d.xy);
     float3 Color = Ambient + Light;
 
     float Fog = saturate(O.ViewDist * fog_params.w + fog_params.x);

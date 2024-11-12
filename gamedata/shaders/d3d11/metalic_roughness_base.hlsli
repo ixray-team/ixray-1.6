@@ -7,7 +7,7 @@
 #define F0 float3(0.04f, 0.04f, 0.04f)
 
 // Use legacy lighting pipeline
-#define USE_LEGACY_LIGHT
+// #define USE_LEGACY_LIGHT
 
 struct IXrayMaterial
 {
@@ -74,11 +74,11 @@ float3 NormalDecode(float3 Normal)
 void GbufferPack(inout IXrayGbufferPack O, inout IXrayMaterial M)
 {
     O.Normal.xyz = NormalEncode(M.Normal.xyz);
-    O.Normal.w = M.Hemi;
+    O.Normal.w = M.Hemi * M.AO;
 
-    O.Color.xyz = M.Color.xyz * M.AO;
+    O.Color.xyz = M.Color.xyz;
     O.Color.w = M.Roughness;
-
+	
     O.Material.y = M.SSS;
 
 #ifdef USE_R2_STATIC_SUN
@@ -127,7 +127,7 @@ void GbufferUnpack(in float2 TexCoord, in float2 HPos, inout IXrayGbuffer O)
     O.Normal.xyz = NormalDecode(NormalHemi.xyz);
     O.Hemi = NormalHemi.w;
 
-    O.Color.xyz = ColorSSS.xyz;
+    O.Color.xyz = PushGamma(ColorSSS.xyz);
     O.SSS = Material.y;
 
     O.Metalness = Material.x;

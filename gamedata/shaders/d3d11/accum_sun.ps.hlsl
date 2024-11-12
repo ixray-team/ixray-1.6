@@ -38,6 +38,8 @@ float4 main(v2p_volume I) : SV_Target
 
 #ifdef USE_LEGACY_LIGHT
     O.Roughness *= 1.0f - O.SSS;
+#else
+    O.Roughness = max(O.Roughness, O.SSS);
 #endif
 
     O.Normal = lerp(O.Normal, -Ldynamic_dir.xyz, O.SSS);

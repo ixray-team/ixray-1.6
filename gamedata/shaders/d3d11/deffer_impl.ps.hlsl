@@ -32,6 +32,8 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 
     M.Normal = Normal_R.wzy + Normal_G.wzy + Normal_B.wzy + Normal_A.wzy - 0.5;
     M.Roughness = min(1.0f, Normal_R.x + Normal_G.x + Normal_B.x + Normal_A.x);
+	
+	M.Roughness = lerp(M.Roughness, 1.0f - dot(M.Color, 0.033f), Mask.y);
 #else
     float4 Detail = s_detail.Sample(smp_base, tcdbump);
 	float4 DetailBump = s_detailBump.Sample(smp_base, tcdbump);
@@ -56,7 +58,8 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 #ifdef USE_LEGACY_LIGHT
     M.Metalness = L_material.w;
 #else
-    M.Roughness = 1.0f - M.Roughness * 0.9f;
+	// M.Metalness = M.Roughness;
+    M.Roughness = 1.0f - M.Roughness * M.Roughness * 0.9f;
 #endif
 
     O.Velocity = I.hpos_curr.xy / I.hpos_curr.w - I.hpos_old.xy / I.hpos_old.w;

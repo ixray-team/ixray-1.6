@@ -56,7 +56,7 @@ float3 DirectLight(float4 Radiance, float3 Light, float3 Normal, float3 View, fl
     float3 Diffuse = Color * (1.0f - Metalness) * (1.0f - F);
 
     float3 BRDF = Specular + Diffuse;
-    return Radiance.xyz * NdotL * BRDF;
+    return PushGamma(Radiance.xyz) * NdotL * BRDF;
 #else
     float2 Material = s_material.SampleLevel(smp_material, float3(NdotL, NdotH, Metalness), 0).xy;
     return Radiance.xyz * (Material.x * Color.xyz + Material.y * Roughness.x * Radiance.w);

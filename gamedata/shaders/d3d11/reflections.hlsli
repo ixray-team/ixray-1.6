@@ -7,12 +7,18 @@
 float get_depth_fast(float2 tc)
 {
     float P = s_position.SampleLevel(smp_rtlinear, tc, 0).x;
-    return depth_unpack.x / (P - depth_unpack.y);
+    return P > 0.02f ? depth_unpack.x * rcp(P - depth_unpack.y) : depth_unpack.z * rcp(P - depth_unpack.w);
 }
 
 float3 gbuf_unpack_position(float2 uv)
 {
     float depth = get_depth_fast(uv);
+    uv = uv * 2.0f - 1.0f;
+    return float3(uv * pos_decompression_params.xy, 1.0f) * depth;
+}
+
+float3 gbuf_unpack_position(float2 uv, float depth)
+{
     uv = uv * 2.0f - 1.0f;
     return float3(uv * pos_decompression_params.xy, 1.0f) * depth;
 }
@@ -23,15 +29,17 @@ float2 gbuf_unpack_uv(float3 position)
     return saturate(position.xy * 0.5 + 0.5);
 }
 
-float4 ScreenSpaceLocalReflections(float3 Point, float3 Reflect)
+float4 ScreenSpaceLocalReflections(float3 Point, float3 Reflect, inout float L)
 {
     float2 ReflUV = 0.0;
     float3 HitPos, TestPos;
-    float L = 0.025f, DeltaL = 0.0f;
-
-    float Fade = saturate(dot(Reflect, normalize(Point)) * 4.0f);
+    float DeltaL = 0.0f;
 	
-	Reflect.xyz /= abs(Reflect.z) + 0.00001f;
+	Point *= 0.996f;
+
+    float Fade = smoothstep(0.4f, 0.5f, dot(Reflect, normalize(Point)));
+	
+	// Reflect.xyz /= abs(Reflect.z) + 0.00001f;
 
     if (Fade < 0.001f)
     {
@@ -46,7 +54,7 @@ float4 ScreenSpaceLocalReflections(float3 Point, float3 Reflect)
         HitPos = gbuf_unpack_position(ReflUV);
         if (all(min(min(1.f - ReflUV.x, ReflUV.x), min(1.f - ReflUV.y, ReflUV.y))))
         {
-            L = abs(Point.z - HitPos.z);
+            L = length(Point - HitPos);
         }
         else
         {
@@ -57,16 +65,16 @@ float4 ScreenSpaceLocalReflections(float3 Point, float3 Reflect)
     DeltaL = length(HitPos) - length(Point);
     Fade *= step(-0.4f, DeltaL);
 
-    float Attention = GetBorderAtten(ReflUV, 0.125f);
-    ReflUV -= s_velocity.SampleLevel(smp_rtlinear, ReflUV, 0).xy * float2(0.5f, -0.5f);
-    Fade *= min(Attention, GetBorderAtten(ReflUV, 0.125f));
+   float Attention = GetBorderAtten(ReflUV, 0.125f);
+   ReflUV -= s_velocity.SampleLevel(smp_rtlinear, ReflUV, 0).xy * float2(0.5f, -0.5f);
+   Fade *= min(Attention, GetBorderAtten(ReflUV, 0.125f));
 
 #ifdef SKYBLED_FADE
     float Fog = saturate(length(HitPos) * fog_params.w + fog_params.x);
     Fade *= 1.f - Fog * Fog;
 #endif
 
-    float3 Color = s_image.SampleLevel(smp_rtlinear, ReflUV, 0).xyz;
+    float3 Color = s_image.SampleLevel(smp_rtlinear, ReflUV, 0).xyz;	
     return float4(Color, Fade);
 }
 
@@ -78,6 +86,9 @@ float4 calc_reflections(float3 pos, float2 pos2d, float3 vreflect)
     pos2d = pos2d - m_taa_jitter.xy * float2(0.5f, -0.5f) * pos_decompression_params2.xy;
     float3 P = float3(pos2d * pos_decompression_params.zw - pos_decompression_params.xy, 1.0f);
 	
-    return ScreenSpaceLocalReflections(P * Point.z, Reflect);
+	float L = 0.025f;
+    return ScreenSpaceLocalReflections(P * Point.z, Reflect, L);
 }
+
 #endif
+

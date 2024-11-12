@@ -590,7 +590,7 @@ void	CBlender_Compile::SetMapping()
 	// fog-params
 	r_Constant("fog_plane", &binder_fog_plane);
 	r_Constant("fog_params", &binder_fog_params);
-	r_Constant("fog_color", &binder_fog_color);
+	r_Constant("fog_color", &binder_fog_color); 
 
 	r_Constant("timers", &binder_times);
 

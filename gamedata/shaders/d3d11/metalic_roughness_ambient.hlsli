@@ -3,7 +3,7 @@
 #include "common.hlsli"
 
 // #define IBL_REMAP_REFLECTIONS
-#define IBL_FAKE_IRRADANCE
+// #define IBL_FAKE_IRRADANCE
 
 float2 EpicGamesEnvBRDFApprox(float NdotV, float Roughness)
 {
@@ -28,9 +28,9 @@ float3 CompureDiffuseIrradance(float3 N, float Hemi)
     float3 SampleLast = env_s0.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
     float3 SampleNext = env_s1.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
 
-    float3 Irradance = L_hemi_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);
+    float3 Irradance = L_sky_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);
 
-    return Irradance * Irradance * Hemi;
+    return PushGamma(Irradance * Hemi);
 }
 
 float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
@@ -42,13 +42,13 @@ float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
     sky_s0.GetDimensions(MipLevels.x, MipLevels.y, MipLevels.z, MipLevels.w);
     float Lod = MipLevels.w * Roughness;
 #else
-	float Lod = 0.0f; Roughness = sqrt(Roughness);
+	float Lod = 0.0f; Roughness = Roughness * Roughness;
     float3 SampleLastD = env_s0.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
     float3 SampleNextD = env_s1.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
 #endif
 
 #ifdef IBL_REMAP_REFLECTIONS
-    LightDirection.y = abs(LightDirection.y);
+   // LightDirection.y = abs(LightDirection.y);
     RemapVector(LightDirection);
 #endif
 	
@@ -56,21 +56,31 @@ float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
     float3 SampleNext = sky_s1.SampleLevel(smp_rtlinear, LightDirection, Lod).xyz;
 	
 #ifdef IBL_FAKE_IRRADANCE
-	SampleLast = lerp(SampleLast, SampleLastD, Roughness);
-	SampleNext = lerp(SampleNext, SampleNextD, Roughness);
+	SampleLast = lerp(SampleLastD, SampleLast, 1.0f - Roughness * Roughness);
+	SampleNext = lerp(SampleNextD, SampleNext, 1.0f - Roughness * Roughness);
 #endif
 
     float3 Irradance = L_sky_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);
-    return Irradance * Hemi * PI;
+    return PushGamma(Irradance * Hemi);
 }
 
-float3 AmbientLighting(float3 View, float3 Normal, float3 Color, float Metalness, float Roughness, float Hemi)
+float2 gbuf_unpack_uv_temp(float3 position)
+{
+    position.xy /= pos_decompression_params.xy * position.z;
+    return saturate(position.xy * 0.5 + 0.5);
+}
+
+float3 AmbientLighting(float3 View, float3 Normal, float3 Color, float Metalness, float Roughness, float Hemi, float2 tc = 0)
 {
     float3 Reflect = reflect(View, Normal);
 
 #ifndef USE_LEGACY_LIGHT
-    float3 DiffuseIrradance = CompureDiffuseIrradance(Normal, Hemi) + L_ambient.xyz;
-    float3 SpecularIrradance = CompureSpecularIrradance(Reflect, Hemi, Roughness);
+    float3 DiffuseIrradance = CompureDiffuseIrradance(Normal, Hemi) + PushGamma(L_ambient.xyz);
+    float3 SpecularIrradance = s_refl.Load(int3(tc, 0)).xyz; //CompureSpecularIrradance(Reflect, Hemi, Roughness);
+	
+	//float4 SSLR = s_refl.SampleLevel(smp_rtlinear, tc, 0);
+	//
+	//SpecularIrradance = lerp(SpecularIrradance.xyz, SSLR.xyz, SSLR.w);
 
     float NdotV = max(0.0, dot(Normal, -View));
 

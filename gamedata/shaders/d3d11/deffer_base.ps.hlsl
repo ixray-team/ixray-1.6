@@ -52,6 +52,7 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 #endif
 
 #if defined(USE_AREF) && defined(USE_TREEWAVE)
+	M.Roughness = 0.8f + dot(M.Color.xyz, LUMINANCE_VECTOR) * 0.2f;
     M.SSS = 1.0f;
 #endif
 

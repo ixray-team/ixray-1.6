@@ -40,7 +40,7 @@ float4 main(p_volume I, float4 pos2d : SV_POSITION) : SV_Target
 		PS.x = dot(Point, m_lmap[0]);
 		PS.y = dot(Point, m_lmap[1]);
     #endif
-    Lightmap *= s_lmap.SampleLevel(smp_rtlinear, PS.xy / PS.w, 0.0f).xyz;
+    Lightmap *= PushGamma(s_lmap.SampleLevel(smp_rtlinear, PS.xy / PS.w, 0.0f).xyz);
 #endif
 
     return float4(Lightmap.xyz * Light.xyz, 0.0f);
