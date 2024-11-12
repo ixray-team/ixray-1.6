@@ -740,6 +740,12 @@ u32 CHudItem::PlayHUDMotion(xr_string M, BOOL bMixIn, CHudItem*  W, u32 state, b
 	if (need_suffix)
 		M = NeedAddSuffix(M);
 
+	if (HudItemData() && !HudAnimationExist(M.c_str()))
+	{
+		Msg("! model [%s] has no motion alias defined [%s]", hud_sect.c_str(), M);
+		return 0;
+	}
+
 	xr_string snd_name = "snd_" + M;
 	if (pSettings->line_exist(hud_sect, snd_name.c_str()))
 	{
