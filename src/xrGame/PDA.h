@@ -77,10 +77,8 @@ public:
 //*	virtual LPCSTR							Name					();
 public:
 	bool m_bZoomed = false;
+	bool m_bAimStart = false;
 	float m_fZoomfactor = 0.f;
-	float m_fZoomFovfactor = 0.f;
-
-	virtual float GetHudFov();
 protected:
 	void									UpdateActiveContacts	();
 

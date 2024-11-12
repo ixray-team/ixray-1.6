@@ -52,14 +52,49 @@ void CPda::net_Destroy()
 	UpdateActiveContacts();
 }
 
-void CPda::PlayAnimIdle() {
-	if(TryPlayAnimIdle()) return;
+void ModifAnim(xr_string& anim)
+{
+	if (Actor() == nullptr)
+		return;
 
-	if(m_bZoomed) {
-		PlayHUDMotion("anm_idle_aim", TRUE, nullptr, GetState());
+	if (Actor()->GetMovementState(eReal) & ACTOR_DEFS::EMoveCommand::mcAnyMove)
+	{
+		anim += "_moving";
+
+		if (Actor()->GetMovementState(eReal) & ACTOR_DEFS::EMoveCommand::mcCrouch && Actor()->GetMovementState(eReal) & ACTOR_DEFS::EMoveCommand::mcAccel)
+			anim += "_crouch_slow";
+		else if (Actor()->GetMovementState(eReal) & ACTOR_DEFS::EMoveCommand::mcCrouch)
+			anim += "_crouch";
+		else if (Actor()->GetMovementState(eReal) & ACTOR_DEFS::EMoveCommand::mcAccel)
+			anim += "_slow";
 	}
-	else {
-		PlayHUDMotion("anm_idle", TRUE, nullptr, GetState());
+}
+
+void CPda::PlayAnimIdle()
+{
+	xr_string anm = "anm_idle";
+
+	if (m_bZoomed)
+	{
+		if (!m_bAimStart)
+		{
+			m_bAimStart = true;
+			PlayHUDMotion("anm_idle_aim_start", TRUE, nullptr, GetState());
+			return;
+		}
+		anm += "_aim";
+		ModifAnim(anm);
+		PlayHUDMotion(anm, TRUE, nullptr, GetState());
+	}
+	else
+	{
+		if (m_bAimStart)
+		{
+			m_bAimStart = false;
+			PlayHUDMotion("anm_idle_aim_end", TRUE, nullptr, GetState());
+			return;
+		}
+		inherited::PlayAnimIdle();
 	}
 }
 
@@ -161,8 +196,6 @@ void CPda::Load(LPCSTR section)
 
 		hud_sect = "";
 	}
-
-	m_fZoomFovfactor = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_factor", 1.0f);
 }
 
 void CPda::shedule_Update(u32 dt) {
@@ -181,11 +214,6 @@ void CPda::shedule_Update(u32 dt) {
 		feel_touch_update(Position(), m_fRadius);
 		UpdateActiveContacts();
 	}
-}
-
-float CPda::GetHudFov() {
-	auto hud_fov = inherited::GetHudFov();
-	return hud_fov * (1.0f + (m_fZoomFovfactor - 1.0f) * m_fZoomfactor);
 }
 
 void CPda::UpdateActiveContacts	()
@@ -346,45 +374,49 @@ void CPda::OnMoveToRuck(const SInvItemPlace& prev)
 	SetPending(FALSE);
 }
 
-u8 CPda::GetCurrentHudOffsetIdx() {
-	return (m_bZoomed || m_fZoomfactor > 0.0f) ? 1 : 0;
+u8 CPda::GetCurrentHudOffsetIdx()
+{
+	bool b_aiming = ((m_bZoomed && m_fZoomfactor <= 1.f) || (!m_bZoomed && m_fZoomfactor > 0.f));
+	return b_aiming ? 1 : 0;
 }
 
 void CPda::UpdateHudAdditonal(Fmatrix& trans) {
 	attachable_hud_item* hi = HudItemData();
 
-	if(!hi) {
+	if (!hi)
+	{
 		return;
 	}
 
-	if((m_bZoomed && m_fZoomfactor <= 1.0f) ||
-		(!m_bZoomed && m_fZoomfactor > 0.0f)) {
-		u8 idx = GetCurrentHudOffsetIdx();
-		Fvector curr_offs = hi->m_measures.m_hands_offset[0][idx];
-		Fvector curr_rot = hi->m_measures.m_hands_offset[1][idx];
+	u8 idx = GetCurrentHudOffsetIdx();
+	Fvector curr_offs = hi->m_measures.m_hands_offset[0][idx];
+	Fvector curr_rot = hi->m_measures.m_hands_offset[1][idx];
 
-		curr_offs.mul(m_fZoomfactor);
-		curr_rot.mul(m_fZoomfactor);
+	curr_offs.mul(m_fZoomfactor);
+	curr_rot.mul(m_fZoomfactor);
 
-		Fmatrix hud_rotation;
-		hud_rotation.identity();
-		hud_rotation.rotateX(curr_rot.x);
+	Fmatrix hud_rotation;
+	hud_rotation.identity();
+	hud_rotation.rotateX(curr_rot.x);
 
-		Fmatrix hud_rotation_y;
-		hud_rotation_y.identity();
-		hud_rotation_y.rotateY(curr_rot.y);
-		hud_rotation.mulA_43(hud_rotation_y);
+	Fmatrix hud_rotation_y;
+	hud_rotation_y.identity();
+	hud_rotation_y.rotateY(curr_rot.y);
+	hud_rotation.mulA_43(hud_rotation_y);
 
-		hud_rotation_y.identity();
-		hud_rotation_y.rotateZ(curr_rot.z);
-		hud_rotation.mulA_43(hud_rotation_y);
+	hud_rotation_y.identity();
+	hud_rotation_y.rotateZ(curr_rot.z);
+	hud_rotation.mulA_43(hud_rotation_y);
 
-		hud_rotation.translate_over(curr_offs);
-		trans.mulB_43(hud_rotation);
+	hud_rotation.translate_over(curr_offs);
+	trans.mulB_43(hud_rotation);
 
-		m_fZoomfactor += (m_bZoomed ? 1.0f : -1.0f) * Device.fTimeDelta * 4.0f;
-		clamp(m_fZoomfactor, 0.f, 1.f);
-	}
+	if (m_bZoomed)
+		m_fZoomfactor += Device.fTimeDelta / 0.25f;
+	else
+		m_fZoomfactor -= Device.fTimeDelta / 0.25f;
+
+	clamp(m_fZoomfactor, 0.f, 1.f);
 
 	// inherited::UpdateHudAdditonal(trans);
 }
@@ -436,37 +468,36 @@ void CPda::UpdateCL()
 
 		g_pGamePersistent->pda_shader_data.pda_display_factor = 0.0f;
 	}
-	else {
-		CEntity::SEntityState st;
-		Actor()->g_State(st);
-
-		if(st.bSprint) {
+	else
+	{
+		u32 state = Actor()->GetMovementState(eReal);
+		if (state & ACTOR_DEFS::EMoveCommand::mcSprint)
 			m_bZoomed = false;
-		}
 
 		g_pGamePersistent->pda_shader_data.pda_display_factor = 1.0f;
 	}
 }
 
-bool CPda::Action(u16 cmd, u32 flags) {
-	switch(cmd) {
+bool CPda::Action(u16 cmd, u32 flags)
+{
+	switch(cmd)
+	{
 		case kWPN_ZOOM:
 		{
-			if(flags & CMD_START) {
-				if(GetState() == eIdle) {
+			if(flags & CMD_START)
+			{
+				if (GetState() == eIdle)
+				{
 					m_bZoomed = !m_bZoomed;
 
-					CEntity::SEntityState st = {};
-					Actor()->g_State(st);
-
-					if(!st.bSprint) {
-						PlayAnimIdle();
-					}
-					else {
+					u32 state = Actor()->GetMovementState(eReal);
+					if (state & ACTOR_DEFS::EMoveCommand::mcSprint)
 						m_bZoomed = false;
-					}
+					else
+						PlayAnimIdle();
 
-					if(m_bZoomed) {
+					if (m_bZoomed)
+					{
 						GetUICursor().SetUICursorPosition(GetUICursor().GetCursorPosition());
 					}
 				}
