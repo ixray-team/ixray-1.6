@@ -161,6 +161,8 @@ void CPda::Load(LPCSTR section)
 
 		hud_sect = "";
 	}
+
+	m_fZoomFovfactor = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov_factor", 1.0f);
 }
 
 void CPda::shedule_Update(u32 dt) {
@@ -179,6 +181,11 @@ void CPda::shedule_Update(u32 dt) {
 		feel_touch_update(Position(), m_fRadius);
 		UpdateActiveContacts();
 	}
+}
+
+float CPda::GetHudFov() {
+	auto hud_fov = inherited::GetHudFov();
+	return hud_fov * (1.0f + (m_fZoomFovfactor - 1.0f) * m_fZoomfactor);
 }
 
 void CPda::UpdateActiveContacts	()
