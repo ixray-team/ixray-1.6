@@ -1,0 +1,220 @@
+class "spawn_item" (CUIListBoxItem)
+
+function spawn_item:__init(height) super(height)
+	self.file_name = "filename"
+
+	self:SetTextColor(GetARGB(255, 170, 170, 170))
+
+	self.fn = self:GetTextItem()
+	self.fn:SetFont(GetFontLetterica18Russian())
+	self.fn:SetEllipsis(true)
+end
+
+function spawn_item:__finalize()
+end
+
+class "spawn_dialog" (CUIScriptWnd)
+
+function spawn_dialog:__init() super()
+	 self:InitControls()
+	 self:InitCallBacks()
+	 self:FillList()
+end
+
+function spawn_dialog:__finalize()
+end
+
+function spawn_dialog:FillList()
+	self.list_box:RemoveAll()
+	
+	local _fs = getFS()
+	local flist = _fs:file_list_open("$game_spawn$", FS.FS_ListFiles + FS.FS_ClampExt)
+	local f_cnt = flist:Size()
+
+	SemiLog(f_cnt)
+
+	for	it = 0, f_cnt - 1 do
+		local Name = flist:GetAt(it)
+		local fullName = _fs:update_path("$game_spawn$", Name .. ".spawn")
+		if _fs:exist(fullName) then
+			self:AddItemToList(Name, "")
+		end
+	end
+	
+	flist:Free()
+end
+
+function spawn_dialog:InitControls()
+	self:SetWndRect			(Frect():set(0,0,1024,768))
+
+	local xml				= CScriptXmlInit()
+	local ctrl
+	xml:ParseFile			("ui_mm_load_dlg.xml")
+
+	xml:InitStatic			("background",self)
+
+	ctrl					= CUIWindow()
+	xml:InitWindow			("file_item:main",0,ctrl)
+
+	self.file_item_main_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	xml:InitWindow			("file_item:fn",0,ctrl)
+	self.file_item_fn_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	xml:InitWindow			("file_item:fd",0,ctrl)
+	self.file_item_fd_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	self.form				= xml:InitStatic("form",self)
+
+	self.caption = xml:InitTextWnd("form:caption",self.form)
+	self.caption:SetTextST("ui_mm_newgame")
+
+	self.picture			= xml:InitStatic("form:picture",self.form)
+
+	self.file_caption 		= xml:InitTextWnd("form:file_caption",self.form)
+	self.file_data			= xml:InitTextWnd("form:file_data",self.form)
+
+	xml:InitFrame			("form:list_frame",self.form)
+
+	self.list_box			= xml:InitListBox("form:list",self.form)
+
+	self.list_box:ShowSelectedItem	(true)
+	self:Register			(self.list_box, "list_window")
+
+	ctrl					= xml:Init3tButton("form:btn_load",	self.form)
+	self:Register			(ctrl, "button_load")
+
+	ctrl = xml:Init3tButton	("form:btn_cancel",	self.form)
+	self:Register			(ctrl, "button_back")
+end
+
+function spawn_dialog:InitCallBacks()
+	self:AddCallback("button_load",		ui_events.BUTTON_CLICKED,             self.OnButton_load_clicked,	self)
+	self:AddCallback("button_back",		ui_events.BUTTON_CLICKED,             self.OnButton_back_clicked,	self)
+
+	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, 			  self.OnListItemClicked,		self)
+	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		  self.OnListItemDbClicked,		self)
+end
+
+function AddTimeDigit(str, dig)
+	if (dig > 9) then
+		str = str .. dig
+	else
+		str = str .. "0" .. dig
+	end
+
+	return str
+
+end
+
+function file_data(fname)
+	local _fs = getFS()
+	local fullName = _fs:update_path("$game_spawn$", fname .. ".spawn")
+
+	if _fs:exist(fullName) then
+		return game.translate_string("ui_inv_time") .. ": " .. _fs:get_file_age_str(fullName)
+	else
+		return "no file data"
+	end
+end
+
+function spawn_dialog:OnListItemClicked()
+	if self.list_box:GetSize()==0 then return end
+
+	local item = self.list_box:GetSelectedItem()
+	
+	local r = self.picture:GetTextureRect()
+	self.picture:InitTexture("ui\\ui_noise")
+	self.picture:SetTextureRect(Frect():set(r.x1,r.y1,r.x2,r.y2))
+
+
+	if item == nil then
+		self.file_caption:SetText("")
+		self.file_data:SetText("")
+		return
+	end
+	
+	local item_text = item.fn:GetText()
+	self.file_caption:SetText(item_text)
+	self.file_caption:SetEllipsis(true)
+	self.file_data:SetText(file_data(item_text))
+end
+
+function spawn_dialog:OnListItemDbClicked()
+	self:OnButton_load_clicked()
+end
+
+function spawn_dialog:load_game_internal()
+	local console = get_console()
+
+	if self.list_box:GetSize() == 0 then return end
+
+	local index = self.list_box:GetSelectedIndex()
+	if index == -1 then return end
+
+	local item = self.list_box:GetItemByIndex(index)
+	local fname = item.fn:GetText()
+
+	console:execute("disconnect")
+	console:execute("start server(" .. fname .. "/single/alife/new) client(localhost)")
+end
+
+function spawn_dialog:OnButton_load_clicked()
+	local console	= get_console()
+
+	if self.list_box:GetSize()==0 then
+		return
+	end
+
+	local item = self.list_box:GetSelectedItem()
+	if item == nil then
+		return
+	end
+
+	self:load_game_internal()
+end
+
+function spawn_dialog:OnButton_back_clicked()
+	if self.owner then
+		self.owner:ShowDialog(true)
+		self.owner:Show(true)
+	end
+	self:HideDialog()
+	_G.sp_dlg = nil
+end
+
+function spawn_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	local bind = dik_to_bind(dik)
+	if bind == key_bindings.kQUIT then
+		self:OnButton_back_clicked()
+	elseif dik == DIK_keys.DIK_RETURN and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		self:OnButton_load_clicked()
+	end
+	return true
+end
+
+function spawn_dialog:AddItemToList(file_name, date_time)
+
+	local _itm			= spawn_item(self.file_item_main_sz.y)
+
+	_itm:SetWndSize		(self.file_item_main_sz)
+
+	_itm.fn:SetWndPos	(vector2():set(0,0))
+	_itm.fn:SetWndSize	(self.file_item_fn_sz)
+	_itm.fn:SetText		(file_name)
+
+	_itm.fage			= _itm:AddTextField(date_time, self.file_item_fd_sz.x)
+	_itm.fage:SetFont	(GetFontLetterica16Russian())
+	_itm.fage:SetWndPos	(vector2():set(self.file_item_fn_sz.x+4, 0))
+	_itm.fage:SetWndSize(self.file_item_fd_sz)
+
+	self.list_box:AddExistingItem(_itm)
+end
+
+function main()
+	if not _G.sp_dlg then
+		_G.sp_dlg = spawn_dialog()
+	end
+	_G.sp_dlg:ShowDialog(true)
+end

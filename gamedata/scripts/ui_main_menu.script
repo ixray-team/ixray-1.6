@@ -246,7 +246,7 @@ end
 
 function main_menu:OnButton_load_clicked()
 	if self.load_dlg ==nil then
-		self.load_dlg = ui_load_dialog.load_dialog()
+		self.load_dlg = ui_spawn_dialog.spawn_dialog()
 		self.load_dlg.owner = self
 	end
 
