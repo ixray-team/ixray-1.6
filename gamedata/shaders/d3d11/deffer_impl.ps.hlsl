@@ -33,7 +33,7 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
     M.Normal = Normal_R.wzy + Normal_G.wzy + Normal_B.wzy + Normal_A.wzy - 0.5;
     M.Roughness = min(1.0f, Normal_R.x + Normal_G.x + Normal_B.x + Normal_A.x);
 	
-	M.Roughness = lerp(M.Roughness, 1.0f - dot(M.Color, 0.033f), Mask.y);
+	M.Roughness = lerp(1.0f - dot(M.Color, 0.033f), M.Roughness, dot(Mask.xwz, 0.333f));
 #else
     float4 Detail = s_detail.Sample(smp_base, tcdbump);
 	float4 DetailBump = s_detailBump.Sample(smp_base, tcdbump);

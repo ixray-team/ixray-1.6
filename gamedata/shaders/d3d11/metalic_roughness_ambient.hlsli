@@ -3,7 +3,7 @@
 #include "common.hlsli"
 
 // #define IBL_REMAP_REFLECTIONS
-// #define IBL_FAKE_IRRADANCE
+#define IBL_FAKE_IRRADANCE
 
 float2 EpicGamesEnvBRDFApprox(float NdotV, float Roughness)
 {
@@ -37,12 +37,11 @@ float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
 {
     float3 LightDirection = mul((float3x3)m_invV, R);
 	
-#ifndef IBL_FAKE_IRRADANCE
     float4 MipLevels = 0.0f;
     sky_s0.GetDimensions(MipLevels.x, MipLevels.y, MipLevels.z, MipLevels.w);
     float Lod = MipLevels.w * Roughness;
-#else
-	float Lod = 0.0f; Roughness = Roughness * Roughness;
+	
+#ifdef IBL_FAKE_IRRADANCE
     float3 SampleLastD = env_s0.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
     float3 SampleNextD = env_s1.SampleLevel(smp_rtlinear, LightDirection, 0.0f).xyz;
 #endif
@@ -56,8 +55,8 @@ float3 CompureSpecularIrradance(float3 R, float Hemi, float Roughness)
     float3 SampleNext = sky_s1.SampleLevel(smp_rtlinear, LightDirection, Lod).xyz;
 	
 #ifdef IBL_FAKE_IRRADANCE
-	SampleLast = lerp(SampleLastD, SampleLast, 1.0f - Roughness * Roughness);
-	SampleNext = lerp(SampleNextD, SampleNext, 1.0f - Roughness * Roughness);
+	SampleLast = lerp(SampleLast, SampleLastD, Roughness * Roughness);
+	SampleNext = lerp(SampleNext, SampleNextD, Roughness * Roughness);
 #endif
 
     float3 Irradance = L_sky_color.xyz * lerp(SampleLast, SampleNext, L_hemi_color.w);

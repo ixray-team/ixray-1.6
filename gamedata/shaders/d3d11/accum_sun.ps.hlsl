@@ -22,7 +22,7 @@ float4 main(v2p_volume I) : SV_Target
         Shift *= dot(Ldynamic_dir.xyz, Shift) >= 0.0 ? -1.0f : 1.0f;
     }
 
-    float4 Point = float4(O.Point.xyz, 1.f);
+    float4 Point = float4(O.PointReal.xyz, 1.f);
     Point.xyz += Shift * 0.025f;
 
     // ----- shadow

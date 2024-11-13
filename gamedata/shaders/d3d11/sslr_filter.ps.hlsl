@@ -4,7 +4,7 @@
 struct PSInput
 {
     float4 hpos : SV_POSITION;
-    float4 texcoord : TEXCOORD0;
+    float2 texcoord : TEXCOORD0;
 };
 
 float IntersectAABB(float4 Dir, float4 Org, float4 Box) {
@@ -76,14 +76,20 @@ void history_clamp(inout float4 history, float4 aabb_min, float4 aabb_max, float
 	history = lerp (history, low_pass_center,  ClampBlend);
 }
 
+uniform float4 scaled_screen_res;
+
 float4 main(PSInput I) : SV_Target
 {
     IXrayGbuffer O;
     GbufferUnpack(I.texcoord.xy, I.hpos.xy, O);
 	
+	I.texcoord.xy = I.hpos.xy * scaled_screen_res.zw;
+	
 	if(O.Depth > 0.9999f) {
 		return 0.0f;
 	}
+	
+	// O.Roughness = 0.0f;
 	
 	float4 SSLR0 = s_image.SampleLevel(smp_nofilter, I.texcoord, 0, int2(+1, +0));
 	float4 SSLR1 = s_image.SampleLevel(smp_nofilter, I.texcoord, 0, int2(-0, +1));
@@ -115,11 +121,12 @@ float4 main(PSInput I) : SV_Target
 	float3 Point = gbuf_unpack_position(I.texcoord.xy, O.PointReal.z);
 	float3 View = normalize(Point);
 	
-	float3 ReflectPoint = View * SSLRBoxMinPos.w + Point;
+	float3 ReflectPoint = View * SSLRBoxMaxPos.w + Point;
 	float2 PrevDiffuseUV = I.texcoord.xy + s_velocity.SampleLevel(smp_rtlinear, I.texcoord.xy, 0).xy * float2(-0.5f, 0.5f);
 	
 	float4 PrevSpecularUV = mul(m_VP_old, float4(mul(m_invV, float4(ReflectPoint, 1.0f)).xyz, 1.0f));
 	PrevSpecularUV.xy = PrevSpecularUV.xy / PrevSpecularUV.w * float2(0.5f, -0.5f) + 0.5f;
+	// PrevSpecularUV.xy = I.texcoord.xy;
 	
 	// float4 PrevUV = mul(m_VP_old, float4(mul(m_invV, float4(Point, 1.0f)).xyz, 1.0f));
 	// PrevUV.xy = PrevUV.xy / PrevUV.w * float2(0.5f, -0.5f) + 0.5f;
@@ -131,20 +138,21 @@ float4 main(PSInput I) : SV_Target
     float4 SSLR_OldDiffyse = s_refl.SampleLevel(smp_rtlinear, PrevDiffuseUV.xy, 0.0f);
 	
 	float W = 1.0f - saturate(length(I.texcoord.xy - PrevDiffuseUV.xy) * 10.0f);
-	W *= 1.0f - saturate(abs(SSLR_OldDiffyse.w - O.Depth) * 100 - 1.0f);
+	W *= 1.0f - saturate(10.0f * abs(SSLR_OldDiffyse.w - O.Depth) / max(SSLR_OldDiffyse.w, O.Depth));
 	W *= GetBorderAtten(PrevDiffuseUV, 0.001f);
 	
 	float4 SSLR_Diffuse = lerp(SSLRMain, SSLR_OldDiffyse, W * 0.98f);
     float4 SSLR_OldSpecular = s_refl.SampleLevel(smp_rtlinear, PrevSpecularUV.xy, 0.0f);
 	
 	W = 1.0f - saturate(length(I.texcoord.xy - PrevSpecularUV.xy) * 10.0f);
-	W *= 1.0f - saturate(abs(SSLR_OldSpecular.w - O.Depth) * 100 - 1.0f);
+	W *= 1.0f - saturate(abs(SSLR_OldSpecular.w - O.Depth) * 10);
 	W *= GetBorderAtten(PrevSpecularUV, 0.001f);
 	
 	history_clamp(SSLR_OldSpecular, SSLRBoxMin, SSLRBoxMax, SSLR_Diffuse);
-	float4 SSLR_Specular = lerp(SSLRMain, SSLR_OldSpecular, W * 0.96f);
+	float4 SSLR_Specular = lerp(SSLRMain, SSLR_OldSpecular, W * 0.9f);
+	float Fade = smoothstep(0.0f, 0.01f, SSLRBoxMax.w);
 	
-	SSLRMain = lerp(SSLR_Specular, SSLR_Diffuse, O.Roughness);
+	SSLRMain = lerp(SSLR_Specular, SSLR_Diffuse, O.Roughness * Fade);
 	SSLRMain.w = O.Depth;
 	
 	return SSLRMain;

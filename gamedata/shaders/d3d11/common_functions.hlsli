@@ -12,8 +12,8 @@ float Contrast(float Input, float ContrastPower)
     return Output;
 }
 
-#define PushGamma(x) pow(x, 2.0f)
-#define PopGamma(x) pow(x, rcp(2.0f))
+#define PushGamma(x) pow(x, 1.0f)
+#define PopGamma(x) pow(x, rcp(1.0f))
 
 float3 tonemap(float3 rgb, float scale)
 {
