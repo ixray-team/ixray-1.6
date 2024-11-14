@@ -1217,11 +1217,16 @@ void CInifile::LTXLoad(IReader* F, LPCSTR path, xr_string_map<xr_string, Sect>& 
 				_splitpath(fn, inc_path, folder, 0, 0);
 				xr_strcat(inc_path, sizeof(inc_path), folder);
 
-				if (strstr(inc_name, "*.ltx"))
+				if (strstr(inc_name, "*"))
 				{
-					FS_FileSet fset;
-					FS.file_list(fset, inc_path, FS_ListFiles, inc_name);
-
+					FS_FileSet fset = {};
+					string_path inc_mask = {};
+					char inc_ext[8] = {};
+					
+					_splitpath(inc_name, nullptr, nullptr, inc_mask, inc_ext);
+					xr_string mask = xr_string(inc_mask) + inc_ext;
+					FS.file_list(fset, inc_path, FS_ListFiles, mask.c_str());
+					
 					for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
 					{
 						LPCSTR _name = it->name.c_str();
