@@ -9,7 +9,7 @@ uniform Texture2D n_bloom;
 float3 CommerceToneMapping( float3 color ) 
 {
     float startCompression = 0.8 - 0.04;
-    float desaturation = 0.15;
+    float desaturation = -0.15; // - 0.15
 
     float x = min(color.r, min(color.g, color.b));
     float offset = x < 0.08 ? x - 6.25 * x * x : 0.04;
@@ -46,23 +46,19 @@ float4 main(v2p_aa_AA I) : SV_Target
     float avg_luma = s_tonemap.Sample(smp_nofilter, float2(0.5f, 0.5f)).x;
     float loc_luma = dot(Color.rgb, LUMINANCE_VECTOR);
 
-    avg_luma = max(avg_luma, 1e-5) * 1.0f + 0.05f; // adaptation.x, adaptation.y
-    float linexp = lerp(0.148f, loc_luma, 0.2) / avg_luma; // middlegrey 0.148 or 0.178 + local contrast
-    float exposure = log2(linexp) - 0.5; // preexposure 
+    avg_luma = max(avg_luma, 1e-5) * 0.98f + 0.02f; // adaptation.x, adaptation.y
+    float linexp = lerp(0.178f, loc_luma, 0.00) / avg_luma; // middlegrey 0.148 or 0.178 + local contrast
+    float exposure = log2(linexp) + 0.0; // preexposure 
     exposure = exp2(exposure);
     
 
     //Color = tonemap(Color, Scale);
-/*
-    float luma = dot(Color.rgb, LUMINANCE_VECTOR);
-    luma = pow(luma, 1.0); // contrast
-    float3 poweredColor = pow(Color.rgb, 1.0); // saturation
-    float powluma = dot(poweredColor.rgb, LUMINANCE_VECTOR);
-    Color.rgb=poweredColor.xyz*luma/(powluma+0.0001);
 
+
+/*
     luma = dot(Bloom.rgb, LUMINANCE_VECTOR);
-    luma = pow(luma, 1.0); // contrast
-    float3 poweredBloom = pow(Bloom.rgb, 1.0); // saturation
+    luma = pow(luma, 1.1); // contrast
+    float3 poweredBloom = pow(Bloom.rgb, 1.3); // saturation
     powluma = dot(poweredBloom.rgb, LUMINANCE_VECTOR);
     Bloom.rgb=poweredBloom.xyz*luma/(powluma+0.0001);
 */
@@ -85,10 +81,10 @@ float4 main(v2p_aa_AA I) : SV_Target
 
     //float fogAmount = (heighfog_params.x / heighfog_params.y) * exp(-campos.y * heighfog_params.y) * (1.0 - exp(-wDistance*wPos.y*heighfog_params.y)) / wPos.y;
 
-    float fogAmount = 1.0 - exp(-length(Point.xyz) * 0.01);
+    float fogAmount = 1.0 - exp(-length(Point.xyz) * 0.002);
 
     fogAmount = saturate(fogAmount);
-    fogAmount = pow(fogAmount, 1.5);
+    fogAmount = pow(fogAmount, 1.0);
     //float Fog = saturate(length(O.PointReal) * fog_params.w + fog_params.x); // 1.0 - exp(-Distance * fog_params.w) + fog_params.x; //
     //Color = lerp(Color, pow(fog_color, 2.2f), saturate(Fog));
 
@@ -100,11 +96,17 @@ float4 main(v2p_aa_AA I) : SV_Target
 
     //Bloom.rgb -= Color;
     //Bloom = max(Bloom, 0.0f);
-    Color.rgb +=  0.06f * Bloom.rgb;
+    Color.rgb +=  0.05f * Bloom.rgb;
 
     Color *= exposure;
     //Color.rgb *= 1.0 / (Color.rgb + 1.0);
     //Color.rgb = 1 - exp(-Color.rgb * 1.0);
+
+    float luma = dot(Color.rgb, LUMINANCE_VECTOR);
+    luma = pow(luma, 1.3); // contrast 
+    float3 poweredColor = pow(Color.rgb, 0.9); // saturation
+    float powluma = dot(poweredColor.rgb, LUMINANCE_VECTOR);
+    Color.rgb=poweredColor.xyz*luma/(powluma+0.0001);
 
     Color.rgb = CommerceToneMapping( 1.f * Color.rgb);
 
@@ -116,9 +118,10 @@ float4 main(v2p_aa_AA I) : SV_Target
 
     Color.rgb = pow(Color.rgb, 0.454545);
 
-    Color.rgb += ScreenSpaceDither(I.HPos.xy);
 
-    //Color.rgb = fogtint;
+
+
+    Color.rgb += ScreenSpaceDither(I.HPos.xy);
 
     return float4(Color.rgb, 1.f);//combine_bloom(Color, Bloom);
 }

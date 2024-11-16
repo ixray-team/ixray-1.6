@@ -53,7 +53,7 @@ float3 DirectLight(float4 Radiance, float3 Light, float3 Normal, float3 View, fl
 
     //Radiance.xyz = pow(Radiance.xyz, 2.2);
     Color.xyz = pow(Color.xyz, 2.2);
-    Radiance.xyz = 3.0 * lerp(Radiance.xyz, dot(Radiance, 0.333), 0.15);
+    Radiance.xyz = 1.0 * lerp(Radiance.xyz, dot(Radiance, 0.333), 0.15);
 
 #ifndef USE_LEGACY_LIGHT
     float NdotV = max(0.0f, -dot(Normal, View));

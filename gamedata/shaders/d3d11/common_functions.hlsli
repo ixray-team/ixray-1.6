@@ -297,7 +297,7 @@ float3 gbuf_unpack_normal(float2 norm)
     return res;
 }
 
-float gbuf_pack_hemi_mtl(float hemi, float mtl, float sss = 1)
+float gbuf_pack_hemi_mtl(float hemi, float mtl, float sss = 0.5)
 {
     uint pack_hemi = saturate(hemi) * 0x3FF;
     uint pack_mtl = uint(mtl * 0x1F) & 0x1F;

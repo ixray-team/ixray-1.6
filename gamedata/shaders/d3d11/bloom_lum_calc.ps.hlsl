@@ -21,7 +21,7 @@ float main(PSInput I) : SV_Target
     float MinLumaCurr = 0.f;
     float tempCurr = 0.f;
     
-    float Sensitivity = 0.5f;    // factor to lerp avg and max
+    float Sensitivity = 0.00f;    // factor to lerp avg and max
     float2 temp;
     float weight;               // weight factor for each luma pixel in input 16x16
     float weightsumm;

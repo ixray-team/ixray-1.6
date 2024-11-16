@@ -1,4 +1,5 @@
 #include "common.hlsli"
+#include "shadow.hlsli"
 
 #undef USE_ULTRA_SHADOWS
 
@@ -20,7 +21,8 @@
     #endif
 #endif
 
-#include "shadow.hlsli"
+Texture2D s_fastnoise;
+Texture2D<float> half_depth;
 
 float4 volume_range; //	x - near plane, y - far plane
 float4 sun_shafts_intensity;
@@ -34,59 +36,68 @@ float4 main(v2p_TL I) : SV_Target
     GbufferUnpack(I.Tex0.xy, I.HPos.xy, O);
 
     float3 P = O.Point;
+	float intensity = sun_shafts_intensity;
+    float density = 0.0;
 
-#ifndef JITTER_SUN_SHAFTS
-	//	Fixed ray length, fixed step dencity
-	//	float3	direction = (RAY_PATH/RAY_SAMPLES)*normalize(P);
-	//	Variable ray length, variable step dencity
-	float3 direction = P / RAY_SAMPLES;
-#else //	JITTER_SUN_SHAFTS
-	//	Variable ray length, variable step dencity, use jittering
-	float4 J0 = jitter0.Sample(smp_jitter, I.HPos.xy / JITTER_TEXTURE_SIZE);
-	float coeff = (RAY_SAMPLES - J0.x) / (RAY_SAMPLES * RAY_SAMPLES);
-	float3 direction = P * coeff;
-#endif //	JITTER_SUN_SHAFTS
+    float jitter = s_fastnoise.Load(int3(frac(I.HPos.xy / 128) * 128 , 0)).x;
 
-    float depth = P.z;
-    float deltaDepth = direction.z;
+	//Start and end positions, shadow projection space
+	//We don't need to divide it by W, as we are working with orthographic matrix
+	float4 ray_origin = mul(m_shadow, float4(0.0, 0.0, 0.0, 1.0));
+	float4 ray_direction = mul(m_shadow, float4(P, 1.0));
 
-    float4 current = mul(m_shadow, float4(P, 1.0f));
-    float4 delta = mul(m_shadow, float4(direction, 0.0f));
+    //Ray increment
+    float3 ray_increment = (ray_direction - ray_origin) / RAY_SAMPLES;
+	
+    //Initial ray position. The first ray is dithered to counteract banding artifacts
+	float3 ray_position = ray_origin.xyz + ray_increment.xyz * jitter;
 
-    float res = 0.0f;
-    float max_density = sun_shafts_intensity.x;
-    float density = max_density / RAY_SAMPLES;
+	//Total light
+	float total_light = 0.0;  
 
-    if(O.Depth > 0.9999f) {
-		depth = 0.0f;
-        res = max_density;
-    }
-
-    [unroll] for(int i = 0; i < RAY_SAMPLES; ++i)
+    [unroll] for(int i = 0; i < RAY_SAMPLES; i++)
     {
-        //density = exp(-length(current) * 0.0001);
-        if (depth > 0.3)
-        {
-		#ifndef FILTER_LOW
-			res += density * shadow(current);
-		#else
-			res += density * sample_hw_pcf(current, float4(0, 0, 0, 0));
-		#endif
-        }
-
-        depth -= deltaDepth;
-        current -= delta;
+        density = exp(-length(ray_position) * 0.66f);
+		//Apply constant bias to prevent light leaks
+		total_light += density * s_smap.SampleCmpLevelZero(smp_smap, ray_position.xy, ray_position.z + 0.000098).x;
+		ray_position += ray_increment;
     }
     
+    total_light /= RAY_SAMPLES;
+
+    float2 fog = 1.0 - exp(-length(P.xyz) * float2(0.005, 0.005)); // fog param.xy
     float fSturation = dot(normalize(P), -Ldynamic_dir.xyz);
-    fSturation = 0.4f * fSturation + 0.6f;
-    float2 noise = J0.yz;
-    float2 fog = 1.0 - exp(-length(P.xyz) * float2(0.003, 0.01)); // fog param.xy
+    float Ro = 0.07957747f * (0.5f + 4.5f * pow((1.0 + fSturation) * 0.5f, 8.0));
+
+    float4 localLcol = pow(Ldynamic_color, 2.2);
+    float4 localFcol = pow(fog_color, 2.2);
+
+    float4 superfogcolor = lerp(localFcol, localLcol, (0.1 + 0.9 * total_light) * Ro);
+
+    float4 final_color = lerp(0.f, superfogcolor, fog.x ) + total_light * localLcol * fog.y * Ro;
+    final_color.a = 1.0;
+	//Color and output
+	//return float4(total_light * Ldynamic_color.xyz, 1.0);
+
+    return final_color;
+
+    //return float4(jitter, jitter, jitter, 1.0);
+
+
+    /*
+    res /= RAY_SAMPLES;
+
+    float fSturation = dot(normalize(P), -Ldynamic_dir.xyz);
+    float fSturation2 = 0.4f * fSturation + 0.6f;
+    float Ro = 0.07957747f * (0.5f + 4.5f * pow((1.0 + fSturation) * 0.5f, 8.0));
+    //float2 noise = J0.yz;
+    float2 fog = 1.0 - exp(-length(P.xyz) * float2(0.001, 1.0)); // fog param.xy
+    //float fog2 = exp(-length(P.xyz) * 0.01);
     fog = saturate(fog);
-    float4 superfogcolor = lerp(fog_color, Ldynamic_color, (0.1 + 0.9 * res) * pow(fSturation, 8.0));
+    float4 superfogcolor = lerp(fog_color, Ldynamic_color, (0.1 + 0.9 * res) * Ro);
 
-    float4 final_color = lerp(0.f, superfogcolor, fog.x + 0.0125 * noise.x) + res * Ldynamic_color * (fog.y + 0.0125 * noise.y);
-
+    float4 final_color = lerp(0.f, superfogcolor, fog.x ) + res * Ldynamic_color * fog.y * Ro;
+    */
 //============== orig ======================================================================
     //float fSturation = dot(normalize(P), -Ldynamic_dir.xyz);
     //	Normalize dot product to
@@ -99,7 +110,7 @@ float4 main(v2p_TL I) : SV_Target
  //==========================================================================================   
 
 
-    return final_color;
+    //return final_color;
 #endif // SUN_SHAFTS_QUALITY
 }
 

@@ -76,6 +76,7 @@
 #define		r2_jitter_mipped	"$user$jitter_mipped"			// --- dither
 #define		r2_sunmask			"shaders\\shaders_sunmask"
 #define		r2_tonemap_lut		"shaders\\tonemap_lut"
+#define		r2_FastNoise		"shaders\\fastnoise"
 
 #define		r2_RT_smaa_edgetex "$user$edgetex"
 #define		r2_RT_smaa_blendtex "$user$blendtex"
