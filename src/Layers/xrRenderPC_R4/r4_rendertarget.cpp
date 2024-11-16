@@ -438,6 +438,8 @@ CRenderTarget::CRenderTarget()
 		DisplayRT(rt_sslr);
 		DisplayRT(rt_sslr_temp);
 
+		DisplayRT(rt_half_depth);
+
 #undef DisplayRT
 
 		ImGui::End();
@@ -653,8 +655,19 @@ CRenderTarget::CRenderTarget()
 		u32 w = s_dwWidth / 2;
 		u32 h = s_dwHeight / 2;
 
-		DxgiFormat fmt = DxgiFormat::DXGI_FORMAT_R16_FLOAT;
-		rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
+		DxgiFormat fmt = DxgiFormat::DXGI_FORMAT_R11G11B10_FLOAT;
+		rt_half_depth.create(r2_RT_half_depth, w, h, fmt, 1, CRT::CRTCreationFlags::MIPPED_RT_FLAG);
+
+
+		rt_half_depth_temp.create(r2_RT_half_depth"_temp", w, h, fmt, 1, CRT::CRTCreationFlags::MIPPED_RT_FLAG);
+
+		FLOAT ColorRGBA[4] = {
+			0.0f, 1.0f, 0.5f, 0.0f
+		};
+
+		for(UINT mip_level = 0, mip_size = rt_half_depth->pMippedRT.size(); mip_level < mip_size; ++mip_level) {
+			RContext->ClearRenderTargetView(rt_half_depth->pMippedRT[mip_level], ColorRGBA);
+		}
 	}
 
 	s_ssao.create(b_ssao, "r2\\ssao");

@@ -127,6 +127,7 @@ private:
 
 	ref_rt						rt_ssao_temp;
 	ref_rt						rt_half_depth;
+	ref_rt						rt_half_depth_temp;
 	ref_shader					s_ssao;
 	ref_shader					s_hdao_cs;
 
@@ -251,6 +252,7 @@ public:
 	void						phase_cas				();
 	void						phase_gtao				();
 	void						phase_sslr				();
+	void						phase_hiz_depth			();
 
 	void						RenderEffect			(ScreenPostProcessType postProcessType);
 	void						PhaseAberration			();
