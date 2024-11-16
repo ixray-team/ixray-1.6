@@ -475,6 +475,7 @@ CRenderTarget::CRenderTarget()
 	b_combine = new CBlender_combine();
 	b_ssao = new CBlender_SSAO();
 
+	CRT::CRTCreationFlags isUAV = RFeatureLevel >= D3D_FEATURE_LEVEL_11_0 ? CRT::USE_UAV_FLAG : (CRT::CRTCreationFlags)NULL;
 
 	u32 s_dwWidth = (u32)RCache.get_width(), s_dwHeight = (u32)RCache.get_height();
 
@@ -498,7 +499,7 @@ CRenderTarget::CRenderTarget()
 		rt_Back_Buffer_AA.create(r2_RT_backbuffer_AA, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
 		rt_Back_Buffer.create(r2_RT_backbuffer_final, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		rt_Generic.create(r2_RT_generic, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT, 1, RFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+		rt_Generic.create(r2_RT_generic, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT, 1, isUAV);
 	
 		rt_ui_pda.create(r_ui_pda, get_target_width(), get_target_height(), DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
@@ -657,7 +658,7 @@ CRenderTarget::CRenderTarget()
 	}
 
 	s_ssao.create(b_ssao, "r2\\ssao");
-	rt_ssao_temp.create(r2_RT_ssao_temp, s_dwWidth, s_dwHeight, DxgiFormat::DXGI_FORMAT_R16_FLOAT, 1, RFeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+	rt_ssao_temp.create(r2_RT_ssao_temp, s_dwWidth, s_dwHeight, DxgiFormat::DXGI_FORMAT_R16_FLOAT, 1);
 
 	// COMBINE
 	{

@@ -454,7 +454,7 @@ void				CResourceManager::_DeleteConstantTable	(const R_constant_table* C)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-CRT*	CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, DxgiFormat f, u32 SampleCount, bool useUAV )
+CRT*	CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, DxgiFormat f, u32 SampleCount, CRT::CRTCreationFlags CreationFlags)
 {
 	R_ASSERT(Name && Name[0] && w && h);
 
@@ -468,7 +468,7 @@ CRT*	CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, DxgiFormat f, u32 Sa
 		CRT *RT					=	new CRT();
 		RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_rtargets.insert		(std::make_pair(RT->set_name(Name),RT));
-		if (Device.b_is_Ready)	RT->create	(Name,w,h,f, SampleCount, useUAV );
+		if (Device.b_is_Ready)	RT->create	(Name,w,h,f, SampleCount, CreationFlags);
 		return					RT;
 	}
 }
