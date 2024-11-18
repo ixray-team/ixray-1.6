@@ -34,42 +34,28 @@ void RenderActorInfos()
 		return;
 	}
 
-	const auto& Data = g_pIGameActor->GetKnowedPortions();
+	char buffer[128]{};
+	ImGui::InputText("Filter:", buffer, sizeof(buffer));
 
-	static char buffer[128]{};
-	ImGui::Text("Filter:");
-	ImGui::SameLine();
-	ImGui::InputText("##FilterAP", buffer, sizeof(buffer));
+	bool filter_is_not_empty = strlen(buffer);
 
-	static char add_info[128]{};
-	ImGui::Text("Add info:");
-	ImGui::SameLine();
-	ImGui::InputText("##AddInfoAP", add_info, sizeof(add_info));
-	ImGui::SameLine();
-
-	if (ImGui::Button("add"))
-	{
-		if (g_pIGameActor)
-		{
-			g_pIGameActor->GiveInfoPortion(add_info);
-		}
-	}
+	auto Data = g_pIGameActor->GetKnowedPortions();
 
 	for (const auto& Str : Data)
 	{
-		bool is_need_to_show = true;
-
-		if (buffer[0]!='\0' || strlen(buffer))
+		bool can_show{true};
+		if (filter_is_not_empty)
 		{
 			if (Str.find(buffer) == xr_string::npos)
 			{
-				is_need_to_show = false;
+				can_show = false;
 			}
 		}
-
-		if (is_need_to_show)
+		
+		if (can_show)
 		{
-			if (ImGui::Button(Str.c_str(), { 200, 30 })) {
+			if (ImGui::Button(Str.c_str(), {200, 30}))
+			{
 				g_pIGameActor->DisableInfoPortion(Str.c_str());
 			}
 		}
