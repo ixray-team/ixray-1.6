@@ -220,7 +220,7 @@ function Cwound_manager:process_fight(hp)
 	key = self:get_key_from_distance(self.a.hp_fight, hp)
 	if key ~= nil then
 		if self.a.hp_fight[key].state then
-			return tostring(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_fight[key].state))
+			return tostring(xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_fight", self.a.hp_fight[key].state))
 		end
 	end
 	return "true"
@@ -230,7 +230,7 @@ function Cwound_manager:process_victim(hp)
 	key = self:get_key_from_distance(self.a.hp_victim, hp)
 	if key ~= nil then
 		if self.a.hp_victim[key].state then
-			return tostring(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_victim[key].state))
+			return tostring(xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_victim", self.a.hp_victim[key].state))
 		end
 	end
 	return "nil"
@@ -242,17 +242,17 @@ function Cwound_manager:process_hp_wound(hp)
 		local r1,r2
 		if self.npc:see(db.actor) then
 			if self.a.hp_state_see[key].state then
-				r1 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_state_see[key].state)
+				r1 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_state_see_state", self.a.hp_state_see[key].state)
 			end
 			if self.a.hp_state_see[key].sound then
-				r2 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_state_see[key].sound)
+				r2 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_state_see_sound", self.a.hp_state_see[key].sound)
 			end
 		else
 			if self.a.hp_state[key].state then
-				r1 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_state[key].state)
+				r1 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_state_state", self.a.hp_state[key].state)
 			end
 			if self.a.hp_state[key].sound then
-				r2 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.hp_state[key].sound)
+				r2 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "hp_state_sound", self.a.hp_state[key].sound)
 			end
 		end
 		return tostring(r1),tostring(r2)
@@ -265,10 +265,10 @@ function Cwound_manager:process_psy_wound(hp)
 	if key ~= nil then
 		local r1,r2
 		if self.a.psy_state[key].state then
-			r1 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.psy_state[key].state)
+			r1 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "psy_state_state", self.a.psy_state[key].state)
 		end
 		if self.a.psy_state[key].sound then
-			r2 = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.psy_state[key].sound)
+			r2 = xr_parser.pick_section_from_condlist(db.actor, self.npc, "xr_wounded", "psy_state_sound", self.a.psy_state[key].sound)
 		end
 		return tostring(r1),tostring(r2)
 	end

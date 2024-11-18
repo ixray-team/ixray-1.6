@@ -365,7 +365,7 @@ function parse_waypoint_data(pathname, wpflags, wpname)
 			end
 
 			if fld == "a" then
-				rslt[fld] = xr_logic.parse_condlist(db.actor, "waypoint_data", "anim_state", val)
+				rslt[fld] = val
 			else
 				rslt[fld] = val
 			end
@@ -668,7 +668,7 @@ function parse_data_1v(npc,s)
 --			printf("	[%s]=[%s][%s]", utils.to_str(dist), utils.to_str(state), utils.to_str(sound))
 			dat.dist = tonumber(dist)
 			if state then
-				dat.state = xr_logic.parse_condlist(npc, dist, state, state)
+				dat.state = state
 			end
 			t[tonumber(dist)] = dat
 		end
@@ -777,10 +777,10 @@ function parse_data(npc,s)
 
 			dat.dist = tonumber(dist)
 			if state then
-				dat.state = xr_logic.parse_condlist(npc, dist, state, state)
+				dat.state = state
 			end
 			if sound then
-				dat.sound = xr_logic.parse_condlist(npc, dist, sound, sound)
+				dat.sound = sound
 			end
 			table.insert(t, dat)
 		end

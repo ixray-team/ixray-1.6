@@ -78,3 +78,5 @@ changelog.txt
 
 # CLion cache
 cmake-build*/
+
+.clang-format
