@@ -272,12 +272,15 @@ void CSkeletonX::_Copy		(CSkeletonX *B)
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
-	PROF_EVENT("CSkeletonX::_Render")
-#ifdef USE_DX11
-	Parent->StoreVisualMatrix(RCache.xforms.m_w);
+	PROF_EVENT("CSkeletonX::_Render");
 
-	if(RenderMode != RM_SINGLE) {
-		RCache.set_xform_world_old(Parent->mOldWorldMartrix);
+#ifdef USE_DX11
+	if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
+		Parent->StoreVisualMatrix(RCache.xforms.m_w);
+
+		if(RenderMode != RM_SINGLE) {
+			RCache.set_xform_world_old(Parent->mOldWorldMartrix);
+		}
 	}
 #endif
 
@@ -292,16 +295,19 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 		{
 			PROF_EVENT("RM_SINGLE")
 			Fmatrix	W;	W.mul_43(RCache.xforms.m_w, Parent->LL_GetTransform_R(u16(RMS_boneid)));
-			Fmatrix	O;	O.mul_43(Parent->mOldWorldMartrix, Parent->LL_GetTransform_R_old(u16(RMS_boneid)));
 
 			RCache.set_xform_world	(W);
+
 #ifdef USE_DX11
-			RCache.set_xform_world_old	(O);
+			if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
+				Fmatrix	O; O.mul_43(Parent->mOldWorldMartrix, Parent->LL_GetTransform_R_old(u16(RMS_boneid)));
+				RCache.set_xform_world_old(O);
+			}
 #endif
 
-			RCache.set_Geometry		(hGeom);
-			RCache.Render			(D3DPT_TRIANGLELIST,0,0,vCount,iOffset,pCount);
-			RCache.stat.r.s_dynamic_inst.add	(vCount);
+			RCache.set_Geometry(hGeom);
+			RCache.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
+			RCache.stat.r.s_dynamic_inst.add(vCount);
 		}
 		break;
 	case RM_SKINNING_1B:
@@ -314,7 +320,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 			ref_constant array = RCache.get_c(s_bones_array_const);
 
 #ifdef USE_DX11
-			ref_constant array_old = RCache.get_c(s_bones_array_const_old);
+			ref_constant array_old = RImplementation.phase == RImplementation.PHASE_NORMAL ? RCache.get_c(s_bones_array_const_old) : array;
 #endif // USE_DX11
 			{
 				PROF_EVENT("SEND_MATRICES")
@@ -329,10 +335,12 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 					RCache.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
 
 #ifdef USE_DX11
-					Fmatrix& O = Parent->LL_GetTransform_R_old(mid);
-					RCache.set_ca(&*array_old, id + 0, O._11, O._21, O._31, O._41);
-					RCache.set_ca(&*array_old, id + 1, O._12, O._22, O._32, O._42);
-					RCache.set_ca(&*array_old, id + 2, O._13, O._23, O._33, O._43);
+					if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
+						Fmatrix& O = Parent->LL_GetTransform_R_old(mid);
+						RCache.set_ca(&*array_old, id + 0, O._11, O._21, O._31, O._41);
+						RCache.set_ca(&*array_old, id + 1, O._12, O._22, O._32, O._42);
+						RCache.set_ca(&*array_old, id + 2, O._13, O._23, O._33, O._43);
+					}
 #endif // USE_DX11
 				}
 			}

@@ -162,7 +162,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, DxgiFormat f, u32 SampleCount, CRT::
 		}
 
 		pMippedRT.resize(desc.MipLevels);
-		pMippedRT[0] = pRT;
+		pMippedRT[0] = pRT; pRT->AddRef();
 
 		for(UINT mip_level = 1; mip_level < desc.MipLevels; ++mip_level) {
 			descRTV.Texture2D.MipSlice = mip_level;

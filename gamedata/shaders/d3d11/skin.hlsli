@@ -11,6 +11,7 @@ struct v_model_skinned_0
     float3 B : BINORMAL; // binormal				// DWORD
     float2 tc : TEXCOORD0; // (u,v)				// short2
 };
+
 struct v_model_skinned_1 // 24 bytes
 {
     float4 P : POSITION; // (float,float,float,1) - quantized	// short4
@@ -19,6 +20,7 @@ struct v_model_skinned_1 // 24 bytes
     float3 B : BINORMAL; // binormal				// DWORD
     float2 tc : TEXCOORD0; // (u,v)				// short2
 };
+
 struct v_model_skinned_2 // 28 bytes
 {
     float4 P : POSITION; // (float,float,float,1) - quantized	// short4
@@ -53,13 +55,12 @@ float4 u_position(float4 v)
 } // -12..+12
 
 #define MAX_BONES_COUNT 128
-#define USE_TRUE_VELOCITY
 
 cbuffer SkinConstants
 {
 	float4 sbones_array[MAX_BONES_COUNT * 3];
 	
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
 	float4 sbones_array_old[MAX_BONES_COUNT * 3];
 #endif
 }
@@ -127,7 +128,7 @@ v_model skinning_1(v_model_skinned_1 v)
     o.B = skinning_dir(v.B.xyz, m0.xyz, m1.xyz, m2.xyz);
     o.tc = v.tc; // -16..+
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     float4 m0_old = sbones_array_old[mid + 0];
     float4 m1_old = sbones_array_old[mid + 1];
     float4 m2_old = sbones_array_old[mid + 2];
@@ -171,7 +172,7 @@ v_model skinning_2(v_model_skinned_2 v)
     o.B = skinning_dir(v.B.xyz, m0.xyz, m1.xyz, m2.xyz);
     o.tc = v.tc.xy; // -16..+16
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     float4 m0_0_old = sbones_array_old[id_0 + 0];
     float4 m1_0_old = sbones_array_old[id_0 + 1];
     float4 m2_0_old = sbones_array_old[id_0 + 2];
@@ -240,7 +241,7 @@ v_model skinning_3(v_model_skinned_3 v)
     o.B = skinning_dir(v.B.xyz, m0.xyz, m1.xyz, m2.xyz);
     o.tc = v.tc.xy; // -16..+16
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     float4 m0_0_old = sbones_array_old[id_0 + 0];
     float4 m1_0_old = sbones_array_old[id_0 + 1];
     float4 m2_0_old = sbones_array_old[id_0 + 2];
@@ -285,7 +286,7 @@ v_model skinning_4(v_model_skinned_4 v)
     float id[4];
     float4 m[4][3]; //	[bone index][matrix row or column???]
 	
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     float4 m_old[4][3]; //	[bone index][matrix row or column???]
 #endif
 
@@ -298,7 +299,7 @@ v_model skinning_4(v_model_skinned_4 v)
         for (int j = 0; j < 3; ++j)
         {
             m[i][j] = sbones_array[id[i] + j];
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
             m_old[i][j] = sbones_array_old[id[i] + j];
 #endif
         }
@@ -315,7 +316,7 @@ v_model skinning_4(v_model_skinned_4 v)
     float4 m1 = m[0][1] * w[0];
     float4 m2 = m[0][2] * w[0];
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     float4 m0_old = m_old[0][0] * w[0];
     float4 m1_old = m_old[0][1] * w[0];
     float4 m2_old = m_old[0][2] * w[0];
@@ -328,7 +329,7 @@ v_model skinning_4(v_model_skinned_4 v)
         m1 += m[k][1] * w[k];
         m2 += m[k][2] * w[k];
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
         m0_old += m_old[k][0] * w[k];
         m1_old += m_old[k][1] * w[k];
         m2_old += m_old[k][2] * w[k];
@@ -343,7 +344,7 @@ v_model skinning_4(v_model_skinned_4 v)
     o.B = skinning_dir(v.B.xyz, m0.xyz, m1.xyz, m2.xyz);
     o.tc = v.tc; // -16..+16
 
-#ifdef USE_TRUE_VELOCITY
+#ifndef DISABLE_VELOCITY
     o.P_old = skinning_pos(v.P, m0_old, m1_old, m2_old);
 #else
     o.P_old = o.P;

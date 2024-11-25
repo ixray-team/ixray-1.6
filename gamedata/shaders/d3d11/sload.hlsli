@@ -86,9 +86,9 @@ void SloadNew(inout p_bumped_new I, inout IXrayMaterial M)
 {
 #if defined(USE_STEEPPARALLAX) && defined(USE_HIGH_QUALITY)
     #ifdef USE_PBR
-		UpdateTC(I, I.tcdh.xy, s_bumpX, 3);
+		UpdateTC(I, I.tcdh.xy, s_bump, 0);
     #else
-		UpdateTC(I, I.tcdh.xy, s_bumpX, 0);
+		UpdateTC(I, I.tcdh.xy, s_bumpX, 3);
 	#endif
 #endif
 

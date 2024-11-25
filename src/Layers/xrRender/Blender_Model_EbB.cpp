@@ -235,6 +235,7 @@ void CBlender_Model_EbB::Compile( CBlender_Compile& C )
 			C.r_End();
 			break;
 		case SE_R2_SHADOW:		// smap
+			RImplementation.addShaderOption("DISABLE_VELOCITY", "1");
 			C.r_Pass("shadow_model", "shadow_base", FALSE);
 			C.r_dx10Texture("s_base", C.L_textures[0]);
 			C.r_dx10Sampler("smp_base");
