@@ -18,7 +18,7 @@
 struct PSInput
 {
     float4 hpos : SV_POSITION;
-    float4 texcoord : TEXCOORD0;
+    float2 texcoord : TEXCOORD0;
 };
 
 Texture2D<uint> t_gtao_packed;

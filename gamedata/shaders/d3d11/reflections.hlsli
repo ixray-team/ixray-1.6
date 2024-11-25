@@ -2,7 +2,7 @@
 #define reflections_h_2134124_inc
 
 // Screen Space Sky Reflections off
-#define SKYBLED_FADE 1
+// #define SKYBLED_FADE 1
 
 float get_depth_fast(float2 tc)
 {
@@ -10,17 +10,15 @@ float get_depth_fast(float2 tc)
     return P > 0.02f ? depth_unpack.x * rcp(P - depth_unpack.y) : depth_unpack.z * rcp(P - depth_unpack.w);
 }
 
-float3 gbuf_unpack_position(float2 uv)
-{
-    float depth = get_depth_fast(uv);
-    uv = uv * 2.0f - 1.0f;
-    return float3(uv * pos_decompression_params.xy, 1.0f) * depth;
-}
-
 float3 gbuf_unpack_position(float2 uv, float depth)
 {
     uv = uv * 2.0f - 1.0f;
     return float3(uv * pos_decompression_params.xy, 1.0f) * depth;
+}
+
+float3 gbuf_unpack_position(float2 uv)
+{
+    return gbuf_unpack_position(uv, get_depth_fast(uv));
 }
 
 float2 gbuf_unpack_uv(float3 position)
@@ -65,9 +63,9 @@ float4 ScreenSpaceLocalReflections(float3 Point, float3 Reflect, inout float L)
     DeltaL = length(HitPos) - length(Point);
     Fade *= step(-0.4f, DeltaL);
 
-   float Attention = GetBorderAtten(ReflUV, 0.125f);
+   float Attention = GetBorderAtten(ReflUV, 0.0125f);
    ReflUV -= s_velocity.SampleLevel(smp_rtlinear, ReflUV, 0).xy * float2(0.5f, -0.5f);
-   Fade *= min(Attention, GetBorderAtten(ReflUV, 0.125f));
+   Fade *= min(Attention, GetBorderAtten(ReflUV, 0.0125f));
 
 #ifdef SKYBLED_FADE
     float Fog = saturate(length(HitPos) * fog_params.w + fog_params.x);

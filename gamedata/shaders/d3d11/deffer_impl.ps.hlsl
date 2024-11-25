@@ -14,9 +14,13 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 
     float4 Lmap = s_lmap.Sample(smp_base, I.tcdh.xy);
     float2 tcdbump = I.tcdh.xy * dt_params.xy;
+	
+	float Wet = 0.0f;
 
 #ifdef USE_4_BUMP
     float4 Mask = s_mask.Sample(smp_base, I.tcdh.xy);
+	Wet = 1.0f - Mask.w; Mask.w = 0.0f;
+	
     Mask /= dot(Mask, 1.0f);
 	
     float3 Detail_R = s_dt_r.Sample(smp_base, tcdbump).xyz * Mask.x;
@@ -32,8 +36,6 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 
     M.Normal = Normal_R.wzy + Normal_G.wzy + Normal_B.wzy + Normal_A.wzy - 0.5;
     M.Roughness = min(1.0f, Normal_R.x + Normal_G.x + Normal_B.x + Normal_A.x);
-	
-	M.Roughness = lerp(1.0f - dot(M.Color, 0.033f), M.Roughness, dot(Mask.xwz, 0.333f));
 #else
     float4 Detail = s_detail.Sample(smp_base, tcdbump);
 	float4 DetailBump = s_detailBump.Sample(smp_base, tcdbump);
@@ -42,15 +44,12 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 	M.Normal.xyz = DetailBump.wzy - 0.5f;
 #endif
 	
+    M.Normal.z *= 0.5f;
     M.Color.xyz *= Detail * 2.0f;
 
     M.Metalness = 0.0f;
     M.SSS = 0.0f;
     M.AO = 1.0f;
-
-    M.Normal.z *= 0.5f;
-    M.Normal = mul(float3x3(I.M1, I.M2, I.M3), M.Normal);
-    M.Normal = normalize(M.Normal);
 
     M.Sun = Lmap.w;
     M.Hemi = M.Color.w;
@@ -58,9 +57,16 @@ void main(p_bumped_new I, out IXrayGbufferPack O)
 #ifdef USE_LEGACY_LIGHT
     M.Metalness = L_material.w;
 #else
-	// M.Metalness = M.Roughness;
-    M.Roughness = 1.0f - M.Roughness * M.Roughness * 0.9f;
+    M.Roughness = 1.0f - M.Roughness;
 #endif
+
+	M.Metalness = lerp(M.Metalness, 0.6f, Wet);
+	M.Roughness = lerp(M.Roughness, 0.02f, Wet);
+	M.Normal.z *= 1.0f + Wet * 30.0f;
+	M.Color *= lerp(1.0f, 0.8f, Wet);
+
+    M.Normal = mul(float3x3(I.M1, I.M2, I.M3), M.Normal);
+    M.Normal = normalize(M.Normal);
 
     O.Velocity = I.hpos_curr.xy / I.hpos_curr.w - I.hpos_old.xy / I.hpos_old.w;
     GbufferPack(O, M);

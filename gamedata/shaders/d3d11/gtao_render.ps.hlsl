@@ -22,7 +22,7 @@
 struct PSInput
 {
     float4 hpos : SV_POSITION;
-    float4 texcoord : TEXCOORD0;
+    float2 texcoord : TEXCOORD0;
 };
 
 float gtao_parameters; // Factor used to transform world space radius to screen space

@@ -74,9 +74,9 @@ float3 NormalDecode(float3 Normal)
 void GbufferPack(inout IXrayGbufferPack O, inout IXrayMaterial M)
 {
     O.Normal.xyz = NormalEncode(M.Normal.xyz);
-    O.Normal.w = M.Hemi * M.AO;
+    O.Normal.w = M.Hemi;
 
-    O.Color.xyz = M.Color.xyz;
+    O.Color.xyz = PushGamma(M.Color.xyz * M.AO);
     O.Color.w = M.Roughness;
 	
     O.Material.y = M.SSS;
@@ -127,7 +127,7 @@ void GbufferUnpack(in float2 TexCoord, in float2 HPos, inout IXrayGbuffer O)
     O.Normal.xyz = NormalDecode(NormalHemi.xyz);
     O.Hemi = NormalHemi.w;
 
-    O.Color.xyz = PushGamma(ColorSSS.xyz);
+    O.Color.xyz = ColorSSS.xyz;
     O.SSS = Material.y;
 
     O.Metalness = Material.x;

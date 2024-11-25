@@ -17,7 +17,8 @@ float DistributionGGX(float SqrNdotH, float Roughness)
 // Simple PBR - like attention
 float ComputeLightAttention(float3 PointToLight, float MinAttention)
 {
-    return saturate(1.0f - dot(PointToLight, PointToLight) * MinAttention);
+    // return saturate(1.0f - dot(PointToLight, PointToLight) * MinAttention);
+	return max(rcp(dot(PointToLight, PointToLight)) - MinAttention, 0.0f);
 }
 
 float GeometrySmithD(float NdotL, float NdotV, float Roughness)

@@ -12,22 +12,22 @@ float Contrast(float Input, float ContrastPower)
     return Output;
 }
 
-#define PushGamma(x) pow(x, 1.0f)
-#define PopGamma(x) pow(x, rcp(1.0f))
+#define PushGamma(x) pow(x, 2.2f)
+#define PopGamma(x) pow(x, rcp(2.2f))
 
 float3 tonemap(float3 rgb, float scale)
 {
-   rgb = rgb * scale;
+	rgb = max(0.0f, rgb * scale);
 
-	// rgb /= 1.0f + rgb;
-   const float fWhiteIntensity = 1.7f;
-   const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
-   
-	// rgb /= (1.0f + rgb);
-    // rgb = PopGamma(rgb);
-	rgb = rgb * (1.0f + rgb / fWhiteIntensitySQR) / (rgb + 1.0f);
+	//const float fWhiteIntensity = 1.7f;
+	//const float fWhiteIntensitySQR = fWhiteIntensity * fWhiteIntensity;
+	//
+	//rgb = rgb * (1.0f + rgb / fWhiteIntensitySQR) / (rgb + 1.0f);
+	
+	rgb /= 1.0f + rgb;
 	rgb = PopGamma(rgb);
-    return rgb;
+
+	return rgb;
 }
 
 // Функции генерации случайных чисел [0, 1]

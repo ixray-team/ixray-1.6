@@ -5,7 +5,7 @@
 struct PSInput
 {
     float4 hpos : SV_POSITION;
-    float4 texcoord : TEXCOORD0;
+    float2 texcoord : TEXCOORD0;
 };
 
 int sample_mip_level;
@@ -20,8 +20,8 @@ float4 main(PSInput I) : SV_Target
 	float MinDepth = min(min(DepthA.x, DepthB.x), min(DepthC.x, DepthD.x));
 	float MaxDepth = max(max(DepthA.y, DepthB.y), max(DepthC.y, DepthD.y));
 	
-	float AvgDepth = 0.25f * (DepthA.z + DepthB.z + DepthC.z + DepthD.z);
+	// float AvgDepth = 0.25f * (DepthA.z + DepthB.z + DepthC.z + DepthD.z);
 	
-	return float4(MinDepth, MaxDepth, AvgDepth, 1.0f);
+	return float4(MinDepth, MaxDepth, frac(MinDepth), 1.0f);
 }
 
