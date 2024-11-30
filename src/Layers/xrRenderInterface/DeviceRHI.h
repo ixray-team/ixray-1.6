@@ -125,6 +125,16 @@ enum eClearFlag
 	CLEAR_STENCIL = 0x2L
 };
 
+enum EShaderType
+{
+	Pixel,
+	Vertex,
+	Geometry,
+	Domain,
+	Hull,
+	Compute
+};
+
 struct SSampleDesc
 {
 	UINT Count = 1;
@@ -363,6 +373,16 @@ public:
 	virtual void Unmap(u32 Subresource) = 0;
 };
 
+class IRenderShader :
+	public IRHIResource
+{
+public:
+	EShaderType Type;
+	void* Pointer = nullptr;
+
+	virtual ~IRenderShader() = default;
+};
+
 class IRenderTargetView :
 	public IRHIResource
 {
@@ -417,7 +437,7 @@ public:
 
 	// Note: maximum is 8 render targets.
 	virtual void SetRenderTargets(u32 NumViews, IRenderTargetView* const* ppRenderTargetViews, IDepthStencilView* pDepthStencilView) = 0;
-
+	virtual void SetShader(IRenderShader* pDom) = 0;
 	virtual void CopyTexture1D(IRHIResource* pDstResource, IRHIResource* pSrcResource) = 0;
 	virtual void CopyTexture2D(IRHIResource* pDstResource, IRHIResource* pSrcResource) = 0;
 	virtual void CopyTexture3D(IRHIResource* pDstResource, IRHIResource* pSrcResource) = 0;

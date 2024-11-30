@@ -22,7 +22,7 @@ IC void CBackend::set_RT(ID3DRenderTargetView* RT, u32 ID)
 		//	Mark RT array dirty
 		//	Reset all RT's here to allow RT to be bounded as input
 		if (!m_bChangedRTorZB)
-			RContext->OMSetRenderTargets(0, 0, 0);
+			g_RenderRHI->SetRenderTargets(0, 0, 0);
 
 		m_bChangedRTorZB = true;
 	}
@@ -38,7 +38,7 @@ IC void	CBackend::set_ZB(ID3DDepthStencilView* ZB)
 
 		//	Reset all RT's here to allow RT to be bounded as input
 		if (!m_bChangedRTorZB)
-			RContext->OMSetRenderTargets(0, 0, 0);
+			g_RenderRHI->SetRenderTargets(0, 0, 0);
 
 		m_bChangedRTorZB = true;
 	}
@@ -56,7 +56,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
 	}
 }
 
-ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
+ICF void CBackend::set_PS(IRenderShader* _ps, LPCSTR _n)
 {
 	if (ps!=_ps)
 	{
@@ -64,7 +64,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
 		stat.ps			++;
 		ps				= _ps;
 
-		RContext->PSSetShader(ps, 0, 0);
+		g_RenderRHI->SetShader(ps);
 
 
 #ifdef DEBUG
@@ -73,7 +73,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
 	}
 }
 
-ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
+ICF void CBackend::set_GS(IRenderShader* _gs, LPCSTR _n)
 {
 	if (gs!=_gs)
 	{
@@ -82,7 +82,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
 
 		gs				= _gs;
 
-		RContext->GSSetShader(gs, 0, 0);
+		g_RenderRHI->SetShader(gs);
 
 #ifdef DEBUG
 		gs_name			= _n;
@@ -91,7 +91,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
 }
 
 
-ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
+ICF void CBackend::set_HS(IRenderShader* _hs, LPCSTR _n)
 {
 	if (hs!=_hs)
 	{
@@ -99,7 +99,7 @@ ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
 		//	TODO: DX10: Get statistics for H Shader change
 
 		hs				= _hs;
-		RContext->HSSetShader(hs, 0, 0);
+		g_RenderRHI->SetShader(hs);
 
 #ifdef DEBUG
 		hs_name			= _n;
@@ -107,7 +107,7 @@ ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
 	}
 }
 
-ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
+ICF void CBackend::set_DS(IRenderShader* _ds, LPCSTR _n)
 {
 	if (ds!=_ds)
 	{
@@ -115,7 +115,7 @@ ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
 		//	TODO: DX10: Get statistics for D Shader change
 
 		ds				= _ds;
-		RContext->DSSetShader(ds, 0, 0);
+		g_RenderRHI->SetShader(ds);
 
 #ifdef DEBUG
 		ds_name			= _n;
@@ -123,7 +123,7 @@ ICF void CBackend::set_DS(ID3D11DomainShader* _ds, LPCSTR _n)
 	}
 }
 
-ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
+ICF void CBackend::set_CS(IRenderShader* _cs, LPCSTR _n)
 {
 	if (cs!=_cs)
 	{
@@ -131,7 +131,7 @@ ICF void CBackend::set_CS(ID3D11ComputeShader* _cs, LPCSTR _n)
 		//	TODO: DX10: Get statistics for D Shader change
 		//stat.cs			++;
 		cs				= _cs;
-		RContext->CSSetShader(cs, 0, 0);
+		g_RenderRHI->SetShader(cs);
 
 #ifdef DEBUG
 		cs_name			= _n;
@@ -144,10 +144,7 @@ ICF	bool CBackend::is_TessEnabled()
 	return true;
 }
 
-
-
-
-ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
+ICF void CBackend::set_VS(IRenderShader* _vs, LPCSTR _n)
 {
 	if (vs!=_vs)
 	{
@@ -155,7 +152,7 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
 		stat.vs			++;
 		vs				= _vs;
 
-		RContext->VSSetShader(vs, 0, 0);
+		g_RenderRHI->SetShader(vs);
 
 #ifdef DEBUG
 		vs_name			= _n;

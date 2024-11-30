@@ -283,6 +283,49 @@ void CRenderRHI_DX11::SetRenderTargets(u32 NumViews, IRenderTargetView* const* p
 		pD3D11DepthStencilView ? pD3D11DepthStencilView->GetDepthStencilView() : nullptr);
 }
 
+void CRenderRHI_DX11::SetShader(IRenderShader* pDom)
+{
+	switch (pDom->Type)
+	{
+		case EShaderType::Compute:
+		{
+			ID3D11ComputeShader* D3DShader = (ID3D11ComputeShader*)pDom->Pointer;
+			GetDeviceContext()->CSSetShader(D3DShader, 0, 0);
+			break;
+		}
+		case EShaderType::Hull:
+		{
+			ID3D11HullShader* D3DShader = (ID3D11HullShader*)pDom->Pointer;
+			GetDeviceContext()->HSSetShader(D3DShader, 0, 0);
+			break;
+		}
+		case EShaderType::Domain:
+		{
+			ID3D11DomainShader* D3DShader = (ID3D11DomainShader*)pDom->Pointer;
+			GetDeviceContext()->DSSetShader(D3DShader, 0, 0);
+			break;
+		}
+		case EShaderType::Pixel:
+		{
+			ID3D11PixelShader* D3DShader = (ID3D11PixelShader*)pDom->Pointer;
+			GetDeviceContext()->PSSetShader(D3DShader, 0, 0);
+			break;
+		}
+		case EShaderType::Vertex:
+		{
+			ID3D11VertexShader* D3DShader = (ID3D11VertexShader*)pDom->Pointer;
+			GetDeviceContext()->VSSetShader(D3DShader, 0, 0);
+			break;
+		}
+		case EShaderType::Geometry:
+		{
+			ID3D11GeometryShader* D3DShader = (ID3D11GeometryShader*)pDom->Pointer;
+			GetDeviceContext()->GSSetShader(D3DShader, 0, 0);
+			break;
+		}
+	}
+}
+
 void CRenderRHI_DX11::CopyTexture1D(IRHIResource* pDstResource, IRHIResource* pSrcResource)
 {
 	CHECK_RESOURCED_DIMENSION(pDstResource, RESOURCE_DIMENSION_TEXTURE1D);

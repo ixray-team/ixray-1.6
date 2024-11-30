@@ -35,6 +35,7 @@ public:
 
 	// Note: maximum is 8 render targets.
 	void SetRenderTargets(u32 NumViews, IRenderTargetView* const* ppRenderTargetViews, IDepthStencilView* pDepthStencilView) override;
+	void SetShader(IRenderShader* pDom) override;
 
 	void CopyTexture1D(IRHIResource* pDstResource, IRHIResource* pSrcResource) override;
 	void CopyTexture2D(IRHIResource* pDstResource, IRHIResource* pSrcResource) override;

@@ -28,7 +28,7 @@ typedef	resptr_core<SInputSignature,resptr_base<SInputSignature> >	ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named							
 {
-	ID3DVertexShader*					vs;
+	IRenderShader*					vs;
 	R_constant_table					constants;
 #ifdef USE_DX11
 	ref_input_sign						signature;
@@ -41,7 +41,7 @@ typedef	resptr_core<SVS,resptr_base<SVS> >	ref_vs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
-	ID3DPixelShader*					ps;
+	IRenderShader*					ps;
 	R_constant_table					constants;
 	~SPS			();
 };
@@ -51,7 +51,7 @@ typedef	resptr_core<SPS,resptr_base<SPS> > ref_ps;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
-	ID3DGeometryShader*					gs;
+	IRenderShader*					gs;
 	R_constant_table					constants;
 	~SGS			();
 };
@@ -59,7 +59,7 @@ typedef	resptr_core<SGS,resptr_base<SGS> > ref_gs;
 
 struct ECORE_API SHS : public xr_resource_named
 {
-	ID3D11HullShader*					sh;
+	IRenderShader*					sh;
 	R_constant_table					constants;
 	~SHS			();
 };
@@ -67,7 +67,7 @@ typedef	resptr_core< SHS, resptr_base<SHS> >	ref_hs;
 
 struct ECORE_API SDS : public xr_resource_named
 {
-	ID3D11DomainShader*					sh;
+	IRenderShader*					sh;
 	R_constant_table					constants;
 	~SDS			();
 };
@@ -75,7 +75,7 @@ typedef	resptr_core< SDS, resptr_base<SDS> >	ref_ds;
 
 struct ECORE_API SCS : public xr_resource_named
 {
-	ID3D11ComputeShader*					sh;
+	IRenderShader*					sh;
 	R_constant_table					constants;
 	~SCS			();
 };

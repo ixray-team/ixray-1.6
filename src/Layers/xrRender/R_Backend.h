@@ -124,13 +124,13 @@ private:
 
 	// Shaders/State
 	ID3DState*						state;
-	ID3DPixelShader*				ps;
-	ID3DVertexShader*				vs;
+	IRenderShader*				ps;
+	IRenderShader*				vs;
 #ifdef USE_DX11
-	ID3DGeometryShader*				gs;
-	ID3D11HullShader*				hs;
-	ID3D11DomainShader*				ds;
-	ID3D11ComputeShader*			cs;
+	IRenderShader*				gs;
+	IRenderShader*				hs;
+	IRenderShader*				ds;
+	IRenderShader*				cs;
 #endif //USE_DX11
 
 #ifdef DEBUG
@@ -282,20 +282,20 @@ public:
 	ICF  void						set_Format			(IDirect3DVertexDeclaration9* _decl);
 #endif
 
-	ICF void						set_PS				(ID3DPixelShader* _ps, LPCSTR _n=0);
+	ICF void						set_PS				(IRenderShader* _ps, LPCSTR _n=0);
 	ICF void						set_PS				(ref_ps& _ps)						{ set_PS(_ps->ps,_ps->cName.c_str());				}
 
 #ifdef USE_DX11
-	ICF void						set_GS				(ID3DGeometryShader* _gs, LPCSTR _n=0);
+	ICF void						set_GS				(IRenderShader* _gs, LPCSTR _n=0);
 	ICF void						set_GS				(ref_gs& _gs)						{ set_GS(_gs->gs,_gs->cName.c_str());				}
 
-	ICF void						set_HS				(ID3D11HullShader* _hs, LPCSTR _n=0);
+	ICF void						set_HS				(IRenderShader* _hs, LPCSTR _n=0);
 	ICF void						set_HS				(ref_hs& _hs)						{ set_HS(_hs->sh,_hs->cName.c_str());				}
 
-	ICF void						set_DS				(ID3D11DomainShader* _ds, LPCSTR _n=0);
+	ICF void						set_DS				(IRenderShader* _ds, LPCSTR _n=0);
 	ICF void						set_DS				(ref_ds& _ds)						{ set_DS(_ds->sh,_ds->cName.c_str());				}
 
-	ICF void						set_CS				(ID3D11ComputeShader* _cs, LPCSTR _n=0);
+	ICF void						set_CS				(IRenderShader* _cs, LPCSTR _n=0);
 	ICF void						set_CS				(ref_cs& _cs)						{ set_CS(_cs->sh,_cs->cName.c_str());				}
 
 #endif //USE_DX11
@@ -311,7 +311,7 @@ public:
 	ICF void						set_VS				(SVS* _vs);
 protected:	//	In DX10 we need input shader signature which is stored in ref_vs
 #endif //USE_DX11
-	ICF void						set_VS				(ID3DVertexShader* _vs, LPCSTR _n=0);
+	ICF void						set_VS				(IRenderShader* _vs, LPCSTR _n=0);
 #ifdef USE_DX11
 public:
 #endif //USE_DX11
