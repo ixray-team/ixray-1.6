@@ -797,7 +797,7 @@ void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* 
 			PHelper().CreateVector	(items, PrepareKey(pref,"Bone\\Shape\\Box\\Half Size"),  	&BONE->shape.box.m_halfsize, 0.f, 1000.f);
 		break;
 		case SBoneShape::stSphere:
-			PHelper().CreateVector	(items, PrepareKey(pref,"Bone\\Shape\\Sphere\\Position"),	&BONE->shape.sphere.P, -10000.f, 10000.f);
+			PHelper().CreateVector	(items, PrepareKey(pref,"Bone\\Shape\\Sphere\\Position"),	&BONE->shape.sphere.P, -100000.f, 100000.f);
 			PHelper().CreateFloat  	(items, PrepareKey(pref,"Bone\\Shape\\Sphere\\Radius"),  	&BONE->shape.sphere.R, 0.f, 1000.f);
 		break;
 		case SBoneShape::stCylinder:
@@ -935,7 +935,7 @@ void CActorTools::FillObjectProperties(PropItemVec& items, LPCSTR pref, ListItem
 		PHelper().CreateFlag32(items, "Object\\Flags\\Using LOD", &m_pEditObject->m_objectFlags, CEditableObject::eoUsingLOD)->OnChangeEvent.bind(this, &CActorTools::OnUsingLodFlagChange);
 	}
 
-	V = PHelper().CreateVector(items, "Object\\Transform\\Position", &m_pEditObject->a_vPosition, -10000, 10000, 0.01, 2);
+	V = PHelper().CreateVector(items, "Object\\Transform\\Position", &m_pEditObject->a_vPosition, -100000, 100000, 0.01, 2);
 	V->OnChangeEvent.bind(this, &CActorTools::OnChangeTransform);
 	V = PHelper().CreateAngle3(items, "Object\\Transform\\Rotation", &m_pEditObject->a_vRotate, -10000, 10000, 0.1, 1);
 	V->OnChangeEvent.bind(this, &CActorTools::OnChangeTransform);
