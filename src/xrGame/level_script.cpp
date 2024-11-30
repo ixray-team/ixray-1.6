@@ -40,6 +40,10 @@
 #include "HUDAnimItem.h"
 #include "ActorCondition.h"
 #include "player_hud.h"
+#include "PickupManager.h"
+#include "UIActorMenu.h"
+#include "Inventory.h"
+#include "Weapon.h"
 
 using namespace luabind;
 
@@ -989,6 +993,66 @@ namespace level_nearest
 	}
 }
 
+bool is_ui_shown() {
+	return CurrentGameUI()->GameIndicatorsShown();
+}
+bool indicators_shown() {
+	bool res = is_ui_shown();
+	if (res)
+	{
+		CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+		
+		if (actor == nullptr)
+			return false;
+
+		CWeapon* wpn = smart_cast<CWeapon*>(actor->inventory().ActiveItem());
+		if (wpn == nullptr)
+			res = true;
+		else if (wpn->IsUIForceHiding())
+			res = false;
+		else if (wpn->IsUIForceUnhiding())
+			res = true;
+		else if (wpn->IsGrenadeMode())
+			res = true;
+		else if (wpn->IsZoomed() && (wpn->get_ScopeStatus() == 1 || wpn->get_ScopeStatus() == 2 && wpn->IsScopeAttached()))
+			res = false;
+		else
+			res = true;
+	}
+	return res;
+}
+bool inventory_shown() {
+	return CurrentGameUI()->ActorMenu().IsShown();
+}
+bool electronics_break() {
+	return false;
+}
+bool pickup_mode() {
+	CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+	if (actor != nullptr)
+		return actor->GetPickupManager()->GetPickupMode();
+
+	return false;
+}
+bool is_actor_burned() {
+	return false;
+}
+bool electronics_restore() {
+	return true;
+}
+bool electronics_reset() {
+	return true;
+}
+bool electronics_apply() {
+	return true;
+}
+int get_parameter_upgraded_int() {
+	return 0;
+}
+int valid_saved_game_int(int number, const char* name) {
+	return 1;
+}
+
 #pragma optimize("s",on)
 void CLevel::script_register(lua_State *L)
 {
@@ -1128,9 +1192,21 @@ void CLevel::script_register(lua_State *L)
 		def("get_active_cam", &get_active_cam),
 		def("set_active_cam", &set_active_cam),
 		def("get_start_time", &get_start_time),
-		def("valid_vertex", &valid_vertex)
+		def("valid_vertex", &valid_vertex),
+		
+		def("is_ui_shown", &is_ui_shown),
+		def("is_actor_burned", &is_actor_burned),
+		def("indicators_shown", &indicators_shown),
+		def("inventory_shown", &inventory_shown),
+		def("electronics_break", &electronics_break),
+		def("pickup_mode", &pickup_mode),
+		def("electronics_restore", &electronics_restore),
+		def("electronics_reset", &electronics_reset),
+		def("electronics_apply", &electronics_apply),
+		def("get_parameter_upgraded_int", &get_parameter_upgraded_int),
+		def("valid_saved_game_int", &valid_saved_game_int)
 	],
-	
+
 	module(L,"nearest")
 	[
 		def("set",						&level_nearest::Set),
