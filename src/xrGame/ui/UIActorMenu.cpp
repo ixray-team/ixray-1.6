@@ -41,6 +41,7 @@
 #include "../trade.h"
 #include "Car.h"
 #include "../xrEngine/string_table.h"
+#include "UITalkWnd.h"
 
 void CUIActorMenu::SetActor(CInventoryOwner* io)
 {
