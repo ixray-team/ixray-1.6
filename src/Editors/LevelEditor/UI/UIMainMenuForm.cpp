@@ -124,7 +124,7 @@ void UIMainMenuForm::Draw()
 				{
 					LTools->RunXrDO();
 				}
-				if (ImGui::BeginMenu("AIMap"))
+				if (ImGui::BeginMenu("AI-Map"))
 				{
 					if (ImGui::MenuItem("High", ""))
 					{
