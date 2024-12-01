@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UIMinimapEditorForm.h"
+#include "../../../xrCore/os_clipboard.h"
 
 UIMinimapEditorForm*    UIMinimapEditorForm::Form = nullptr;
 
@@ -64,7 +65,7 @@ void UIMinimapEditorForm::ShowElementList() {
 
 	ImGui::Text(" Elements");
 	ImGui::Separator();
-
+	ImGui::BeginDisabled(BoundRectMode);
 	for (int i = 0; i < elements.size(); i++) 
 	{
 		//tyt bi iconki
@@ -83,6 +84,7 @@ void UIMinimapEditorForm::ShowElementList() {
 		}
 		ImGui::PopID();
 	}
+	ImGui::EndDisabled();
 }
 
 void UIMinimapEditorForm::RenderCanvas() 
@@ -167,7 +169,7 @@ void UIMinimapEditorForm::RenderCanvas()
 
 		int resize_off = 5;
 		int resize_mode = 0;
-		int resize_or = 0;
+		bool resize_or = 0;
 
 		if (inside)
 		{
@@ -256,12 +258,9 @@ void UIMinimapEditorForm::RenderCanvas()
 			}
 		}
 
-		if (is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) 
+		if (inside && is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 		{
-			if (inside) 
-			{
-				SelectElement(element);
-			}
+			SelectElement(element);
 		}
 
 		if (element.EdSelected && !element.EdLocked) 
@@ -336,11 +335,8 @@ void UIMinimapEditorForm::RenderCanvas()
 					m_saveResizeMode = 0;
 					m_saveResizeOr = 0;
 				}
-				else
-				if (m_EditMode != Resize)
+				else if (m_EditMode != Resize)
 					m_EditMode = None;
-
-				
 			}
 		}
 		
@@ -387,6 +383,217 @@ void UIMinimapEditorForm::RenderCanvas()
 	if (is_hovered && !is_mapItemHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
 		UnselectAllElements();
+	}
+}
+
+void UIMinimapEditorForm::RenderBoundCanvas()
+{
+
+	ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
+	ImVec2 canvas_size = ImGui::GetContentRegionAvail();
+
+	if (canvas_size.x < 64 && canvas_size.y < 64)
+		return;
+
+	ImGui::InvisibleButton("canvas", canvas_size);
+
+	bool is_hovered = ImGui::IsItemHovered();
+	//bool is_mapItemHovered = false;
+
+	if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+		if (!isDragging) {
+			isDragging = true;
+			initial_mouse_pos = ImGui::GetMousePos();
+			initial_bg_position = m_BoundBackgroundPosition;
+		}
+		ImVec2 mouse_delta = ImGui::GetMousePos() - initial_mouse_pos;
+		m_BoundBackgroundPosition = initial_bg_position + mouse_delta;
+	}
+	else {
+		isDragging = false;
+	}
+
+	if (is_hovered) {
+		float scroll = ImGui::GetIO().MouseWheel;
+		if (scroll != 0.0f) {
+			float old_zoom = m_BZoom;
+			m_BZoom = Clamp(m_BZoom + scroll * 0.1f, 0.1f, 5.0f);
+
+			ImVec2 mouse_pos = ImGui::GetIO().MousePos;
+			m_BoundBackgroundPosition.x += (mouse_pos.x - canvas_p0.x - m_BoundBackgroundPosition.x) * (1 - m_BZoom / old_zoom);
+			m_BoundBackgroundPosition.y += (mouse_pos.y - canvas_p0.y - m_BoundBackgroundPosition.y) * (1 - m_BZoom / old_zoom);
+		}
+	}
+
+	ImVec2 bg_display_size(selectedElement->FileSize.x * m_BZoom, selectedElement->FileSize.y * m_BZoom);
+	ImGui::GetWindowDrawList()->AddImage(selectedElement->Texture, canvas_p0 + m_BoundBackgroundPosition, canvas_p0 + m_BoundBackgroundPosition + bg_display_size);
+
+
+	ImVec2 element_screen_pos = canvas_p0 + m_BoundBackgroundPosition;
+	ImVec2 element_screen_size = selectedElement->FileSize * m_BZoom;
+
+	float handle_size = m_BZoom;
+
+	ImVec2 top_left = element_screen_pos - ImVec2(handle_size / 2, handle_size / 2);
+	ImVec2 bottom_right = element_screen_pos + ImVec2(handle_size / 2, handle_size / 2) + element_screen_size;
+
+	//File Size Border
+	ImGui::GetWindowDrawList()->AddRect(top_left, bottom_right, IM_COL32(130, 130, 130, 100), 0.0f, ImDrawFlags_RoundCornersNone, 1.0f);
+
+	ImVec2 topLeftBoundRect = element_screen_pos + element_screen_size / 2 - ImVec2(handle_size / 2, handle_size / 2);
+	ImVec2 bottomRightBoundRect = topLeftBoundRect;
+
+	topLeftBoundRect.x += m_Bound.x * m_BZoom;
+	topLeftBoundRect.y += m_Bound.y * m_BZoom;
+	bottomRightBoundRect.x += m_Bound.z * m_BZoom;
+	bottomRightBoundRect.y += m_Bound.w * m_BZoom;
+
+	ImGui::GetWindowDrawList()->AddRect(topLeftBoundRect, bottomRightBoundRect, IM_COL32(130, 200, 130, 250), 0.0f, ImDrawFlags_RoundCornersNone, 1.0f);
+
+	int resize_off = 5;
+	int resize_mode = 0;
+	bool resize_or = 0;
+
+	auto ckCursorZone = [](float x1, float x2, float y1, float y2)
+		{
+			return (ImGui::GetIO().MousePos.x >= (x1) && ImGui::GetIO().MousePos.x <= (x2) &&
+				ImGui::GetIO().MousePos.y >= (y1) && ImGui::GetIO().MousePos.y <= (y2));
+		};
+
+	{
+		ImVec2 image_min = topLeftBoundRect;
+		ImVec2 image_max = bottomRightBoundRect;
+
+		if (ckCursorZone(image_min.x- resize_off, (image_min.x + resize_off), (image_min.y + resize_off), (image_max.y - resize_off)))
+		{
+			resize_mode = 1;
+			resize_or = 0;
+		}
+		else if (ckCursorZone((image_max.x - resize_off), image_max.x+ resize_off, (image_min.y + resize_off), (image_max.y - resize_off)))
+		{
+			resize_mode = 1;
+			resize_or = 1;
+		}
+		else if (ckCursorZone(image_min.x + resize_off, image_max.x - resize_off, image_min.y- resize_off, image_min.y + resize_off))
+		{
+			resize_mode = 2;
+			resize_or = 0;
+		}
+		else if (ckCursorZone(image_min.x + resize_off, image_max.x - resize_off, image_max.y - resize_off, image_max.y+ resize_off))
+		{
+			resize_mode = 2;
+			resize_or = 1;
+		}
+
+		if (resize_mode != 0 && !BoundEditMode && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			BoundEditMode = true;
+			m_saveResizeMode = resize_mode;
+			m_saveResizeOr = resize_or;
+		}
+	}
+	
+	if (resize_mode == 1 || m_saveResizeMode == 1)
+	{
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+	}
+	else if (resize_mode == 2 || m_saveResizeMode == 2)
+	{
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+	}
+		//bool blockMouse = false;
+	if (BoundEditMode && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+	{
+		ImVec2 mouse_delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+
+		ImVec2 hl3 = element_screen_pos + element_screen_size / 2 - ImVec2(handle_size / 2, handle_size / 2);
+		/*
+		{
+			//cache
+			KG1fc2F2ZVJlc2l6ZU1vZGUgPT0gMSA/ICgobV9zYXZlUmVzaXplT3IgPT0gMCA/IHRvcExlZnRCb3VuZFJlY3QueCArIG1vdXNlX2RlbHRhLnggPCBobDMueCA6IAoJYm90dG9tUmlnaHRCb3VuZFJlY3QueCArIG1vdXNlX2RlbHRhLnggPiBobDMueCkKCSYmIChtX3NhdmVSZXNpemVPciA9PSAwID8gdG9wTGVmdEJvdW5kUmVjdC54ICsgbW91c2VfZGVsdGEueCA+IGVsZW1lbnRfc2NyZWVuX3Bvcy54IDogCmJvdHRvbVJpZ2h0Qm91bmRSZWN0LnggKyBtb3VzZV9kZWx0YS54IDwgZWxlbWVudF9zY3JlZW5fcG9zLnggKyBlbGVtZW50X3NjcmVlbl9zaXplLngpID8gCihtX3NhdmVSZXNpemVPciA9PSAwID8gdG9wTGVmdEJvdW5kUmVjdC54IDogYm90dG9tUmlnaHRCb3VuZFJlY3QueCkgKz0gbW91c2VfZGVsdGEueCA6IDApIAo6IChtX3NhdmVSZXNpemVNb2RlID09IDIgPyAoKG1fc2F2ZVJlc2l6ZU9yID09IDAgPyB0b3BMZWZ0Qm91bmRSZWN0LnkgKyBtb3VzZV9kZWx0YS55IDwgaGwzLnkgOiAKCWJvdHRvbVJpZ2h0Qm91bmRSZWN0LnkgKyBtb3VzZV9kZWx0YS55ID4gaGwzLnkpCiYmIChtX3NhdmVSZXNpemVPciA9PSAwID8gdG9wTGVmdEJvdW5kUmVjdC55ICsgbW91c2VfZGVsdGEueSA+IGVsZW1lbnRfc2NyZWVuX3Bvcy55IDoKYm90dG9tUmlnaHRCb3VuZFJlY3QueSArIG1vdXNlX2RlbHRhLnkgPCBlbGVtZW50X3NjcmVlbl9wb3MueSArIGVsZW1lbnRfc2NyZWVuX3NpemUueSkgPyAKKG1fc2F2ZVJlc2l6ZU9yID09IDAgPyB0b3BMZWZ0Qm91bmRSZWN0LnkgOiBib3R0b21SaWdodEJvdW5kUmVjdC55KSArPSBtb3VzZV9kZWx0YS55IDogMCkgOiAwKSk7
+		}
+		*/
+
+		if (m_saveResizeMode == 1)
+		{
+			if (m_saveResizeOr == 0 && topLeftBoundRect.x + mouse_delta.x < hl3.x &&
+				topLeftBoundRect.x + mouse_delta.x > element_screen_pos.x)
+				topLeftBoundRect.x += mouse_delta.x;
+			else if (m_saveResizeOr == 1 && bottomRightBoundRect.x + mouse_delta.x > hl3.x &&
+				bottomRightBoundRect.x + mouse_delta.x < element_screen_pos.x + element_screen_size.x)
+				bottomRightBoundRect.x += mouse_delta.x;
+		}
+		else if (m_saveResizeMode == 2)
+		{
+			if (m_saveResizeOr == 0 && topLeftBoundRect.y + mouse_delta.y < hl3.y &&
+				topLeftBoundRect.y + mouse_delta.y > element_screen_pos.y)
+				topLeftBoundRect.y += mouse_delta.y;
+			else if (m_saveResizeOr == 1 && bottomRightBoundRect.y + mouse_delta.y > hl3.y &&
+				bottomRightBoundRect.y + mouse_delta.y < element_screen_pos.y + element_screen_size.y)
+				bottomRightBoundRect.y += mouse_delta.y;
+		}
+
+		
+		ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
+
+		m_Bound.x = (topLeftBoundRect.x - (element_screen_pos.x + element_screen_size.x / 2 - handle_size / 2)) / m_BZoom;
+		m_Bound.y = (topLeftBoundRect.y - (element_screen_pos.y + element_screen_size.y / 2 - handle_size / 2)) / m_BZoom;
+		m_Bound.z = (bottomRightBoundRect.x - (element_screen_pos.x + element_screen_size.x / 2 - handle_size / 2)) / m_BZoom;
+		m_Bound.w = (bottomRightBoundRect.y - (element_screen_pos.y + element_screen_size.y / 2 - handle_size / 2)) / m_BZoom;
+	}
+	else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+	{
+		BoundEditMode = false;
+		m_saveResizeMode = 0;
+		m_saveResizeOr = 0;
+	}
+	
+	ImVec2 top_leftd = element_screen_pos + element_screen_size / 2 - ImVec2(handle_size / 2, handle_size / 2);
+	ImVec2 bottom_rightd = top_leftd;
+	if (m_saveResizeMode == 1)
+	{
+		top_leftd.y = element_screen_pos.y;
+		bottom_rightd = top_leftd;
+		bottom_rightd.y += element_screen_size.y;
+
+		ImGui::GetWindowDrawList()->AddLine(top_leftd, bottom_rightd, IM_COL32(200, 0, 0, 100), 2.0f);
+	}
+	else if (m_saveResizeMode == 2)
+	{
+		top_leftd.x = element_screen_pos.x;
+		bottom_rightd = top_leftd;
+		bottom_rightd.x += element_screen_size.x;
+
+		ImGui::GetWindowDrawList()->AddLine(top_leftd, bottom_rightd, IM_COL32(200, 0, 0, 100), 2.0f);
+	}
+
+
+	if (m_DebugView)
+	{
+		string_path dbg_info;
+		sprintf(dbg_info,
+			"= [Debug Info] Bound Rect EDITOR =\nname\t = %s\nposition = %.3f : %.3f \nsize: %.0fx%.0f\nresize_mode: %d\nresize_or: %d\nBoundEditMode = %d",
+			selectedElement->name.c_str(), m_BoundBackgroundPosition.x, m_BoundBackgroundPosition.y, selectedElement->FileSize.x, selectedElement->FileSize.y,
+			m_saveResizeMode, m_saveResizeOr, BoundEditMode
+		);
+		ImGui::GetWindowDrawList()->AddText(top_left, IM_COL32(255, 255, 255, 255), dbg_info);
+
+		{
+			top_leftd = element_screen_pos + element_screen_size / 2 - ImVec2(handle_size / 2, handle_size / 2);
+			top_leftd.y = element_screen_pos.y;
+			bottom_rightd = top_leftd;
+			bottom_rightd.y += element_screen_size.y;
+
+			ImGui::GetWindowDrawList()->AddLine(top_leftd, bottom_rightd, IM_COL32(0, 255, 255, 100), 2.0f);
+		}
+		{
+			top_leftd = element_screen_pos + element_screen_size / 2 - ImVec2(handle_size / 2, handle_size / 2);
+			top_leftd.x = element_screen_pos.x;
+			bottom_rightd = top_leftd;
+			bottom_rightd.x += element_screen_size.x;
+
+			ImGui::GetWindowDrawList()->AddLine(top_leftd, bottom_rightd, IM_COL32(0, 255, 255, 150), 2.0f);
+		}
 	}
 }
 
@@ -573,7 +780,7 @@ void UIMinimapEditorForm::ShowMenu()
 	{
 		LoadBGClick();
 	}
-
+	
 	CreateElementPopup();
 
 	if (ImGui::MenuItem("Add Location"))
@@ -585,17 +792,17 @@ void UIMinimapEditorForm::ShowMenu()
 	ImGui::Separator();
 	if (ImGui::MenuItem("Reset pos"))
 	{
-		m_BackgroundPosition.x = 0;
-		m_BackgroundPosition.y = 0;
+		(BoundRectMode ? m_BoundBackgroundPosition : m_BackgroundPosition) = ImVec2(0,0);
 	}
 
 	if (ImGui::MenuItem("Reset zoom")) 
 	{
-		m_Zoom = 1.f;
+		(BoundRectMode ? m_BZoom : m_Zoom) = 1.f;
 	}
-
+	
 	ImGui::Separator();
 	ImGui::Checkbox("Preview", &PreviewMode);
+	ImGui::BeginDisabled(BoundRectMode);
 	ImGui::Checkbox("Always Draw Border", &m_AlwaysDrawBorder);
 
 	ImGui::Separator();
@@ -610,8 +817,46 @@ void UIMinimapEditorForm::ShowMenu()
 	ImGui::Text("Items Opacity:"); ImGui::SameLine();
 	ImGui::SliderInt("##opt", &m_ItemsOpacity, 1, 255, "%d");
 	ImGui::Separator();
+	ImGui::EndDisabled();
+	if (BoundRectMode)
+	{
+		ImGui::Text("bound_rect");
+		auto tempX = ImGui::GetContentRegionMax().x;
+		ImGui::SetNextItemWidth(tempX-7.f);
+		if (ImGui::DragFloat4("##b_s", (float*)&m_Bound, 1.0f, -2048.0f, 2048))
+		{
+			if (!isEdited) isEdited = true;
+		}
+		if (ImGui::Button("Save and Close"))
+		{
+			string_path levelLtx;
+			sprintf(levelLtx, "%s%s\\level.ltx", FS.get_path("$level$")->m_Path, selectedElement->name.c_str());
 
-	if (selectedElement)
+			if (FS.exist(levelLtx))
+			{
+				CInifile levelLtxFile(levelLtx, FALSE, TRUE, 1);
+
+				levelLtxFile.remove_line("level_map", "bound_rect");
+				levelLtxFile.w_fvector4("level_map", "bound_rect", m_Bound);
+			}
+
+			BoundRectMode = false;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Copy"))
+		{
+			string_path boundData;
+			sprintf(boundData, "%2.f, %2.f, %2.f, %2.f", m_Bound.x, m_Bound.y, m_Bound.z, m_Bound.w);
+			os_clipboard::copy_to_clipboard(boundData);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Close"))
+		{
+			BoundRectMode = false;
+		}
+	}
+
+	if (selectedElement && !BoundRectMode)
 	{
 		ImGui::Text("Selected item:");
 		/*ImGui::Text("Name:");
@@ -673,6 +918,25 @@ void UIMinimapEditorForm::ShowMenu()
 			isEdited = true;
 		}
 		ImGui::EndDisabled();
+		ImGui::SameLine();
+		if (ImGui::Button("BoundRect Editor"))
+		{
+			BoundRectMode = true;
+
+			string_path levelLtx;
+			sprintf(levelLtx, "%s%s\\level.ltx", FS.get_path("$level$")->m_Path, selectedElement->name.c_str());
+
+			if (FS.exist(levelLtx))
+			{
+				CInifile levelLtxFile(levelLtx, TRUE);
+
+				if (levelLtxFile.line_exist("level_map", "bound_rect")) 
+				{
+					auto textureFile = levelLtxFile.r_fvector4("level_map", "bound_rect");
+					m_Bound = textureFile;
+				}
+			}
+		}
 	}
 }
 
@@ -913,7 +1177,10 @@ void UIMinimapEditorForm::Draw()
 		ImGui::NextColumn();
 
 		ImGui::BeginChild("Canvas", ImVec2(0, 0), true);
-		RenderCanvas();
+		if (BoundRectMode)
+			RenderBoundCanvas();
+		else
+			RenderCanvas();
 		ImGui::EndChild();
 
 	}

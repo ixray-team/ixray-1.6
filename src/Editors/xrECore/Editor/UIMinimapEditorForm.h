@@ -49,6 +49,7 @@ private:
 
 	void ShowMenu();
 	void RenderCanvas();
+
 	void ShowElementList();
 	void ShowPreview();
 	void UnselectAllElements();
@@ -91,6 +92,14 @@ private:
 	EdMode m_EditMode = None;
 	int m_saveResizeMode	= 0;
 	int m_saveResizeOr		= 0;
+
+	//bound
+	void RenderBoundCanvas();
+	bool BoundRectMode = false;
+	bool BoundEditMode = false;
+	float m_BZoom = 1.0f;
+	ImVec2		m_BoundBackgroundPosition{ 0,0 };
+	Fvector4	m_Bound { 0,0,0,0};
 private:
 	ImTextureID					m_BackgroundTexture;
 	ImTextureID					m_TextureRemove;
