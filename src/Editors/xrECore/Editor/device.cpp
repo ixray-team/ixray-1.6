@@ -199,7 +199,7 @@ bool CEditorRenderDevice::Create()
 	//HW.CreateDevice		(m_hWnd, true);
 	if (UI)
 	{
-		HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
+		HWND hwnd = g_AppInfo.GetHWND();
 		string_path 		ini_path;
 		string_path			ini_name;
 		xr_strcpy			(ini_name, UI->EditorName());
@@ -521,7 +521,7 @@ void CEditorRenderDevice::CreateWindow()
 	int DisplayX = GetSystemMetrics(SM_CXFULLSCREEN);
 	int DisplayY = GetSystemMetrics(SM_CYFULLSCREEN);
 
-	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", DisplayX, DisplayY, SDL_WINDOW_RESIZABLE);
+	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DisplayX, DisplayY, SDL_WINDOW_RESIZABLE);
 }
 
 void CEditorRenderDevice::DestryWindow()

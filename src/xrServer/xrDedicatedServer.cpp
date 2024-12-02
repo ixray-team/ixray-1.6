@@ -15,7 +15,7 @@ void CreateGameWindow()
 		SDL_WindowFlags window_flags = SDL_WINDOW_HIDDEN;
 		u32 screen_width = GetSystemMetrics(SM_CXSCREEN);
 		u32 screen_height = GetSystemMetrics(SM_CYSCREEN);
-		g_AppInfo.Window = SDL_CreateWindow("IX-Ray Dedicated Server", screen_width, screen_height, window_flags);
+		g_AppInfo.Window = SDL_CreateWindow("IX-Ray Dedicated Server", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, window_flags);
 	}
 }
 

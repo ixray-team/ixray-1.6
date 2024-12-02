@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "../xrCore/_std_extensions.h"
-#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdl2.h"
 #include "IGame_Persistent.h"
 
 #include <d3d11.h>
@@ -195,9 +195,9 @@ bool CRenderDevice::InitRenderDevice(APILevel API)
 #ifndef _EDITOR
 	CImGuiManager& ImManager = CImGuiManager::Instance();
 
-	ImManager.PlatformNewFrameCallback = ImGui_ImplSDL3_NewFrame;
-	ImManager.PlatformDestroyCallback = ImGui_ImplSDL3_Shutdown;
-	ImManager.PlatformInitCallback = []() { ImGui_ImplSDL3_InitForD3D(g_AppInfo.Window); };
+	ImManager.PlatformNewFrameCallback = []() { ImGui_ImplSDL2_NewFrame(); };
+	ImManager.PlatformDestroyCallback = ImGui_ImplSDL2_Shutdown;
+	ImManager.PlatformInitCallback = []() { ImGui_ImplSDL2_InitForD3D(g_AppInfo.Window); };
 
 	ImManager.InitPlatform();
 
@@ -419,7 +419,7 @@ void CRenderDevice::ResizeWindow(u32 width, u32 height)
 		SDL_DisplayMode displayMode;
 		displayMode.w = psCurrentVidMode[0];
 		displayMode.h = psCurrentVidMode[1];
-		SDL_SetWindowFullscreenMode(g_AppInfo.Window, &displayMode);
+		SDL_SetWindowDisplayMode(g_AppInfo.Window, &displayMode);
 		SDL_SetWindowFullscreen(g_AppInfo.Window, SDL_WINDOW_FULLSCREEN);
 	} else {
 		SDL_SetWindowFullscreen(g_AppInfo.Window, 0);

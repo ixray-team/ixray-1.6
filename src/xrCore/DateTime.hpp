@@ -2,7 +2,7 @@
 #include <ctime>
 #include <string>
 
-class XRCORE_API Time
+class XRCORE_API DateTime
 {
 private:
 	time_t t;
@@ -10,7 +10,7 @@ private:
 	using string = xr_string;
 
 public:
-	Time();
+	DateTime();
 
 	// Convert time to string
 	string GetSecondsString() const;

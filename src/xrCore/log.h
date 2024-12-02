@@ -47,7 +47,7 @@ private:
 		LogRecord() {}
 		LogRecord(LPCSTR Msg, u32 sizeMsg);
 		xr_string Message;
-		Time time;
+		DateTime time;
 	};
 
 	xrCriticalSection logDataGuard;

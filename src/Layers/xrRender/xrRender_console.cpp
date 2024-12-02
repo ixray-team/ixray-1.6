@@ -372,7 +372,7 @@ public:
 
 	virtual void Execute(LPCSTR args) {
 		if (Device.GetRenderDocAPI()) {
-			HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
+			HWND hwnd = g_AppInfo.GetHWND();
 			Device.GetRenderDocAPI()->StartFrameCapture(RDevice, hwnd);
 		}
 	}
@@ -386,7 +386,7 @@ public:
 
 	virtual void Execute(LPCSTR args) {
 		if (Device.GetRenderDocAPI()) {
-			HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
+			HWND hwnd = g_AppInfo.GetHWND();
 			Device.GetRenderDocAPI()->EndFrameCapture(RDevice, hwnd);
 		}
 	}

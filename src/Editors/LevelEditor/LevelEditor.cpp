@@ -76,32 +76,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		{
 			switch (Event.type)
 			{
-			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-				//EPrefs->SaveConfig();
+			case SDL_QUIT:
 				GContentView->Destroy();
 				NeedExit = true;
 				break;
 
-			case SDL_EVENT_WINDOW_RESIZED:
-				if (UI && REDevice)
+			case SDL_WINDOWEVENT:
+				switch (Event.window.event)
 				{
-					UI->Resize(Event.window.data1, Event.window.data2, true);
-					EPrefs->SaveConfig();
+				case SDL_WINDOWEVENT_RESIZED:
+					if (UI && REDevice)
+					{
+						UI->Resize(Event.window.data1, Event.window.data2, true);
+						EPrefs->SaveConfig();
+					}
+					break;
+				case SDL_WINDOWEVENT_SHOWN:
+				case SDL_WINDOWEVENT_ENTER:
+					Device.b_is_Active = true;
+					break;
+				case SDL_WINDOWEVENT_HIDDEN:
+				case SDL_WINDOWEVENT_LEAVE:
+					Device.b_is_Active = !!psDeviceFlags.test(rsDeviceActive);
+					break;
 				}
 				break;
-			case SDL_EVENT_WINDOW_SHOWN:
-			case SDL_EVENT_WINDOW_MOUSE_ENTER:
-				Device.b_is_Active = true;
-				//if (UI) UI->OnAppActivate();
 
-				break;
-			case SDL_EVENT_WINDOW_HIDDEN:
-			case SDL_EVENT_WINDOW_MOUSE_LEAVE:
-				Device.b_is_Active = !!psDeviceFlags.test(rsDeviceActive);
-				//if (UI)UI->OnAppDeactivate();
-				break;
-
-			case SDL_EVENT_KEY_DOWN:
+			case SDL_KEYDOWN:
 				if (UI)
 				{
 					UI->KeyDown(Event.key.keysym.scancode, UI->GetShiftState());
@@ -120,11 +121,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 							ShowCursor(FALSE);
 						}
 					}
-				}break;
-			case SDL_EVENT_KEY_UP:
+				}
+				break;
+			case SDL_KEYUP:
 				if (UI) {
 					UI->KeyUp(Event.key.keysym.scancode, UI->GetShiftState());
-					if(UI->IsPlayInEditor() && pInput->IsAcquire) 
+					if (UI->IsPlayInEditor() && pInput->IsAcquire)
 					{
 						if (pInput->IsAcquire)
 						{
@@ -133,22 +135,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 					}
 				}
 				break;
-			case SDL_EVENT_MOUSE_MOTION:
+			case SDL_MOUSEMOTION:
 			{
 				if (UI->IsPlayInEditor() && !pInput->IsAcquire)
 					break;
 
 				pInput->MouseMotion(Event.motion.xrel, Event.motion.yrel);
-			} break;
-			case SDL_EVENT_MOUSE_WHEEL:
+			}
+			break;
+			case SDL_MOUSEWHEEL:
 			{
 				if (UI->IsPlayInEditor() && !pInput->IsAcquire)
 					break;
 
 				pInput->MouseScroll(Event.wheel.y);
-			}break;
-			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-			case SDL_EVENT_MOUSE_BUTTON_UP:
+			}
+			break;
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
 			{
 				if (UI->IsPlayInEditor() && !pInput->IsAcquire)
 					break;
@@ -157,7 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 				if (Event.button.button == SDL_BUTTON_LEFT) { mouse_button = 0; }
 				if (Event.button.button == SDL_BUTTON_RIGHT) { mouse_button = 1; }
 				if (Event.button.button == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
-				if (Event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+				if (Event.type == SDL_MOUSEBUTTONDOWN) {
 					pInput->MousePressed(mouse_button);
 				}
 				else {

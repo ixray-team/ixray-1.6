@@ -25,52 +25,55 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         {
             switch (Event.type)
             {
-            case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            case SDL_QUIT:
                 EPrefs->SaveConfig();
                 NeedExit = true;
                 break;
 
-            case SDL_EVENT_WINDOW_RESIZED:
-                if (UI && REDevice)
+            case SDL_WINDOWEVENT:
+                switch (Event.window.event)
                 {
-                    UI->Resize(Event.window.data1, Event.window.data2, true);
-                    EPrefs->SaveConfig();
+                case SDL_WINDOWEVENT_RESIZED:
+                    if (UI && REDevice)
+                    {
+                        UI->Resize(Event.window.data1, Event.window.data2, true);
+                        EPrefs->SaveConfig();
+                    }
+                    break;
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_ENTER:
+                    Device.b_is_Active = true;
+                    break;
+
+                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_LEAVE:
+                    Device.b_is_Active = false;
+                    break;
                 }
                 break;
-            case SDL_EVENT_WINDOW_SHOWN:
-            case SDL_EVENT_WINDOW_MOUSE_ENTER:
-                Device.b_is_Active = true;
-                //if (UI) UI->OnAppActivate();
 
+            case SDL_KEYDOWN:
+                if (UI) UI->KeyDown(Event.key.keysym.scancode, UI->GetShiftState());
                 break;
-            case SDL_EVENT_WINDOW_HIDDEN:
-            case SDL_EVENT_WINDOW_MOUSE_LEAVE:
-                Device.b_is_Active = false;
-                //if (UI)UI->OnAppDeactivate();
+            case SDL_KEYUP:
+                if (UI) UI->KeyUp(Event.key.keysym.scancode, UI->GetShiftState());
                 break;
 
-            case SDL_EVENT_KEY_DOWN:
-                if (UI)UI->KeyDown(Event.key.keysym.scancode, UI->GetShiftState());
-                break;
-            case SDL_EVENT_KEY_UP:
-                if (UI)UI->KeyUp(Event.key.keysym.scancode, UI->GetShiftState());
-                break;
-
-            case SDL_EVENT_MOUSE_MOTION:
+            case SDL_MOUSEMOTION:
                 pInput->MouseMotion(Event.motion.xrel, Event.motion.yrel);
                 break;
-            case SDL_EVENT_MOUSE_WHEEL:
+            case SDL_MOUSEWHEEL:
                 pInput->MouseScroll(Event.wheel.y);
                 break;
 
-            case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            case SDL_EVENT_MOUSE_BUTTON_UP:
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
             {
                 int mouse_button = 0;
                 if (Event.button.button == SDL_BUTTON_LEFT) { mouse_button = 0; }
                 if (Event.button.button == SDL_BUTTON_RIGHT) { mouse_button = 1; }
                 if (Event.button.button == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
-                if (Event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+                if (Event.type == SDL_MOUSEBUTTONDOWN) {
                     pInput->MousePressed(mouse_button);
                 }
                 else {

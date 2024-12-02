@@ -7,7 +7,7 @@
 #include "../xrEngine/xr_ioc_cmd.h"
 #include "../xrEngine/string_table.h"
 
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include "DynamicSplashScreen.h"
 
 #include "../xrCore/git_version.h"
@@ -24,34 +24,37 @@ INT_PTR CALLBACK logDlgProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp);
 
 void EnumerateDisplayModes()
 {
-	SDL_DisplayID primaryDisplay = SDL_GetPrimaryDisplay();
-	if (!primaryDisplay)
-	{
-		return;
-	}
-	bool isHigherResolutionFound = false;
+	int primaryDisplay = 0;
 
-	const char* name = SDL_GetDisplayName(primaryDisplay);
-	SDL_Log("Enumerating for display %" SDL_PRIu32 ": %s\n", primaryDisplay, name ? name : "Unknown");
-
-	const SDL_DisplayMode* pDisplayMode = SDL_GetDesktopDisplayMode(primaryDisplay);
-	if (!pDisplayMode)
+	int numDisplays = SDL_GetNumVideoDisplays();
+	if (numDisplays <= primaryDisplay)
 	{
-		SDL_Log("Failed to get display mode, using defaults ...");
 		psCurrentVidMode[0] = 800;
 		psCurrentVidMode[1] = 600;
 		return;
 	}
 
-	if (isHigherResolutionFound && psCurrentVidMode[0] < pDisplayMode->w && psCurrentVidMode[1] < pDisplayMode->h)
+	const char* name = SDL_GetDisplayName(primaryDisplay);
+
+	SDL_DisplayMode displayMode;
+	if (SDL_GetDesktopDisplayMode(primaryDisplay, &displayMode) != 0)
 	{
-		psCurrentVidMode[0] = pDisplayMode->w;
-		psCurrentVidMode[1] = pDisplayMode->h;
+		psCurrentVidMode[0] = 800;
+		psCurrentVidMode[1] = 600;
+		return;
+	}
+
+	bool isHigherResolutionFound = false;
+
+	if (isHigherResolutionFound && psCurrentVidMode[0] < displayMode.w && psCurrentVidMode[1] < displayMode.h)
+	{
+		psCurrentVidMode[0] = displayMode.w;
+		psCurrentVidMode[1] = displayMode.h;
 	}
 	else if (!isHigherResolutionFound)
 	{
-		psCurrentVidMode[0] = pDisplayMode->w;
-		psCurrentVidMode[1] = pDisplayMode->h;
+		psCurrentVidMode[0] = displayMode.w;
+		psCurrentVidMode[1] = displayMode.h;
 		isHigherResolutionFound = true;
 	}
 }
@@ -64,7 +67,14 @@ void CreateGameWindow()
 		EnumerateDisplayModes();
 
 		SDL_WindowFlags window_flags = SDL_WINDOW_HIDDEN;
-		g_AppInfo.Window = SDL_CreateWindow("IX-Ray Engine", psCurrentVidMode[0], psCurrentVidMode[1], window_flags);
+		g_AppInfo.Window = SDL_CreateWindow(
+			"IX-Ray Engine",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			psCurrentVidMode[0],
+			psCurrentVidMode[1],
+			window_flags
+		);
 	}
 }
 
@@ -76,7 +86,7 @@ int APIENTRY WinMain
 	int nCmdShow
 )
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMEPAD) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
 		return -1;
 	}
 

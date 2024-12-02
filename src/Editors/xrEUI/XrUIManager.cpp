@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "../../xrEngine/stdafx.h"
 #include "imgui_impl_dx9.h"
-#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdl2.h"
 #include "spectrum.h"
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 #include "xrUITheme.h"
 #include "ImGuizmo.h"
 
@@ -78,20 +78,20 @@ void XrUIManager::Initialize(HWND hWnd, IDirect3DDevice9* device, const char* in
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 	io.Fonts->Build();
 	//ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplSDL3_InitForD3D(g_AppInfo.Window);
+	ImGui_ImplSDL2_InitForD3D(g_AppInfo.Window);
 	ImGui_ImplDX9_Init(device);
 }
 
 void XrUIManager::Destroy()
 {
 	ImGui_ImplDX9_Shutdown();
-	ImGui_ImplSDL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 }
 
 bool XrUIManager::ProcessEvent(void* Event)
 {
-	if (!ImGui_ImplSDL3_ProcessEvent((SDL_Event*)Event))
+	if (!ImGui_ImplSDL2_ProcessEvent((SDL_Event*)Event))
 		return false;
 
 	return true;
@@ -106,7 +106,7 @@ void XrUIManager::BeginFrame()
 
 	LazyFonts.clear();
 
-	ImGui_ImplSDL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
 	ImGui_ImplDX9_NewFrame();
 }
 
