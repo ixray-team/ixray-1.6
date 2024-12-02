@@ -9,6 +9,8 @@ private:
 	xrCriticalSection(xrCriticalSection const & copy) {};
 #ifdef IXR_WINDOWS
 	CRITICAL_SECTION pmutex;
+#elif defined(IXR_LINUX)
+	pthread_mutex_t pmutex;
 #else
     std::recursive_mutex pmutex;
 #endif
@@ -40,13 +42,15 @@ private:
 
 #ifdef IXR_WINDOWS
     SRWLOCK smutex;
+#elif defined(IXR_LINUX)
+	pthread_rwlock_t smutex;
 #else
     std::shared_mutex smutex;
 #endif
 
 public:
     xrSRWLock();
-    ~xrSRWLock() {};
+    ~xrSRWLock();
 
     void AcquireExclusive();
     void ReleaseExclusive();
