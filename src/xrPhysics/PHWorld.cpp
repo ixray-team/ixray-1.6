@@ -63,11 +63,6 @@ CObjectSpace*  mesh_create_object_space(Fvector* verts, CDB::TRI* tris, const hd
 	return os;
 }
 
-void  set_mtl_lib(CGameMtlLibrary * l)
-{
-	PGMLib = l;
-}
-
 void  destroy_object_space(CObjectSpace* &os)
 {
 	xr_delete(os);
@@ -76,7 +71,7 @@ void  destroy_object_space(CObjectSpace* &os)
 void CPHMesh ::Create(dSpaceID space, dWorldID world)
 {
 	Geom = dCreateTriList(space, 0, 0);
-	CPHGeometryBits::init_geom( *this );
+	CPHGeometryBits::init_geom(*this);
 }
 
 void CPHMesh::Destroy()
