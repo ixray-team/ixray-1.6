@@ -15,8 +15,5 @@ bool CAppInfo::IsPrimaryThread() const noexcept
 
 HWND CAppInfo::GetHWND() const noexcept
 {
-	if (Window == nullptr)
-		return nullptr;
-
 	return Platform::GetWindowHandle(Window);
 }
