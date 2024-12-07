@@ -10,14 +10,14 @@
 #include "smart_cover_planner_target_selector.h"
 #include "smart_cover_animation_planner.h"
 #include "script_game_object.h"
-#include "stalker_property_evaluators.h"
 #include "smart_cover_planner_target_provider.h"
-#include "stalker_decision_space.h"
 #include "smart_cover_loophole.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "smart_cover_evaluators.h"
 #include "ai/stalker/ai_stalker.h"
 #include "smart_cover_default_behaviour_planner.hpp"
+
+#include "property_evaluator_member.h"
 
 using namespace StalkerDecisionSpace;
 using smart_cover::target_selector;

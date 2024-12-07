@@ -22,7 +22,6 @@
 #include "../../danger_manager.h"
 #include "../../item_manager.h"
 #include "../../Actor.h"
-#include "../../stalker_planner.h"
 #include "../../script_game_object.h"
 #include "../../stalker_animation_manager.h"
 #include "../../Weapon.h"
@@ -58,6 +57,8 @@
 #include "../../smart_cover_planner_target_selector.h"
 #include "../../../xrUI/ui_base.h"
 #include "../../doors_actor.h"
+
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 
 CActor *g_debug_actor = 0;
 

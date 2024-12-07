@@ -12,7 +12,6 @@
 #include "ai/stalker/ai_stalker.h"
 #include "ai/stalker/ai_stalker_impl.h"
 #include "ai/stalker/ai_stalker_space.h"
-#include "stalker_property_evaluators.h"
 #include "smart_cover_planner_actions.h"
 #include "smart_cover_loophole_planner_actions.h"
 #include "Hit.h"
@@ -26,6 +25,8 @@
 #include "smart_cover_animation_selector.h"
 #include "clsid_game.h"
 #include "game_object_space.h"
+#include "Legacy/StalkerPlanner/stalker_danger_property_evaluators.h"
+#include "Legacy/StalkerPlanner/stalker_property_evaluators.h"
 
 using smart_cover::animation_planner;
 using namespace StalkerDecisionSpace;

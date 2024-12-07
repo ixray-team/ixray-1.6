@@ -41,7 +41,6 @@
 #include "visual_memory_manager.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "movement_manager_space.h"
-#include "stalker_planner.h"
 #include "enemy_manager.h"
 
 const float COMBAT_SOUND_PERCEIVE_RADIUS_SQR	= _sqr(5.f);

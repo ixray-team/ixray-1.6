@@ -30,7 +30,6 @@
 #include "../xrEngine/CameraBase.h"
 #include "../../relation_registry.h"
 #include "../../stalker_animation_manager.h"
-#include "../../stalker_planner.h"
 #include "../../script_game_object.h"
 #include "../../detail_path_manager.h"
 #include "../../agent_manager.h"
@@ -55,12 +54,12 @@
 #include "../../../xrServerEntities/alife_human_brain.h"
 #include "../../BoneProtections.h"
 #include "../../stalker_animation_names.h"
-#include "../../stalker_decision_space.h"
 #include "../../agent_member_manager.h"
 #include "../../location_manager.h"
 #include "smart_cover_animation_selector.h"
 #include "smart_cover_animation_planner.h"
 #include "smart_cover_planner_target_selector.h"
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 #if USE_OLD_OBJECT_PLANNER
 #include "Legacy/object_handler_planner.h"
 #endif

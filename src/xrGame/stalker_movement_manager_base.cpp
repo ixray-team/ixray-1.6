@@ -23,12 +23,11 @@
 #include "stalker_velocity_collection.h"
 #include "stalker_animation_manager.h"
 #include "smart_cover_animation_selector.h"
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 
 #ifdef DEBUG
-#	include "stalker_decision_space.h"
-#	include "stalker_planner.h"
 #	include "script_game_object.h"
-#	include "stalker_combat_planner.h"
+#include "Legacy/StalkerPlanner/stalker_combat_planner.h"
 #endif // DEBUG
 
 using namespace StalkerMovement;

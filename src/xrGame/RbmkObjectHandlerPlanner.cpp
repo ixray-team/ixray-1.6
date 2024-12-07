@@ -531,7 +531,6 @@ public:
 
 	virtual void Active() override
 	{
-		FRbmkObjectActionWeaponBase::Active();
 		CAI_Stalker* StalkerOwner = GetOwner();
 		VERIFY(ItemObject);
 		VERIFY(StalkerOwner->inventory().ActiveItem());
@@ -1382,7 +1381,7 @@ void FRbmkObjectHandlerPlanner::SetGoap(MonsterSpace::EObjectAction ObjectAction
 		ActionName.printf("Firing1");
 		break;
 	case MonsterSpace::eObjectActionFireNoReload:
-		ActionName.printf("FiringNoReload1");
+		ActionName.printf("FiringNoReload");
 		break;
 	case MonsterSpace::eObjectActionFire2:
 		ActionName.printf("Firing2");
@@ -1449,7 +1448,7 @@ void FRbmkObjectHandlerPlanner::SetGoap(MonsterSpace::EObjectAction ObjectAction
 		
 		uint32		QueueSize = 1;
 		if (MaxQueueSize == InMinQueueSize)
-			QueueSize		= _max(1,QueueSize);
+			QueueSize		= _max(1,MinQueueSize);
 		else
 			QueueSize		= _max(1,::Random.randI(MinQueueSize,MaxQueueSize));
 

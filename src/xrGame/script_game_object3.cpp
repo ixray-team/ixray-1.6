@@ -16,7 +16,6 @@
 #include "cover_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_animation_manager.h"
-#include "stalker_planner.h"
 #include "Weapon.h"
 #include "Inventory.h"
 #include "CustomZone.h"
@@ -34,9 +33,9 @@
 #include "trade_parameters.h"
 #include "../xrScripts/exports/script_ini_file.h"
 #include "sound_player.h"
-#include "stalker_decision_space.h"
 #include "space_restriction_manager.h"
 #include "eatable_item.h"
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 
 namespace MemorySpace {
 	struct CVisibleObject;

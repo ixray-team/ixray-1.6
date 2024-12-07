@@ -13,13 +13,11 @@
 #include "../../script_entity_action.h"
 #include "../../Inventory.h"
 #include "../../ef_storage.h"
-#include "../../stalker_decision_space.h"
 #include "../../script_game_object.h"
 #include "../../CustomZone.h"
 #include "../../../Include/xrRender/KinematicsAnimated.h"
 #include "../../agent_manager.h"
 #include "../../stalker_animation_manager.h"
-#include "../../stalker_planner.h"
 #include "../../ef_pattern.h"
 #include "../../memory_manager.h"
 #include "../../hit_memory_manager.h"
@@ -46,11 +44,10 @@
 #include "../../stalker_animation_names.h"
 #include "../../agent_corpse_manager.h"
 #include "../../CharacterPhysicsSupport.h"
-#include "../../stalker_planner.h"
-#include "../../stalker_decision_space.h"
 #include "../../script_game_object.h"
 #include "../../Inventory.h"
 
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 #include "../../trajectories.h"
 
 #if USE_OLD_OBJECT_PLANNER

@@ -17,7 +17,6 @@
 #include "memory_manager.h"
 #include "enemy_manager.h"
 #include "ai_monster_space.h"
-#include "stalker_decision_space.h"
 #include "smart_cover_animation_planner.h"
 #include "property_storage.h"
 #include "stalker_movement_manager_smart_cover.h"

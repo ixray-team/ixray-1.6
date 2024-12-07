@@ -10,7 +10,7 @@
 
 #include "smart_cover_detail.h"
 #include "action_planner_script.h"
-#include "stalker_decision_space.h"
+#include "Legacy/StalkerPlanner/stalker_decision_space.h"
 
 class CAI_Stalker;
 struct SHit;

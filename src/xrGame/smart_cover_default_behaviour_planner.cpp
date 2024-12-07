@@ -12,9 +12,7 @@
 #include "smart_cover_animation_planner.h"
 #include "smart_cover_planner_target_provider.h"
 #include "smart_cover_evaluators.h"
-#include "stalker_decision_space.h"
 #include "ai/stalker/ai_stalker.h"
-#include "stalker_property_evaluators.h"
 #include "script_game_object.h"
 
 using namespace StalkerDecisionSpace;

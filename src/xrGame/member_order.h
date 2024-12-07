@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "stalker_decision_space.h"
 #include "graph_engine_space.h"
 #include "condition_state.h"
 

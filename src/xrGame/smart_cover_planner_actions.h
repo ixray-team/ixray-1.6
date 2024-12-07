@@ -9,7 +9,7 @@
 #define SMART_COVER_PLANNER_ACTIONS_H_INCLUDED
 
 #include "smart_cover_detail.h"
-#include "stalker_combat_action_base.h"
+#include "Legacy/StalkerPlanner/stalker_combat_action_base.h"
 
 class CAI_Stalker;
 

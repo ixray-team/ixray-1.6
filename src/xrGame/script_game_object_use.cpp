@@ -5,7 +5,6 @@
 #include "GameObject.h"
 #include "../xrScripts/script_storage_space.h"
 #include "../xrScripts/script_engine.h"
-#include "stalker_planner.h"
 #include "ai/stalker/ai_stalker.h"
 #include "searchlight.h"
 #include "game_object_space.h"
@@ -18,6 +17,7 @@
 #include "PHSimpleCalls.h"
 #include "../xrPhysics/IPHWorld.h"
 #include "doors_manager.h"
+#include "Legacy/StalkerPlanner/stalker_planner.h"
 
 void CScriptGameObject::SetTipText (LPCSTR tip_text)
 {

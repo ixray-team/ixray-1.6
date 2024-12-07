@@ -9,10 +9,11 @@
 #include "stdafx.h"
 #include "pch_script.h"
 #include "ai_stalker.h"
-#include "../../stalker_decision_space.h"
 #include "ai_stalker_space.h"
 #include "../../script_game_object.h"
-#include "../../stalker_planner.h"
+#include "action_planner.h"
+#include "Legacy/StalkerPlanner/stalker_planner.h"
+#include "Legacy/StalkerPlanner/stalker_decision_space.h"
 
 using namespace luabind;
 
