@@ -287,6 +287,7 @@ void RenderUIWeather() {
 
 	CEnvironment& env = g_pGamePersistent->Environment();
 	CEnvDescriptor* cur = env.Current[0];
+	const static bool isReadSunConfig = EngineExternal()[EEngineExternalEnvironment::ReadSunConfig];
 
 	u64 time = g_pGameLevel->GetEnvironmentGameTime() / 1000;
 	ImGui::Text("Time: %02d:%02d:%02d", int(time / (60 * 60) % 24), int(time / 60 % 60), int(time % 60));
