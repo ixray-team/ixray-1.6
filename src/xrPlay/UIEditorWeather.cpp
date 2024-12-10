@@ -296,6 +296,11 @@ void RenderUIWeather() {
 	if (ImGui::SliderFloat("Time factor", &tf, 0.0f, 1000.0f)) {
 		g_pGameLevel->SetEnvironmentTimeFactor(tf);
 	}
+	ImGui::SameLine();
+	if (ImGui::Button("Default"))
+	{
+		g_pGameLevel->SetEnvironmentTimeFactor(10.f);
+	}
 
 	xr_vector<shared_str> cycles;
 	int iCycle = -1;
@@ -326,6 +331,76 @@ void RenderUIWeather() {
 		env.SetWeather(cycles[iCycle], true);
 	}
 
+#if 0 //v 1
+	static int tTime[3] = { -1,0,0 };
+	static bool refreshTime = false;
+
+	if (refreshTime)
+	{
+		tTime[0] = int(time / (60 * 60) % 24);
+		tTime[1] = int(time / 60 % 60);
+		tTime[2] = int(time % 60);
+	}
+	
+	if (tTime[0] == -1)
+	{
+		refreshTime = true;
+		ImGui::Text("...");
+	}
+	else
+	{
+		ImGui::BeginGroup();
+
+		if (ImGui::DragInt3("Game time", tTime, 1.0, 0, 60))
+		{
+			if (tTime[0] > 24) tTime[0] = 24;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Apply")) 
+		{
+			xr_string cmd;
+			cmd = "set_game_time ";
+			cmd += cmd.ToString(tTime[0]);
+			cmd += " ";
+			cmd += cmd.ToString(tTime[1]);
+			cmd += " ";
+			cmd += cmd.ToString(tTime[2]);
+
+			g_pEventManager->Event.Defer("KERNEL:console", size_t(xr_strdup(cmd.c_str())));
+		}
+		ImGui::EndGroup();
+
+		refreshTime = !ImGui::IsItemHovered();
+	}
+#else //v 2
+	static int tTime[3] = { 0,0,0 };
+
+	if (ImGui::DragInt3("Game time", tTime, 1.0, 0, 60))
+	{
+		if (tTime[0] > 24) tTime[0] = 24;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Apply"))
+	{
+		xr_string cmd;
+		cmd = "set_game_time ";
+		cmd += cmd.ToString(tTime[0]);
+		cmd += " ";
+		cmd += cmd.ToString(tTime[1]);
+		cmd += " ";
+		cmd += cmd.ToString(tTime[2]);
+
+		g_pEventManager->Event.Defer("KERNEL:console", size_t(xr_strdup(cmd.c_str())));
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Sync"))
+	{
+		tTime[0] = int(time / (60 * 60) % 24);
+		tTime[1] = int(time / 60 % 60);
+		tTime[2] = int(time % 60);
+	}
+
+#endif
 	//static bool b = getScriptWeather();
 	//if (ImGui::Checkbox("Script weather", &b))
 	//	setScriptWeather(b);
@@ -469,6 +544,8 @@ void RenderUIWeather() {
 	static float editor_altitude = 0.f;
 	static float editor_longitude = 0.f;
 
+	ImGui::BeginDisabled(!isReadSunConfig);
+
 	if (ImGui::SliderFloat("sun_altitude", &editor_altitude, -360.0f, 360.0f)) {
 		changed = true;
 		cur->sun_dir.setHP(deg2rad(editor_longitude), deg2rad(editor_altitude));
@@ -477,6 +554,9 @@ void RenderUIWeather() {
 		changed = true;
 		cur->sun_dir.setHP(deg2rad(editor_longitude), deg2rad(editor_altitude));
 	}
+
+	ImGui::EndDisabled();
+
 	if (ImGui::SliderFloat("sun_shafts_intensity", &cur->m_fSunShaftsIntensity, 0.0f, 1.0f)) {
 		changed = true;
 	}
