@@ -85,6 +85,7 @@
 // Engine
 #include "Platform/PlatformAPI.h"
 #include "xr_delegate.h"
+#include "_noncopyable.h"
 
 #include "xrDebug.h"
 #include "vector.h"

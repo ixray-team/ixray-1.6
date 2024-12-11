@@ -25,7 +25,8 @@ class	CObjectList;
 
 class CPHWorld	:	public	pureFrame,
 					public	IPHWorld,
-					public	cphysics_scripted
+					public	cphysics_scripted,
+					private xray::noncopyable
 #ifdef DEBUG_DRAW
 					, public pureRender
 #endif
@@ -74,8 +75,6 @@ private:
 	PhysicsStepTimeCallback*	physics_step_time_callback;
 
 public:
-	CPHWorld(const CPHWorld& other) = delete;
-	CPHWorld& operator =(const CPHWorld& other) = delete;
 								CPHWorld						( )							;
 	virtual						~CPHWorld						(){}						;
 

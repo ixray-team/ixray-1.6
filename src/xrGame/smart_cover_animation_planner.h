@@ -21,7 +21,9 @@ namespace smart_cover {
 class cover;
 class target_selector;
 
-class animation_planner final : public CActionPlannerScript<CAI_Stalker>
+class animation_planner final : 
+	public CActionPlannerScript<CAI_Stalker>,
+	private xray::noncopyable
 {
 private:
 	typedef CActionPlannerScript<CAI_Stalker> inherited;
@@ -46,11 +48,9 @@ private:
 private:
 			void		add_evaluators				();
 			void		add_actions					();
-			bool  hit_callback			(SHit const *hit);
+			bool		hit_callback				(SHit const *hit);
 
 public:
-	animation_planner(const animation_planner& other) = delete;
-	animation_planner& operator=(const animation_planner& other) = delete;
 						animation_planner			(CAI_Stalker *object, LPCSTR action_name);
 	virtual				~animation_planner			();
 	virtual	void		setup						(CAI_Stalker *object, CPropertyStorage *storage);

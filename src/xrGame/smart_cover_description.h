@@ -4,9 +4,7 @@
 //	Author		: Alexander Dudin
 //	Description : Smart cover description class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef SMART_COVER_DESCRIPTION_H_INCLUDED
-#define SMART_COVER_DESCRIPTION_H_INCLUDED
+#pragma once
 
 #include "smart_cover_detail.h"
 #include "graph_abstract.h"
@@ -20,7 +18,9 @@ namespace transitions {
 	class action;
 }
 
-class description final : public detail::intrusive_base_time
+class description final :
+	public detail::intrusive_base_time,
+	private xray::noncopyable
 {
 public:
 	typedef xr_vector<loophole*>	Loopholes;
@@ -39,8 +39,6 @@ private:
 	shared_str						m_table_id;
 
 public:
-	description(const description& other) = delete;
-	description& operator=(const description& other) = delete;
 									description			(shared_str const &table_id);
 									~description		();
 	IC		shared_str const		&table_id			() const;
@@ -55,8 +53,6 @@ private:
 			void					load_actions		(luabind::object const &table, ActionsList& result);
 };
 
-} // namespace smart_cover
+}
 
 #include "smart_cover_description_inline.h"
-
-#endif // SMART_COVER_DESCRIPTION_H_INCLUDED
