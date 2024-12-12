@@ -87,7 +87,8 @@ void EScene::Render( const Fmatrix& camera )
             	t_it->second->BeforeRender(); 
                 // sort tools
                 ESceneCustomOTool* mt = smart_cast<ESceneCustomOTool*>(t_it->second);
-                if (mt)           	object_tools.insert(mt);
+                if (mt)           	
+                    object_tools.insert(mt);
                 scene_tools.insert	(t_it->second);
             }
     }
@@ -99,12 +100,13 @@ void EScene::Render( const Fmatrix& camera )
         for (; t_it!=t_end; t_it++)
         {
             ObjectList& lst = (*t_it)->GetObjects();
-            ObjectIt o_it 	= lst.begin();
-            ObjectIt o_end 	= lst.end();
-            for(;o_it!=o_end;o_it++){
-                if( (*o_it)->Visible()&& (*o_it)->IsRender() ){
-                    float distSQ = EDevice->vCameraPosition.distance_to_sqr((*o_it)->FPosition);
-                    mapRenderObjects.insertInAnyWay(distSQ,*o_it);
+
+            for (CCustomObject* Obj : lst)
+            {
+                if (Obj->Visible() && Obj->IsRender())
+                {
+                    float distSQ = EDevice->vCameraPosition.distance_to_sqr(Obj->FPosition);
+                    mapRenderObjects.insertInAnyWay(distSQ, Obj);
                 }
             }
         }
