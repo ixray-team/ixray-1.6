@@ -288,6 +288,7 @@ void RenderUIWeather() {
 	CEnvironment& env = g_pGamePersistent->Environment();
 	CEnvDescriptor* cur = env.Current[0];
 	const static bool isReadSunConfig = EngineExternal()[EEngineExternalEnvironment::ReadSunConfig];
+	static bool update_itudes = true;
 
 	u64 time = g_pGameLevel->GetEnvironmentGameTime() / 1000;
 	ImGui::Text("Time: %02d:%02d:%02d", int(time / (60 * 60) % 24), int(time / 60 % 60), int(time % 60));
@@ -314,6 +315,7 @@ void RenderUIWeather() {
 
 	if (ImGui::Combo("Weather cycle", &iCycle, enumCycle, &cycles, (int)env.WeatherCycles.size())) {
 		env.SetWeather(cycles[iCycle], true);
+		update_itudes = true;
 	}
 
 	int sel = -1;
@@ -330,6 +332,7 @@ void RenderUIWeather() {
 		time += u64(env.CurrentWeather->at(sel)->exec_time * 1000 + 0.5f);
 		g_pGameLevel->SetEnvironmentGameTimeFactor(time, tf);
 		env.SetWeather(cycles[iCycle], true);
+		update_itudes = true;
 	}
 
 #if 0 //v 1
@@ -541,21 +544,36 @@ void RenderUIWeather() {
 	if (ImGui::ColorEdit3("sun_color", (float*)&cur->sun_color)) {
 		changed = true;
 	}
-
 	static float editor_altitude = 0.f;
 	static float editor_longitude = 0.f;
 
 	ImGui::BeginDisabled(!isReadSunConfig);
 
+	if (update_itudes)
+	{
+		update_itudes = false;
+		cur->sun_dir.getHP(editor_longitude, editor_altitude);
+	}
+
 	if (ImGui::SliderFloat("sun_altitude", &editor_altitude, -360.0f, 360.0f)) {
 		changed = true;
 		cur->sun_dir.setHP(deg2rad(editor_longitude), deg2rad(editor_altitude));
 	}
+	ImGui::SameLine();
+	if (ImGui::Button("update"))
+	{
+		editor_altitude = cur->sun_dir.getP();
+	}
+
 	if (ImGui::SliderFloat("sun_longitude", &editor_longitude, -360.0f, 360.0f)) {
 		changed = true;
 		cur->sun_dir.setHP(deg2rad(editor_longitude), deg2rad(editor_altitude));
 	}
-
+	ImGui::SameLine();
+	if (ImGui::Button("update"))
+	{
+		editor_longitude = cur->sun_dir.getH();
+	}
 	ImGui::EndDisabled();
 
 	if (ImGui::SliderFloat("sun_shafts_intensity", &cur->m_fSunShaftsIntensity, 0.0f, 1.0f)) {
