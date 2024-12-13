@@ -231,12 +231,12 @@ CEditableObject* CSceneObject::UpdateReference()
             if (surf->IsVoid())
             {
                 if (m_pReference->IsSkeleton())
-                    ::Render->shader_option_skinning(4);
+                    Engine.External.SetSkinningMode(4);
 
                 surf->OnDeviceCreate();
 
                 if (m_pReference->IsSkeleton())
-                    ::Render->shader_option_skinning(-1);
+                    Engine.External.SetSkinningMode();
             }
         }
     }

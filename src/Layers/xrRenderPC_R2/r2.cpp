@@ -95,11 +95,11 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 extern ENGINE_API BOOL r2_sun_static;
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
-void					CRender::create					()
+void CRender::create()
 {
 	Device.seqFrame.Add	(this,REG_PRIORITY_HIGH+0x12345678);
 
-	m_skinning			= -1;
+	Engine.External.SetSkinningMode();
 
 	// hardware
 	o.smapsize			= ps_r2_smapsize;
@@ -680,6 +680,7 @@ HRESULT	CRender::shader_compile			(
 	}
 
 	// options
+	const int m_skinning = Engine.External.GetSkinningMode();
 	{
 		xr_sprintf						(c_smapsize,"%04d",u32(o.smapsize));
 		defines[def_it].Name		=	"SMAP_size";

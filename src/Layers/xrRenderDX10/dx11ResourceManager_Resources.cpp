@@ -132,8 +132,10 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 	xrCriticalSectionGuard guard(creationGuard);
 	xr_string res_name = _name;
 
-	if (Render->m_skinning > 0) {
-		res_name += "_" + std::to_string(Render->m_skinning);
+	const int m_skinning = Engine.External.GetSkinningMode();
+	if (m_skinning > 0)
+	{
+		res_name += "_" + xr_string::ToString(m_skinning);
 	}
 
 	res_name += RImplementation.getShaderParams();

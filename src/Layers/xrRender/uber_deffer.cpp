@@ -67,13 +67,6 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 		RImplementation.addShaderOption("USE_PBR", "1");
 	}
 
-#ifdef _EDITOR
-	if (::Render->m_skinning > 0)
-	{
-		RImplementation.addShaderOption("SKINNED_MESH", "1");
-	}
-#endif
-
 	if(bump) {
 		RImplementation.addShaderOption("USE_BUMP", "1");
 

@@ -78,7 +78,7 @@ void					CRender::create					()
 	o.color_mapping = v_dev >= v_need && !Core.ParamsData.test(ECoreParams::nocolormap);
 	Msg("* color_mapping: %s, dev(%d),need(%d)", o.color_mapping ? "used" : "unavailable", v_dev, v_need);
 
-	m_skinning					= -1;
+	Engine.External.SetSkinningMode();
 
 	// disasm
 	o.disasm					= Core.ParamsData.test(ECoreParams::disasm);
@@ -821,6 +821,8 @@ HRESULT	CRender::shader_compile			(
 		void*&							result
 	)
 {
+	const int m_skinning = Engine.External.GetSkinningMode();
+
 	D3D_SHADER_MACRO defines[128];
 	int def_it = 0;
 
