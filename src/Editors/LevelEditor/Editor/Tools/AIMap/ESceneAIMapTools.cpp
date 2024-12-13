@@ -414,19 +414,25 @@ void ESceneAIMapTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 
 int ESceneAIMapTool::AddNode(const Fvector& pos, bool bIgnoreConstraints, bool bAutoLink, int sz)
 {
-   	Fvector Pos				= pos;
-    if (1==sz){
-        SAINode* N 			= BuildNode(Pos,Pos,bIgnoreConstraints,true);
-        if (N){
-            N->flags.set	(SAINode::flSelected,TRUE);
-            if (bAutoLink) 	UpdateLinks(N,bIgnoreConstraints);
-            return			1;
-        }else{
-            ELog.Msg		(mtError,"Can't create node.");
-            return 			0;
+    Fvector Pos = pos;
+    if (1 == sz)
+    {
+        SAINode* N = BuildNode(Pos, Pos, bIgnoreConstraints, true);
+        IsLoaded = true;
+        if (N) 
+        {
+            N->flags.set(SAINode::flSelected, TRUE);
+            if (bAutoLink) 	UpdateLinks(N, bIgnoreConstraints);
+            return 1;
         }
-    }else{
-		return BuildNodes	(Pos,sz,bIgnoreConstraints);
+        else 
+        {
+            ELog.Msg(mtError, "Can't create node.");
+            return 0;
+        }
+    }
+    else {
+        return BuildNodes(Pos, sz, bIgnoreConstraints);
     }
 }
 
