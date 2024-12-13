@@ -15,6 +15,8 @@
 #include "../xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "../xrRender/ShaderResourceTraits.h"
 
+#include "../../xrParticles/ParticlesAsyncManager.h"
+
 CRender										RImplementation;
 
 //////////////////////////////////////////////////////////////////////////

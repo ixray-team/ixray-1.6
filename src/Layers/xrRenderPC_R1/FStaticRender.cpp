@@ -21,7 +21,8 @@
 #include "../xrRender/dxUIShader.h"
 #include "../../xrCore/git_version.h"
 
-using	namespace		R_dsgraph;
+#include "../../xrParticles/ParticlesAsyncManager.h"
+using namespace R_dsgraph;
 
 CRender													RImplementation;
 
@@ -604,6 +605,7 @@ void	CRender::Render		()
 	}
 
 	g_r											= 1;
+	CParticlesAsync::Wait();
 	Device.Statistic->RenderDUMP.Begin();
 	// Begin
 	Target->Begin								();

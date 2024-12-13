@@ -207,6 +207,7 @@ void xrLogger::LogThreadEntry()
 	{
 		if (bFlushRequested)
 		{
+			PROF_EVENT("Log Flush")
 			if (logFile != nullptr)
 			{
 				IWriter* mutableWritter = (IWriter*)logFile;
@@ -237,7 +238,8 @@ void xrLogger::LogThreadEntry()
 			xr_vector<xr_string> LogLines = theRecord.Message.Split('\n');
 
 			string256 TimeOfDay = {};
-			
+
+			PROF_EVENT("Log: Apply Messages")
 			int TimeOfDaySize = 0;
 			for (const xr_string& line : LogLines)
 			{

@@ -31,7 +31,7 @@ ENGINE_API CTimer loading_save_timer;
 ENGINE_API bool loading_save_timer_started = false;
 ENGINE_API BOOL g_bRendering = FALSE;
 extern ENGINE_API float psHUD_FOV;
-static HANDLE RenderEventMT = nullptr;
+static HANDLE Event3rdFirstStep = nullptr;
 
 BOOL		g_bLoaded = FALSE;
 ref_light	precache_light = 0;
@@ -129,9 +129,9 @@ void CRenderDevice::End		(void)
 static void mt_3rdThread(void* ptr)
 {
 	PROF_THREAD("3rd Thread");
-	while (FALSE==Device.mt_bMustExit)
+	while (FALSE == Device.mt_bMustExit)
 	{
-		WaitForSingleObject(RenderEventMT, INFINITE);
+		WaitForSingleObject(Event3rdFirstStep, INFINITE);
 		PROF_EVENT("CPU Frame: Render");
 
 		{
@@ -139,10 +139,19 @@ static void mt_3rdThread(void* ptr)
 			g_Discord.Update();
 		}
 
-		for (u32 pit = 0; pit < Device.seqParallelRender.size(); pit++)
-			Device.seqParallelRender[pit]();
+		if (Device.ParticleWorkerCallback)
+		{
+			PROF_EVENT("Process Particles");
+			Device.ParticleWorkerCallback();
+		}
 
-		ResetEvent(RenderEventMT);
+		PROF_EVENT("Process Render");
+		for (u32 pit = 0; pit < Device.seqParallelRender.size(); pit++)
+		{
+			Device.seqParallelRender[pit]();
+		}
+
+		ResetEvent(Event3rdFirstStep);
 	}
 }
 
@@ -248,6 +257,8 @@ void CRenderDevice::on_idle		()
 	PROF_THREAD("MainThread");
 	PROF_FRAME("Main Thread");
 
+	SetEvent(Event3rdFirstStep);
+
 	Device.BeginRender();
 	const bool Minimized = SDL_GetWindowFlags(g_AppInfo.Window) & SDL_WINDOW_MINIMIZED;
 	const bool Focus = !Minimized && !(g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) && !CImGuiManager::Instance().IsCapturingInputs();
@@ -324,8 +335,6 @@ void CRenderDevice::on_idle		()
 	mFullTransform_saved	= mFullTransform;
 
 	vCameraPosition_saved	= vCameraPosition;
-
-	SetEvent(RenderEventMT);
 
 	// *** Resume threads
 	// Capture end point - thread must run only ONE cycle
@@ -422,7 +431,7 @@ void CRenderDevice::Run()
 	mt_bMustExit = FALSE;
 
 	g_AppInfo.MainThread = GetCurrentThread();
-	RenderEventMT = CreateEventA(nullptr, true, false, "Render Helper Event");
+	Event3rdFirstStep = CreateEventA(nullptr, true, false, "3rd thread Helper Event");
 	// Start Balance-Threads
 	thread_spawn(mt_Thread, "X-RAY Secondary thread", 0, 0);
 	thread_spawn(mt_3rdThread, "X-RAY 3rd thread", 0, 0);
@@ -437,7 +446,7 @@ void CRenderDevice::Run()
 
 	// Stop Balance-Threads
 	mt_bMustExit = TRUE;
-	SetEvent(RenderEventMT); // Important for correct thread closing!!!
+	SetEvent(Event3rdFirstStep); // Important for correct thread closing!!!
 	mt_csEnter.Leave();
 	while (mt_bMustExit)	Sleep(0);
 #endif

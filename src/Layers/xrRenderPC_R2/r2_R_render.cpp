@@ -4,6 +4,8 @@
 #include "../../xrEngine/CustomHUD.h"
 #include "../../xrEngine/xr_object.h"
 #include "../xrRender/SkeletonCustom.h"
+#include "../../xrParticles/ParticlesAsyncManager.h"
+
 static	float	CalcSSADynamic				(const Fvector& C, float R)
 {
     Fvector4 v_res1, v_res2;
@@ -413,6 +415,8 @@ void CRender::Render()
 		HOM.Enable									();
 		HOM.Render									(ViewBase);
 	}
+
+	CParticlesAsync::Wait();
 
 	//******* Z-prefill calc - DEFERRER RENDERER
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		{

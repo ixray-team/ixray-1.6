@@ -28,13 +28,13 @@ public:
 
 	virtual bool		shedule_Needed		()	{return true;};
 	virtual float		shedule_Scale		()	;
-	virtual void		shedule_Update		(u32 dt);
 	virtual void		renderable_Render	();
 	void				PerformAllTheWork	();
 
 	Fvector&			Position			();
 	void				SetXFORM			(const Fmatrix& m);
 	IC	Fmatrix&		XFORM				()	{return renderable.xform;}
+	void				Update				(u32 dt);
 	void				UpdateParent		(const Fmatrix& m, const Fvector& vel);
 	void				SetLiveUpdate		(BOOL b);
 	BOOL				GetLiveUpdate		();

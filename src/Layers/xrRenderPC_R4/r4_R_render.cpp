@@ -5,6 +5,8 @@
 #include "../../xrEngine/CustomHUD.h"
 #include "../../xrEngine/xr_object.h"
 
+#include "../../xrParticles/ParticlesAsyncManager.h"
+
 #include "../xrRender/QueryHelper.h"
 
 #include "FSR2Wrapper.h"
@@ -55,8 +57,10 @@ void CRender::render_main	(bool deffered, bool zfill)
 //	Msg						("---begin");
 	marker					++;
 	bool dont_test_sectors = Sectors.size() <= 1;
+
 	// Calculate sector(s) and their objects
-	if (pLastSector)		{
+	if (pLastSector)		
+	{
 		//!!!
 		//!!! BECAUSE OF PARALLEL HOM RENDERING TRY TO DELAY ACCESS TO HOM AS MUCH AS POSSIBLE
 		//!!!
@@ -475,6 +479,8 @@ void CRender::Render		()
 		HOM.Enable									();
 		HOM.Render									(ViewBase);
 	}
+	
+	CParticlesAsync::Wait();
 
 	//******* Z-prefill calc - DEFERRER RENDERER
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		

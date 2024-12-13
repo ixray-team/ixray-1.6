@@ -60,11 +60,6 @@ void CParticlesObject::Init	(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 	spatial.type			= 0;
 	spatial.sector			= S;
 	
-	// sheduled
-	shedule.t_min			= 20;
-	shedule.t_max			= 50;
-	shedule_register		();
-
 	NeedUpdate = CParticlesAsync::Push(this);
 
 	dwLastTime = Device.dwTimeGlobal;
@@ -166,7 +161,7 @@ void CParticlesObject::Stop(BOOL bDefferedStop)
 	m_bStopping					= true;
 }
 
-void CParticlesObject::shedule_Update(u32 _dt)
+void CParticlesObject::Update(u32 _dt)
 {
 	inherited::shedule_Update(_dt);
 
