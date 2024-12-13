@@ -28,16 +28,17 @@ static void 	build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* p
 
 BOOL CLevelEditor::net_Start(LPCSTR op_server, LPCSTR op_client)
 {
-	Server = new xrServer();
-	map_data.m_name = "test";
-	m_caServerOptions = op_server;
-	m_caClientOptions = op_client;
 	auto& p = g_pGamePersistent->m_game_params;
 	xr_strcpy(p.m_game_type ,"single");
 	xr_strcpy(p.m_alife, "alife");
 	xr_strcpy(p.m_new_or_load, "editor");
 	xr_strcpy(p.m_game_or_spawn, "editor");
 	p.m_e_game_type = eGameIDSingle;
+
+	Server = new xrServer();
+	map_data.m_name = "test";
+	m_caServerOptions = op_server;
+	m_caClientOptions = op_client;
 	
 	GameDescriptionData game_descr;
 	if ((Server->Connect(m_caServerOptions, game_descr)) != xrServer::ErrNoError)
