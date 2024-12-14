@@ -99,6 +99,8 @@ void	CBlender_deffer_model::Compile(CBlender_Compile& C)
 			if (bAref) {
 				RImplementation.addShaderOption("USE_AREF", "1");
 			}
+			
+			RImplementation.addShaderOption("DISABLE_VELOCITY", "1");
 			C.r_Pass("shadow_model", "shadow_base", FALSE);
 
 			C.r_dx10Texture("s_base", C.L_textures[0]);

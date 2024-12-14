@@ -648,12 +648,12 @@ void CRender::Render		()
 
 	{
 		PIX_EVENT(ZBUFFER_COPY);
-	RCache.set_ZB(NULL);
-	ID3D11Resource* res;
-	RDepth->GetResource(&res);
+		RCache.set_ZB(NULL);
+		ID3D11Resource* res;
+		RDepth->GetResource(&res);
 
-	RContext->CopyResource(Target->rt_Position->pSurface, res);
-	_RELEASE(res);
+		RContext->CopyResource(Target->rt_Position->pSurface, res);
+		_RELEASE(res);
 	}
 
 	// Wall marks
@@ -699,6 +699,8 @@ void CRender::Render		()
 		Target->increment_light_marker();
 	}
 
+	phase = PHASE_NORMAL;
+
 	{
 		PIX_EVENT(DEFER_SELF_ILLUM);
 		Target->phase_accumulator			();
@@ -731,6 +733,8 @@ void CRender::Render		()
 		PIX_EVENT(DEFER_LIGHT_OCCQ);
 		render_lights							(LP_pending);
 	}
+
+	phase = PHASE_NORMAL;
 
 	// Postprocess
 	{
