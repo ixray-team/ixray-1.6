@@ -102,6 +102,27 @@ float4 GbufferGetPoint(in float2 HPos)
     return float4(Point, 1.0f);
 }
 
+float3 GbufferGetPointRealUnjitter(in float2 TexCoord, in float Depth)
+{
+	float3 Point = float3(TexCoord * 2.0f - 1.0f, 1.0f);
+	
+	if(Depth < 0.02f) {
+		Point.z = depth_unpack.z * rcp(Depth * 50.0f - depth_unpack.w);
+		Point.xy *= pos_decompression_params_hud.xy * Point.z;
+	} else {
+		Point.z = depth_unpack.x * rcp(Depth - depth_unpack.y);
+		Point.xy *= pos_decompression_params.xy * Point.z;
+	}
+	
+	return Point;
+}
+
+float3 GbufferGetPointRealUnjitter(in float2 TexCoord)
+{
+	float Depth = s_position.Load(int3(TexCoord * pos_decompression_params2.xy, 0)).x;
+	return GbufferGetPointRealUnjitter(TexCoord, Depth);
+}
+
 void GbufferUnpack(in float2 TexCoord, in float2 HPos, inout IXrayGbuffer O)
 {
     float4 NormalHemi = s_normal.Load(int3(HPos, 0));
@@ -119,7 +140,7 @@ void GbufferUnpack(in float2 TexCoord, in float2 HPos, inout IXrayGbuffer O)
     O.Point = P * depth_unpack.x * rcp(O.Depth - depth_unpack.y);
     O.PointHud = P_hud * depth_unpack.z * rcp(O.Depth * 50.0f - depth_unpack.w);
 
-    O.PointReal = O.Depth >= 0.02f ? O.Point : O.PointHud;
+    O.PointReal = O.Depth < 0.02f ? O.PointHud : O.Point;
 	
 	O.ViewDist = length(O.PointReal);
 	O.View = O.PointReal * rcp(O.ViewDist);

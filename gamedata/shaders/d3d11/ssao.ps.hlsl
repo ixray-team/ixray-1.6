@@ -27,7 +27,7 @@ float3 GetViewPos(float2 uv)
 
 float doPBAO(float2 uv, float3 pos, float3 n, float invRad, float bias, float selfOcc)
 {
-	float3 p = GetViewPos(uv);
+	float3 p = GbufferGetPointRealUnjitter(uv);
 	float3 dist	= p - pos;
 	
 	float len = length(dist);
@@ -37,7 +37,7 @@ float doPBAO(float2 uv, float3 pos, float3 n, float invRad, float bias, float se
 	return max(-selfOcc, dot(n, v) - bias) * rcp(atten * atten + 1.0f);
 }
 
-float calc_ssao(float3 pos, float3 normal, float2 tc0)
+float calc_ssao(float depth, float3 normal, float2 tc0)
 {
 	// define kernel
 	float n = 0.0f;
@@ -66,11 +66,11 @@ float calc_ssao(float3 pos, float3 normal, float2 tc0)
 	float2 jit_offset = 0.0f;
 	sincos(m_taa_jitter.z * 6.283, jit_offset.x, jit_offset.y);
 	
-	float2 tc1 = (tc0 * scaled_screen_res.xy + jit_offset * 4.0f) * 0.015625f;
+	float2 tc1 = (tc0 * scaled_screen_res.xy) * 0.015625f + jit_offset;
 	float3 rotSample = jitter0.Sample(smp_jitter, tc1).xyz;
 	rotSample = normalize(rotSample - 0.5f);
 
-	pos = uv_to_eye(tc0, pos.z * 0.99f);
+	float3 pos = GbufferGetPointRealUnjitter(tc0, depth) * 0.99f;
 	
 	// calculate angle bias
 	float bias = 0.0;
