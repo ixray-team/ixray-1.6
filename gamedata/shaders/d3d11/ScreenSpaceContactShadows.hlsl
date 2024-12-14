@@ -15,39 +15,51 @@ float2 GetPointTexCoord(float3 Point)
     return saturate(Point.xy * 0.5f + 0.5f);
 }
 
+float GetMaxDirLength(float3 Point, float3 RDir)
+{
+	float3 FirstPoint = RDir - Point * RDir;
+	float3 LastPoint = -Point * RDir;
+	
+	float3 MaxPoint = max(FirstPoint, LastPoint);
+	return min(MaxPoint.x, min(MaxPoint.z, MaxPoint.y));
+}
+
 void RayTraceContactShadow(float2 TexCoord, float3 Point, float3 LightDir, inout float3 Light)
 {
-	float ContactShadow = 0.0f;
-	float3 Dir = -0.07f * LightDir * rcp(HUD_SHADOWS_STEPS);
-	
 	Point.xyz *= 0.99f;
+	
+	float4 StartProj = mul(m_P_hud, float4(Point, 1.0f)); StartProj.xyz /= StartProj.w;
+	float4 EndProj = mul(m_P_hud, float4(Point - LightDir * 0.07f, 1.0f)); EndProj.xyz /= EndProj.w;
+	
+	StartProj.xy = StartProj.xy * float2(0.5f, -0.5f) + 0.5f; StartProj.z *= 0.02f;
+	EndProj.xy = EndProj.xy * float2(0.5f, -0.5f) + 0.5f; EndProj.z *= 0.02f;
+	
+	LightDir = EndProj.xyz - StartProj.xyz;
+	float Len = GetMaxDirLength(StartProj.xyz, rcp(LightDir));
+	
+	LightDir *= min(1.0f, Len);
+	LightDir *= rcp(HUD_SHADOWS_STEPS);
+	
+	float ContactShadow = 0.0f;	
 	
 	[unroll(HUD_SHADOWS_STEPS)]
 	for (int i = 0; i < HUD_SHADOWS_STEPS; ++i)
 	{
-		Point += Dir * float(0.8f + 0.4f * Hash(TexCoord));
-		TexCoord = GetPointTexCoord(Point);
-
-		if (all(min(TexCoord, 1.0f - TexCoord)))
+		StartProj.xyz += LightDir * float(0.8f + 0.4f * Hash(StartProj.xy));
+		float HitDepth = s_position.SampleLevel(smp_nofilter, StartProj.xy, 0).x;
+		
+		if (HitDepth <= StartProj.z)
 		{
-			float HitPointZ = SampleHudHitPoint(TexCoord);
-			if (HitPointZ <= Point.z)
+			ContactShadow += 0.2f;
+			if (ContactShadow >= 1.0f)
 			{
-				ContactShadow += 0.2f;
-				if (ContactShadow >= 1.0f)
-				{
-					ContactShadow = 1.0f;
-					break;
-				}
+				ContactShadow = 1.0f;
+				break;
 			}
 		}
-		else
-		{
-			return;
-		}
 	}
-
-	ContactShadow *= GetBorderAtten(TexCoord, 0.0125f);
+	
+	ContactShadow *= GetBorderAtten(StartProj.xy, 0.0125f);
 	Light *= 1.0f - saturate(ContactShadow);
 }
 #endif
