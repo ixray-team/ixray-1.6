@@ -40,7 +40,7 @@ float fastacos_approx(float x)
 float example_how_to_not_implement_gtao(float3 view_position, float3 view_normal, float zbuffer, float2 texcoord, float jitter)
 {
     // Exclude HUD, and far plane geometry
-    if (zbuffer < 0.02f || view_position.z > 60.0f)
+    if (view_position.z > 60.0f)
     {
         return 1.0f;
     }
@@ -108,9 +108,8 @@ float example_how_to_not_implement_gtao(float3 view_position, float3 view_normal
             }
 
             // Sample the view space position
-            float s_view_z = depth_unpack.x * rcp(s_position.SampleLevel(smp_nofilter, s_texcoord, 0.0).x - depth_unpack.y);
             // float s_view_z = s_half_depth.SampleLevel(smp_nofilter, s_texcoord, 0.0).x;
-            float3 s_view_position = float3((s_texcoord * 2.0 - 1.0) * pos_decompression_params.xy, 1.0) * s_view_z;
+            float3 s_view_position = GbufferGetPointRealUnjitter(s_texcoord);
 
             // Get front and back vectors
             float3 s_front_vector = s_view_position - view_position;
@@ -156,14 +155,12 @@ uint main(PSInput I) : SV_Target
     // Unpack G-Buffer data...
     float3 Normal, Point; float Depth;
     {
-        Depth = s_position.SampleLevel(smp_nofilter, I.texcoord.xy, 0.0f).x;
-
         Normal = s_normal.SampleLevel(smp_nofilter, I.texcoord.xy, 0.0f).xyz;
         Normal = normalize(Normal.xyz - 0.5f);
         Normal.z = -Normal.z;
-
-        float s_view_z = depth_unpack.x * rcp(Depth - depth_unpack.y);
-        Point = float3((I.texcoord.xy * 2.0f - 1.0f) * pos_decompression_params.xy, 1.0f) * s_view_z;
+		
+        Depth = s_position.SampleLevel(smp_nofilter, I.texcoord.xy, 0.0f).x;
+        Point = GbufferGetPointRealUnjitter(I.texcoord.xy, Depth);
     }
 
     // Init

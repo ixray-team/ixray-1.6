@@ -19,7 +19,7 @@ float4 main(_input I) : SV_Target0
 		return 1.0f;
 	}
 
-	float occ = calc_ssao(O.Point, O.Normal, I.tc0.xy);
+	float occ = calc_ssao(O.Depth, O.Normal, I.tc0.xy);
     return float4(occ, occ, occ, occ);
 }
 
