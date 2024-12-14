@@ -605,7 +605,6 @@ void	CRender::Render		()
 	}
 
 	g_r											= 1;
-	CParticlesAsync::Wait();
 	Device.Statistic->RenderDUMP.Begin();
 	// Begin
 	Target->Begin								();
@@ -633,6 +632,7 @@ void	CRender::Render		()
 	r_pmask										(true,true);	// enable priority "0" and "1"
 	if(L_Shadows)L_Shadows->render				();				// ... and shadows
 	r_dsgraph_render_lods						(false,true);	// lods - FB
+	CParticlesAsync::Wait();
 	r_dsgraph_render_graph						(1);			// normal level, secondary priority
 	L_Dynamic->render							(1);			// addititional light sources, secondary priority
 	phase = PHASE_NORMAL;

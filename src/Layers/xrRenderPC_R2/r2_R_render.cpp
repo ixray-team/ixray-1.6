@@ -416,8 +416,6 @@ void CRender::Render()
 		HOM.Render									(ViewBase);
 	}
 
-	CParticlesAsync::Wait();
-
 	//******* Z-prefill calc - DEFERRER RENDERER
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		{
 		Device.Statistic->RenderCALC.Begin			();
@@ -644,6 +642,7 @@ void CRender::render_forward				()
 		render_main								(false);//
 		//	Igor: we don't want to render old lods on next frame.
 		mapLOD.clear							();
+		CParticlesAsync::Wait();
 		r_dsgraph_render_graph					(1)	;					// normal level, secondary priority
 		PortalTraverser.fade_render				()	;					// faded-portals
 		r_dsgraph_render_sorted					()	;					// strict-sorted geoms

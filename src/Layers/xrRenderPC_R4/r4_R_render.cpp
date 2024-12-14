@@ -140,7 +140,7 @@ void CRender::render_main	(bool deffered, bool zfill)
 		// Determine visibility for static geometry hierrarhy
 		if(psDeviceFlags.test(rsDrawStatic))
 		{
-			PROF_EVENT("static geometry hierrarhy");
+			PROF_EVENT("add_static")
 
 			if (dont_test_sectors)
 			{
@@ -161,7 +161,7 @@ void CRender::render_main	(bool deffered, bool zfill)
 				}
 			}
 		}
-
+		PROF_EVENT("add_dynamic")
 		// Traverse frustums
 		for (u32 o_it=0; o_it<lstRenderablesMain.size(); o_it++)
 		{
@@ -480,8 +480,6 @@ void CRender::Render		()
 		HOM.Render									(ViewBase);
 	}
 	
-	CParticlesAsync::Wait();
-
 	//******* Z-prefill calc - DEFERRER RENDERER
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		
 	{
@@ -760,6 +758,7 @@ void CRender::render_forward				()
 		render_main								(false);//
 		//	Igor: we don't want to render old lods on next frame.
 		mapLOD.clear							();
+		CParticlesAsync::Wait();
 		r_dsgraph_render_graph					(1)	;					// normal level, secondary priority
 		PortalTraverser.fade_render				()	;					// faded-portals
 		r_dsgraph_render_sorted					()	;					// strict-sorted geoms
