@@ -256,7 +256,11 @@ void CRenderDevice::on_idle		()
 
 	PROF_THREAD("MainThread");
 	PROF_FRAME("Main Thread");
-
+	{
+		PROF_EVENT("Update Particles");
+		if (g_pGamePersistent)
+			g_pGamePersistent->UpdateParticles();
+	}
 	SetEvent(Event3rdFirstStep);
 
 	Device.BeginRender();
@@ -277,12 +281,6 @@ void CRenderDevice::on_idle		()
 	}
 	else 
 	{
-		if (g_pGamePersistent != nullptr)
-		{
-			PROF_EVENT("Update Particles");
-			g_pGamePersistent->UpdateParticles();
-		}
-
 		for (auto it = m_time_callbacks.begin(); it != m_time_callbacks.end();)
 		{
 		    if (Device.dwTimeGlobal >= it->first)
