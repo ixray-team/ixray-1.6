@@ -134,7 +134,16 @@ void UIHintWindow::Update()
 	if (m_expression.IsCompiled())
 	{
 		ExpressionVarVariadic Var = m_expression.ExecuteExpression();
-		m_hint_text = Var.Str;
+
+		xr_string NewText;
+		switch (Var.VarType)
+		{
+			case ExpressionVarVariadic::EVariadicType::eFloat:	NewText = xr_string::ToString(Var.Flt); break;
+			case ExpressionVarVariadic::EVariadicType::eStr:	NewText = Var.Str.c_str(); break;
+			case ExpressionVarVariadic::EVariadicType::eInt:	NewText = xr_string::ToString(Var.Int); break;
+			case ExpressionVarVariadic::EVariadicType::eBool:	NewText = Var.Boolean ? "true" : "false"; break;
+		}
+		m_hint_text = NewText.data();
 	}
 	update_hint_text();
 }

@@ -176,7 +176,6 @@ void CUIStatic::Update()
 		case ExpressionVarVariadic::EVariadicType::eStr:	NewText = Result.Str.c_str(); break;
 		case ExpressionVarVariadic::EVariadicType::eInt:	NewText = xr_string::ToString(Result.Int); break;
 		case ExpressionVarVariadic::EVariadicType::eBool:	NewText = Result.Boolean ? "true" : "false"; break;
-			
 		}
 
 		m_pTextControl->SetText(NewText.c_str());
