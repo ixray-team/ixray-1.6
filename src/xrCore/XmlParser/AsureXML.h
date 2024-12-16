@@ -1,6 +1,6 @@
 #pragma once
 #include "tinyxml.h"
-
+#include <functional>
 class CXMLOverride
 {
 private:
