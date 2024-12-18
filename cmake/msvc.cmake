@@ -23,8 +23,20 @@ add_compile_options(/wd4595 /wd4996 /wd4005)
 add_link_options("$<$<CONFIG:DEBUG>:/SAFESEH:NO>")
 add_compile_options("$<$<CONFIG:RELEASE>:/wd4530>" "$<$<CONFIG:DEBUG>:/wd4275>" "$<$<CONFIG:DEBUG>:/wd4251>" "$<$<CONFIG:RELWITHDEBINFO>:/wd4530>")
 
+add_compile_options("$<$<CONFIG:RELEASE>:/GF>" "$<$<CONFIG:RELWITHDEBINFO>:/GF>")
+add_compile_options("$<$<CONFIG:RELEASE>:/Oi>" "$<$<CONFIG:RELWITHDEBINFO>:/Oi>")
+add_compile_options("$<$<CONFIG:RELEASE>:/Oy>" "$<$<CONFIG:RELWITHDEBINFO>:/Oy>")
+add_compile_options("$<$<CONFIG:RELEASE>:/GT>" "$<$<CONFIG:RELWITHDEBINFO>:/GT>")
+add_compile_options("$<$<CONFIG:RELEASE>:/GL>" "$<$<CONFIG:RELWITHDEBINFO>:/GL>")
+add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/Ob2>")
+add_compile_options("$<$<CONFIG:RELWITHDEBINFO>:/Ot>")
+add_link_options("$<$<CONFIG:RELEASE>:/LTCG:incremental>" "$<$<CONFIG:RELWITHDEBINFO>:/LTCG:incremental>")
+add_link_options("$<$<CONFIG:RELEASE>:/INCREMENTAL:NO>" "$<$<CONFIG:RELWITHDEBINFO>:/INCREMENTAL:NO>")
+
 ## Exceptions...
-add_compile_options("/EHsc")
+if (NOT IXRAY_LDEBUG)
+    add_compile_options("$<$<CONFIG:DEBUG>:/EHsc>")
+endif()
 
 ## Edit and Continue mode
 if (IXRAY_ASAN)
