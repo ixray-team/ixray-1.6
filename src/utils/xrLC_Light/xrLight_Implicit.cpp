@@ -92,6 +92,9 @@ void	ImplicitExecute::	Execute	( )
 				break;
 			}
 			ThreadTaskID_Implication++;
+
+			Progress( float(V) / float(defl.Height()) );
+
 			csLockImplicit.Leave();
 
 
@@ -143,7 +146,10 @@ void	ImplicitExecute::	Execute	( )
 					defl.Marker(U,V)	= 0;
 				}
 			}
-	//		thProgress	= float(V - y_start) / float(y_end-y_start);
+
+			if (V % 64 == 0)
+				Status("CurrentV: %d", V);
+			
 		}
 }
 

@@ -50,12 +50,16 @@ public:
 
 			D					= lc_global_data()->g_deflectors()[task_pool.back()];
 			task_pool.pop_back	();
+
+			thProgress = float ( 1.0f / task_pool.size() );
 			task_CS.Leave		();
 
 			// Perform operation
-			try {
+			try 
+			{
 				D->Light	(&DB,&LightsSelected,H);
-			} catch (...)
+			} 
+			catch (...)
 			{
 				clMsg("* ERROR: CLMThread::Execute - light");
 			}
@@ -89,7 +93,8 @@ for(u32 dit = 0; dit<lc_global_data()->g_deflectors().size(); dit++)
 		const	u32	thNUM	= CPU::ID.n_threads - 2;
 
 		CTimer	start_time;	start_time.Start();				
-		for				(int L=0; L<thNUM; L++)	threads.start(new CLMThread (L));
+		for				(int L=0; L<thNUM; L++)	
+			threads.start(new CLMThread (L));
 		threads.wait	(500);
 		clMsg			("%f seconds",start_time.GetElapsed_sec());
 }
@@ -106,9 +111,9 @@ void CBuild::Light()
  
 	//****************************************** Wait for MU
 	FPU::m64r();
-	Phase("LIGHT: Waiting for MU-thread...");
-	mem_Compact();
-	wait_mu_base();
+	/// Phase("LIGHT: Waiting for MU-thread...");
+	//mem_Compact();
+	//wait_mu_base();
 
 
 	//****************************************** Implicit
