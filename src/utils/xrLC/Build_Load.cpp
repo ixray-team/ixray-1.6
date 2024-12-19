@@ -359,7 +359,8 @@ void CBuild::Load	(const b_params& Params, const IReader& _in_FS)
 				BT.THM.width			= THM->r_u32();
 				BT.THM.height           = THM->r_u32();
 				BOOL			bLOD=FALSE;
-				if (N[0]=='l' && N[1]=='o' && N[2]=='d' && N[3]=='\\') bLOD = TRUE;
+				if (N[0]=='l' && N[1]=='o' && N[2]=='d' && N[3]=='\\')
+					bLOD = TRUE;
 
 				// load surface if it has an alpha channel or has "implicit lighting" flag
 				BT.dwWidth	= BT.THM.width;
@@ -374,9 +375,16 @@ void CBuild::Load	(const b_params& Params, const IReader& _in_FS)
 						BT.pSurface		=	Surface_Load(N,w,h);
 						BT.THM.SetHasSurface(TRUE);
 
-						if (!BT.pSurface) {
+						if (!BT.pSurface)
+						{
 							clMsg("cannot find tga texture: %s", N);
 							is_tga_missing = true;
+ 
+							BT.dwWidth = 1024;
+							BT.dwHeight = 1024;
+							BT.bHasAlpha = TRUE;
+							BT.THM.SetHasSurface(FALSE);
+ 
 							continue;
 						}
 
