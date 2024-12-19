@@ -9,7 +9,8 @@ extern ECORE_API	xr_token	qsun_shafts_token[];
 extern ECORE_API	u32			ps_r2_smapsize;
 extern ECORE_API	xr_token	qsmapsize_token[];
 
-extern ENGINE_API	u32			ps_r_scale_mode;
+extern ENGINE_API u32 ps_r_scale_mode;
+extern ENGINE_API u32 ps_proxy_r_scale_mode;
 
 extern ECORE_API	u32			ps_r_ssao_mode;
 extern ECORE_API	xr_token	qssao_mode_token[];
