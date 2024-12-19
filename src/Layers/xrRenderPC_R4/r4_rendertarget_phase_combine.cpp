@@ -273,14 +273,14 @@ void CRenderTarget::phase_combine()
 		case 3:
 		{
 			if(!phase_fsr()) {
-				ps_r_scale_mode = 1;
+				ps_proxy_r_scale_mode = ps_r_scale_mode = 1;
 			}
 			break;
 		}
 		case 2:
 		{
 			if(!phase_dlss()) {
-				ps_r_scale_mode = 3;
+				ps_proxy_r_scale_mode = ps_r_scale_mode = 3;
 			}
 			break;
 		}
