@@ -447,6 +447,7 @@ void CRenderDevice::Run()
 	SetEvent(Event3rdFirstStep); // Important for correct thread closing!!!
 	mt_csEnter.Leave();
 	while (mt_bMustExit)	Sleep(0);
+	ParticleWorkerCallback = nullptr;
 #endif
 }
 
