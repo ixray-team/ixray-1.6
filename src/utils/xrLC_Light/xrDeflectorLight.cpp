@@ -278,35 +278,154 @@ float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip
 	return scale;
 }
 
+// CDB RAY TRACE FILTER
+
+
+// NEW CDB_RAY
+void FilterIntersection(OpcodeArgs* context)
+{
+	CDB::MODEL* MDL = (CDB::MODEL*)context->MDL;
+
+	// Access to texture
+	CDB::TRI& clT = MDL->get_tris()[context->hit_struct.prim];
+	base_Face* F = (base_Face*) convert_nax( clT.dummy );
+
+	if (0 == F || context->skip == F)
+		return;
+
+	const Shader_xrLC& SH = F->Shader();
+	if (!SH.flags.bLIGHT_CastShadow)
+		return;
+
+	if (F->flags.bOpaque)
+	{
+		R_Light& light = (*((R_Light*)context->Light));
+
+		// Opaque poly - cache it
+		light.tri[0].set(MDL->get_verts()[clT.verts[0]]);
+		light.tri[1].set(MDL->get_verts()[clT.verts[1]]);
+		light.tri[2].set(MDL->get_verts()[clT.verts[2]]);
+
+		context->valid = false;
+		context->energy = 0;
+		return;
+	}
+
+	b_material& M = inlc_global_data()->materials()[F->dwMaterial];
+	b_texture& T = inlc_global_data()->textures()[M.surfidx];
+
+	if (T.pSurface == nullptr)
+	{
+		F->flags.bOpaque = true;
+		clMsg("* ERROR: RAY-TRACE: Strange face detected... Has alpha without texture... %s", T.name);
+		context->valid = false;
+		context->IntersectContinue = false;
+		context->energy = 0;
+		return;
+	}
+
+	// barycentric coords
+	// note: W,U,V order
+	Fvector B;
+	B.set(1.0f - context->hit_struct.u - context->hit_struct.v, context->hit_struct.u, context->hit_struct.v);
+
+	// calc UV
+	Fvector2* cuv = F->getTC0();
+	Fvector2	uv;
+	uv.x = cuv[0].x * B.x + cuv[1].x * B.y + cuv[2].x * B.z;
+	uv.y = cuv[0].y * B.x + cuv[1].y * B.y + cuv[2].y * B.z;
+
+	int U = iFloor(uv.x * float(T.dwWidth) + .5f);
+	int V = iFloor(uv.y * float(T.dwHeight) + .5f);
+	U %= T.dwWidth;
+	if (U < 0) U += T.dwWidth;
+	V %= T.dwHeight;
+	if (V < 0) V += T.dwHeight;
+
+	u32* raw = static_cast<u32*>(T.pSurface);
+	u32 pixel = raw[V * T.dwWidth + U];
+	u32 pixel_a = color_get_A(pixel);
+	float opac = 1.f - _sqr(float(pixel_a) / 255.f);
+
+	context->energy *= opac;
+
+	// Energy Dead
+	if (context->energy < 0.001f)
+		context->valid = false;
+};
+
+float rayTraceCheck(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Fvector& P, Fvector& D, float R, Face* skip)
+{
+	R_ASSERT(DB);
+
+	// 1. Check cached polygon	 
+	float _u, _v, range;
+	bool res = CDB::TestRayTri(P, D, L.tri, _u, _v, range, false);
+ 	if (res  && range > 0 && range < R)
+ 		return 0;
+ 
+	// 2. Polygon doesn't pick - real database query
+
+	OpcodeContext ctxt;
+	ctxt.r_dir = D;
+	ctxt.r_start = P;
+	ctxt.r_range = R;
+
+
+	OpcodeArgs args;
+	args.energy = 1.0f;
+	args.Light = (void*)&L;
+	args.skip = (void*)skip;
+	args.MDL = (void*)MDL;
+	args.valid = true;
+	args.pos = P;
+
+	// args.IntersectContinue = true;
+
+	ctxt.result = &args;
+
+	ctxt.filterIntersect = &FilterIntersection;
+
+	// Start RayTracing
+	DB->rayTrace1(&ctxt);
+	return ctxt.result->energy;
+}
+
+// Embree
+
 float RaytraceEmbreeProcess(R_Light& L, Fvector& P, Fvector& N, float range, Face* skip);
 
 float rayTrace	(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Fvector& P, Fvector& D, float R, Face* skip, BOOL bUseFaceDisable)
 {
+	// R_ASSERT	(DB);
+	// 
+	// // 1. Check cached polygon
+	// float _u,_v,range;
+	// bool res = CDB::TestRayTri(P,D,L.tri,_u,_v,range,false);
+	// if (res) {
+	// 	if (range>0 && range<R) return 0;
+	// }
+	// 
+	// // 2. Polygon doesn't pick - real database query
+	// DB->ray_query	(MDL,P,D,R);
+	// 
+	// // 3. Analyze polygons and cache nearest if possible
+	// if (0==DB->r_count()) {
+	// 	return 1;
+	// } else {
+	// 	return getLastRP_Scale(DB,MDL, L,skip,bUseFaceDisable);
+	// }
+	// return 0;
+
+
+	return rayTraceCheck(DB, MDL, L, P, D, R, skip);
+}
+
+float RayTraceIntel(R_Light& L, Fvector& P, Fvector& N, float range, Face* skip, BOOL bUseFaceDisable)
+{
 	// INTEL RAY TRACING
 	if (lc_global_data()->GetIsIntelUse())
- 		return RaytraceEmbreeProcess(L, P, D, R, skip);
-
-
- 
-	R_ASSERT	(DB);
-
-	// 1. Check cached polygon
-	float _u,_v,range;
-	bool res = CDB::TestRayTri(P,D,L.tri,_u,_v,range,false);
-	if (res) {
-		if (range>0 && range<R) return 0;
-	}
-
-	// 2. Polygon doesn't pick - real database query
-	DB->ray_query	(MDL,P,D,R);
-
-	// 3. Analyze polygons and cache nearest if possible
-	if (0==DB->r_count()) {
-		return 1;
-	} else {
-		return getLastRP_Scale(DB,MDL, L,skip,bUseFaceDisable);
-	}
-	return 0;
+		return RaytraceEmbreeProcess(L, P, N, range, skip);
 }
 
 void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip)
@@ -469,6 +588,173 @@ void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P,
 				float A		=	scale / (L->attenuation0 + L->attenuation1*R + L->attenuation2*sqD);
 
 				C.hemi		+=	A;
+			}
+		}
+	}
+}
+
+void LightPoint_Intel( base_color_c& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags, Face* skip)
+{
+	Fvector		Ldir, Pnew;
+	Pnew.mad(P, N, 0.01f);
+
+	BOOL		bUseFaceDisable = flags & LP_UseFaceDisable;
+
+	if (0 == (flags & LP_dont_rgb))
+	{
+ 		R_Light* L = &*lights.rgb.begin(), * E = &*lights.rgb.end();
+		for (; L != E; L++)
+		{
+			switch (L->type)
+			{
+			case LT_DIRECT:
+			{
+				// Cos
+				Ldir.invert(L->direction);
+				float D = Ldir.dotproduct(N);
+				if (D <= 0) continue;
+
+				// Trace Light
+				float scale = D * L->energy * RayTraceIntel(*L, Pnew, Ldir, 1000.f, skip, bUseFaceDisable);
+				C.rgb.x += scale * L->diffuse.x;
+				C.rgb.y += scale * L->diffuse.y;
+				C.rgb.z += scale * L->diffuse.z;
+			}
+			break;
+			case LT_POINT:
+			{
+				// Distance
+				float sqD = P.distance_to_sqr(L->position);
+				if (sqD > L->range2) continue;
+
+				// Dir
+				Ldir.sub(L->position, P);
+				Ldir.normalize_safe();
+				float D = Ldir.dotproduct(N);
+				if (D <= 0)			continue;
+
+				// Trace Light
+				float R = _sqrt(sqD);
+				float scale = D * L->energy * RayTraceIntel(*L, Pnew, Ldir, R, skip, bUseFaceDisable);
+				float A;
+				if (inlc_global_data()->gl_linear())
+					A = 1 - R / L->range;
+				else
+				{
+					//	Igor: let A equal 0 at the light boundary
+					A = scale *
+						(
+							1 / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD) -
+							R * L->falloff
+							);
+
+				}
+
+				C.rgb.x += A * L->diffuse.x;
+				C.rgb.y += A * L->diffuse.y;
+				C.rgb.z += A * L->diffuse.z;
+			}
+			break;
+			case LT_SECONDARY:
+			{
+				// Distance
+				float sqD = P.distance_to_sqr(L->position);
+				if (sqD > L->range2) continue;
+
+				// Dir
+				Ldir.sub(L->position, P);
+				Ldir.normalize_safe();
+				float	D = Ldir.dotproduct(N);
+				if (D <= 0) continue;
+				D *= -Ldir.dotproduct(L->direction);
+				if (D <= 0) continue;
+
+				// Jitter + trace light -> monte-carlo method
+				Fvector	Psave = L->position, Pdir;
+				L->position.mad(Pdir.random_dir(L->direction, PI_DIV_4), .05f);
+				float R = _sqrt(sqD);
+				float scale = powf(D, 1.f / 8.f) * L->energy * RayTraceIntel( *L, Pnew, Ldir, R, skip, bUseFaceDisable);
+				float A = scale * (1 - R / L->range);
+				L->position = Psave;
+
+				C.rgb.x += A * L->diffuse.x;
+				C.rgb.y += A * L->diffuse.y;
+				C.rgb.z += A * L->diffuse.z;
+			}
+			break;
+			}
+		}
+	}
+
+	if (0 == (flags & LP_dont_sun))
+	{
+ 		R_Light* L = &*(lights.sun.begin()), * E = &*(lights.sun.end());
+		for (; L != E; L++)
+		{
+			if (L->type == LT_DIRECT) {
+				// Cos
+				Ldir.invert(L->direction);
+				float D = Ldir.dotproduct(N);
+				if (D <= 0) continue;
+
+				// Trace Light
+				float scale = L->energy * RayTraceIntel( *L, Pnew, Ldir, 1000.f, skip, bUseFaceDisable);
+				C.sun += scale;
+			}
+			else {
+				// Distance
+				float sqD = P.distance_to_sqr(L->position);
+				if (sqD > L->range2) continue;
+
+				// Dir
+				Ldir.sub(L->position, P);
+				Ldir.normalize_safe();
+				float D = Ldir.dotproduct(N);
+				if (D <= 0)			continue;
+
+				// Trace Light
+				float R = _sqrt(sqD);
+				float scale = D * L->energy * RayTraceIntel( *L, Pnew, Ldir, R, skip, bUseFaceDisable);
+				float A = scale / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD);
+
+				C.sun += A;
+			}
+		}
+	}
+	
+	if (0 == (flags & LP_dont_hemi))
+	{
+		R_Light* L = &*lights.hemi.begin(), * E = &*lights.hemi.end();
+		for (; L != E; L++)
+		{
+			if (L->type == LT_DIRECT) {
+				// Cos
+				Ldir.invert(L->direction);
+				float D = Ldir.dotproduct(N);
+				if (D <= 0) continue;
+
+				// Trace Light
+				Fvector		PMoved;	PMoved.mad(Pnew, Ldir, 0.001f);
+				float scale = L->energy * RayTraceIntel( *L, PMoved, Ldir, 1000.f, skip, bUseFaceDisable);
+				C.hemi += scale;
+			}
+			else {
+				// Distance
+				float sqD = P.distance_to_sqr(L->position);
+				if (sqD > L->range2) continue;
+
+				// Dir
+				Ldir.sub(L->position, P);
+				Ldir.normalize_safe();
+				float D = Ldir.dotproduct(N);
+				if (D <= 0) continue;
+
+				// Trace Light
+				float R = _sqrt(sqD);
+				float scale = D * L->energy * RayTraceIntel( *L, Pnew, Ldir, R, skip, bUseFaceDisable);
+				float A = scale / (L->attenuation0 + L->attenuation1 * R + L->attenuation2 * sqD);
+
+				C.hemi += A;
 			}
 		}
 	}

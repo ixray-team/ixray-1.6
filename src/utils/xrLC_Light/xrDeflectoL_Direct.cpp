@@ -44,8 +44,11 @@ void CDeflector::L_Direct_Edge (CDB::COLLIDER* DB, base_lighting* LightsSelected
 		VERIFY(inlc_global_data());
 		VERIFY(inlc_global_data()->RCAST_Model());
 
-		LightPoint		(DB, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected, (inlc_global_data()->b_nosun()?LP_dont_sun:0)|LP_DEFAULT, skip); //.
-		
+		if (inlc_global_data()->GetIsIntelUse())
+			LightPoint_Intel		(C, P, N, *LightsSelected, (inlc_global_data()->b_nosun()?LP_dont_sun:0)|LP_DEFAULT, skip); //.
+		else 
+			LightPoint(DB, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected, (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip); //.
+
 		C.mul		(.5f);
 		lm.surface	[_y*lm.width+_x]._set	(C);
 		lm.marker	[_y*lm.width+_x]		= 255;
@@ -104,16 +107,25 @@ void CDeflector::L_Direct	(CDB::COLLIDER* DB, base_lighting* LightsSelected, HAS
 							Vertex	*V2 = F->v[1];
 							Vertex	*V3 = F->v[2];
 							wP.from_bary(V1->P,V2->P,V3->P,B);
-//. не нужно использовать	if (F->Shader().flags.bLIGHT_Sharp)	{ wN.set(F->N); }
+
+//. не нужно использовать	if (F->Shader().flags.bLIGHT_Sharp)	
+//							{ wN.set(F->N); }
 //							else								
 							{ 
 								wN.from_bary(V1->N,V2->N,V3->N,B);	exact_normalize	(wN); 
 								wN.add		(F->N);					exact_normalize	(wN);
 							}
-							try {
+							try 
+							{
 								VERIFY(inlc_global_data());
 								VERIFY(inlc_global_data()->RCAST_Model());
-								LightPoint	(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected, (inlc_global_data()->b_nosun()?LP_dont_sun:0)|LP_UseFaceDisable, F); //.
+								u32 flags = (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable;
+								
+								if (inlc_global_data()->GetIsIntelUse())
+									LightPoint_Intel(C, wP, wN, *LightsSelected, flags, F);
+								else
+									LightPoint	(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected, flags, F); 
+
 								Fcount		+= 1;
 							} catch (...) {
 								clMsg("* ERROR (CDB). Recovered. ");
@@ -122,7 +134,9 @@ void CDeflector::L_Direct	(CDB::COLLIDER* DB, base_lighting* LightsSelected, HAS
 						}
 					}
 				} 
-			} catch (...) {
+			}
+			catch (...)
+			{
 				clMsg("* ERROR (Light). Recovered. ");
 			}
 			
