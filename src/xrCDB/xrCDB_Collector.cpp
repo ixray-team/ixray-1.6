@@ -274,10 +274,7 @@ namespace CDB
 			
 			auto IT = std::find_if(std::execution::par, vl->begin(), vl->end(), [&] (u32& VAL) 
 			{
-				if (verts[VAL].similar(V))
-				{
-					return true;
-				}
+				return verts[VAL].similar(V);
 			});
 
 			if (IT != vl->end())

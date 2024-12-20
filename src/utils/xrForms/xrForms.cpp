@@ -1,5 +1,34 @@
 #include "../../xrCore/xrCore.h"
 #include "cl_log.h"
+#include <luabind/luabind.hpp>
+
+static LPVOID __cdecl luabind_allocator(
+	luabind::memory_allocation_function_parameter const,
+	void const* const pointer,
+	size_t const size
+)
+{
+	if (!size)
+	{
+		LPVOID	non_const_pointer = const_cast<LPVOID>(pointer);
+		xr_free(non_const_pointer);
+		return	(0);
+	}
+
+	if (!pointer)
+	{
+		return	(Memory.mem_alloc(size));
+	}
+
+	LPVOID non_const_pointer = const_cast<LPVOID>(pointer);
+	return (Memory.mem_realloc(non_const_pointer, size));
+}
+
+void setup_luabind_allocator()
+{
+	luabind::allocator = &luabind_allocator;
+	luabind::allocator_parameter = 0;
+}
 
 #pragma warning(disable:4995)
 #include <timeapi.h>
@@ -29,7 +58,8 @@ struct CompilersMode {
 
 CompilersMode gCompilerMode;
 
-void Startup(LPSTR lpCmdLine) {
+void Startup(LPSTR lpCmdLine) 
+{
 	u32 dwStartupTime = timeGetTime();
 
 	u32 dwTimeLC = 0;
@@ -42,9 +72,12 @@ void Startup(LPSTR lpCmdLine) {
 	}
 
 	u32 dwTimeAI = 0;
-	if (gCompilerMode.AI) {
+	if (gCompilerMode.AI)
+	{
 		dwTimeAI = timeGetTime();
 		Phase("xrAI Startup");
+
+		setup_luabind_allocator();
 		InitialFactory();
 		StartupAI(lpCmdLine);
 		DestroyFactory();
