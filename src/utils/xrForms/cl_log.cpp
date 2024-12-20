@@ -154,8 +154,8 @@ void logThread(void* dummy) {
 	if ((0 == xr_strcmp(u_name, "oles")) || (0 == xr_strcmp(u_name, "alexmx")))	bHighPriority = TRUE;
 
 	// Main cycle
-	u32		LogSize = 0;
-	float	PrSave = 0;
+	size_t LogSize = 0;
+	float PrSave = 0;
 	xrLogger::AddLogCallback(MyLogCallback);
 
 	while (TRUE)
@@ -178,16 +178,21 @@ void logThread(void* dummy) {
 			if (LogSize != myLogQueue.size())
 			{
 				bWasChanges = TRUE;
-				for (size_t Iter = 0; Iter < myLogQueue.size(); Iter++)
+
+				while (!myLogQueue.empty())
 				{
 					string256 S = {};
 					xr_strcpy(S, myLogQueue.front().c_str());
 					
 					if (S[0])
+					{
 						SendMessageA(hwLog, LB_ADDSTRING, 0, (LPARAM)S);
+						LogSize++;
+					}
+
 					myLogQueue.pop();
 				}
-				SendMessageA(hwLog, LB_SETTOPINDEX, LogSize - 1, 0);
+				SendMessageA(hwLog, LB_SETTOPINDEX, (u32)LogSize - 1, 0);
 			}
 		}
 		if (_abs(PrSave - progress) > EPS_L) {
