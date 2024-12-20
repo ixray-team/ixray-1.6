@@ -127,7 +127,15 @@ void	ImplicitExecute::	Execute	( )
 								wP.from_bary(V1->P,V2->P,V3->P,B);
 								wN.from_bary(V1->N,V2->N,V3->N,B);
 								wN.normalize();
-								LightPoint	(&DB, inlc_global_data()->RCAST_Model(), C, wP, wN, inlc_global_data()->L_static(), (inlc_global_data()->b_nosun()?LP_dont_sun:0), F);
+							
+								
+
+								u32 flags = (inlc_global_data()->b_nosun() ? LP_dont_sun : 0);
+
+								if (inlc_global_data()->GetIsIntelUse())
+									LightPoint_Intel(C, wP, wN, inlc_global_data()->L_static(), flags, F);
+								else 
+									LightPoint	(&DB, inlc_global_data()->RCAST_Model(), C, wP, wN, inlc_global_data()->L_static(), flags, F);
 								Fcount		++;
 							}
 						}

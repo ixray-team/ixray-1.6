@@ -41,17 +41,18 @@ public:
 		{
 			// Get task
 			task_CS.Enter		();
-			thProgress			= 1.f - float(task_pool.size())/float(lc_global_data()->g_deflectors().size());
+			thProgress			= 1.f - float(task_pool.size()) / float(lc_global_data()->g_deflectors().size());
 			if (task_pool.empty())	
 			{
 				task_CS.Leave		();
 				return;
 			}
+			int ID = task_pool.back();
 
-			D					= lc_global_data()->g_deflectors()[task_pool.back()];
+			StatusNoMsg("Deflectors %u|%u", ID, lc_global_data()->g_deflectors().size());
+
+			D					= lc_global_data()->g_deflectors()[ID];
 			task_pool.pop_back	();
-
-			thProgress = float ( 1.0f / task_pool.size() );
 			task_CS.Leave		();
 
 			// Perform operation
@@ -108,7 +109,12 @@ void	CBuild::LMaps					()
  
 void CBuild::Light()
 {
- 
+//	g_params().m_lm_jitter_samples = 1;
+//
+//	g_params().m_lm_pixels_per_meter = 10;
+//	g_params().m_lm_rms = 4;
+//	g_params().m_lm_rms_zero = 4; 
+
 	//****************************************** Wait for MU
 	FPU::m64r();
 	/// Phase("LIGHT: Waiting for MU-thread...");

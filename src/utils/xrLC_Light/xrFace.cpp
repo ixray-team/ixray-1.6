@@ -29,7 +29,7 @@ void			base_Face::CacheOpacity	()
 	else			
 		flags.bOpaque = true;
 
-	if ( !flags.bOpaque && (0 != T.pSurface) )	////	pSurface was possible deleted
+	if ( !flags.bOpaque && (!T.THM.HasSurface()) )	////	pSurface was possible deleted
 	{
 		flags.bOpaque	= true;
 	//	clMsg			("Strange face detected... Has alpha without texture...");

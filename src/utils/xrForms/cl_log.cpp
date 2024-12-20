@@ -76,7 +76,8 @@ std::string make_time	(u32 sec) {
 	return std::string(buf);
 }
 
-void __cdecl Status(const char* format, ...) {
+void __cdecl Status(const char* format, ...) 
+{
 	csLog.Enter();
 	va_list				mark;
 	va_start(mark, format);
@@ -84,6 +85,16 @@ void __cdecl Status(const char* format, ...) {
 	bStatusChange = TRUE;
 	Msg("    | %s", status);
 	csLog.Leave();
+}
+
+void StatusNoMsg(const char* format, ...)
+{
+	csLog.Enter();
+	va_list				mark;
+	va_start(mark, format);
+	vsprintf(status, format, mark);
+	bStatusChange = TRUE;
+ 	csLog.Leave();
 }
 
 void Progress(const float F) {

@@ -266,30 +266,22 @@ namespace CDB
 		int MAX_THREADS = CPU::ID.n_threads;
 
 		// Se7kills (для интела нельзя использовать сжатие) (будет при построении модели вылетать)
-		if (strstr(Core.Params, "-use_intel") == 0)
-		{
- 			// MT Method Finding Simular Verticies
-			DWORDList* vl;
-			vl = &(VM[ix][iy][iz]);
-			
-			auto IT = std::find_if(std::execution::par, vl->begin(), vl->end(), [&] (u32& VAL) 
-			{
-				return verts[VAL].similar(V);
-			});
-
-			if (IT != vl->end())
-			{
-				P = *IT;
-			}
-
-
-			//for(DWORDIt it=vl->begin();it!=vl->end(); it++)
-			//if( verts[*it].similar(V) )	
-			//{
-			//	P = *it;
-			//	break;
-			//}
-		}
+		// if (strstr(Core.Params, "-use_intel") == 0)
+		// {
+ 		// 	// MT Method Finding Simular Verticies
+		// 	DWORDList* vl;
+		// 	vl = &(VM[ix][iy][iz]);
+		// 	
+		// 	auto IT = std::find_if(std::execution::par, vl->begin(), vl->end(), [&] (u32& VAL) 
+		// 	{
+		// 		return verts[VAL].similar(V);
+		// 	});
+		// 
+		// 	if (IT != vl->end())
+		// 	{
+		// 		P = *IT;
+		// 	} 
+		// }
 
 		if (0xffffffff==P)
 		{
