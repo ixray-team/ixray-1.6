@@ -349,8 +349,11 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	else m_pLight = nullptr;
 
 	setEnabled					(TRUE);
-
-	PlayIdleParticles			();
+	
+	if (IsEnabled())
+	{
+		PlayIdleParticles();
+	}
 
 	m_iPreviousStateTime		= m_iStateTime = 0;
 
