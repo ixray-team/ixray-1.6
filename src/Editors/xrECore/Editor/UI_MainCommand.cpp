@@ -103,7 +103,10 @@ CCommandVar 	ExecCommand	(u32 cmd, CCommandVar p1, CCommandVar p2)
 	VERIFY				(cmd<ECommands.size());
 	CCommandVar	res;
 	SECommand*	CMD 	= ECommands[cmd];
-	VERIFY				(CMD&&!CMD->command.empty());
+
+	if (CMD == nullptr || CMD->command.empty())
+		return 0;
+
 	//static int exec_level= 0;
 	if (bAllowLogCommands)
 	{
@@ -114,6 +117,7 @@ CCommandVar 	ExecCommand	(u32 cmd, CCommandVar p1, CCommandVar p2)
 		if (p2.IsString()) sp2 = ((sp2.find("\n") == sp2.npos) && (sp2.find("\r") == sp2.npos)) ? sp2 : "...";
 
 	}
+
 	res = CMD->command(p1,p2);
 	return res;
 }
