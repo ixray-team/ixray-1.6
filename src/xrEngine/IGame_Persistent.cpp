@@ -122,7 +122,7 @@ void IGame_Persistent::OnGameStart()
 	loading_save_timer.Start();
 	loading_save_timer_started = true;
 	Msg("* Game Loading Timer: Started!");
-//	LoadTitle("st_prefetching_objects");
+	SetLoadStageTitle("st_prefetching_objects");
 	LoadTitle();
 	if(!Core.ParamsData.test(ECoreParams::noprefetch))
 		Prefetch();
