@@ -349,7 +349,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pTradePartnerList)			return iPartnerTrade;
 	if(l==m_pDeadBodyBagList)			return iDeadBodyBag;
 
-	if(l==m_pQuickSlot)					return iQuickSlot;
+	if(l==m_pQuickSlot && m_pQuickSlot)					return iQuickSlot;
 	if(l==m_pTrashList)					return iTrashSlot;
 
 	R_ASSERT(0);
@@ -517,10 +517,16 @@ void CUIActorMenu::clear_highlight_lists()
 			m_pInvSlotHighlight[i]->Show(false);
 	}
 
-	for(u8 i=0; i<4; i++)
-		m_QuickSlotsHighlight[i]->Show(false);
-	for(u8 i=0; i<e_af_count; i++)
-		m_ArtefactSlotsHighlight[i]->Show(false);
+	if (m_QuickSlotsHighlight[0])
+	{
+		for (u8 i = 0; i < 4; i++)
+			m_QuickSlotsHighlight[i]->Show(false);
+	}
+	if (m_ArtefactSlotsHighlight[0])
+	{
+		for (u8 i = 0; i < e_af_count; i++)
+			m_ArtefactSlotsHighlight[i]->Show(false);
+	}
 
 	m_pInventoryBagList->clear_select_armament();
 
@@ -579,8 +585,11 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
 		if(cell_item->OwnerList() && GetListType(cell_item->OwnerList())==iQuickSlot)
 			return;
 
-		for(u8 i=0; i<4; i++)
-			m_QuickSlotsHighlight[i]->Show(true);
+		if (m_QuickSlotsHighlight[0])
+		{
+			for (u8 i = 0; i < 4; i++)
+				m_QuickSlotsHighlight[i]->Show(true);
+		}
 		return;
 	}
 	if(artefact)
@@ -589,8 +598,11 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
 			return;
 
 		Ivector2 cap = m_pInventoryBeltList->CellsCapacity();
-		for(u8 i=0; i<cap.x; i++)
-			m_ArtefactSlotsHighlight[i]->Show(true);
+		if (m_ArtefactSlotsHighlight[0])
+		{
+			for (u8 i = 0; i < cap.x; i++)
+				m_ArtefactSlotsHighlight[i]->Show(true);
+		}
 		return;
 	}
 }
@@ -849,7 +861,8 @@ void CUIActorMenu::ClearAllLists()
 			m_pInvList[i]->ClearAll(true);
 	}
 
-	m_pQuickSlot->ClearAll(true);
+	if (m_pQuickSlot)
+		m_pQuickSlot->ClearAll(true);
 
 	m_pTradeActorBagList->ClearAll(true);
 	m_pTradeActorList->ClearAll(true);

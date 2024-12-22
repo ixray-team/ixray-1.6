@@ -53,7 +53,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 	Init_IconInfoItem( *xml_doc, "icon",                eIcon         );
 	Init_IconInfoItem( *xml_doc, "icon_over",           eIconOver     );
 
-/*	Init_IconInfoItem( *xml_doc, "rank_icon",           eRankIcon     );
+	Init_IconInfoItem( *xml_doc, "rank_icon",           eRankIcon     );
 	Init_IconInfoItem( *xml_doc, "rank_icon_over",      eRankIconOver );
 
 	Init_IconInfoItem( *xml_doc, "commumity_icon",      eCommunityIcon     );
@@ -61,7 +61,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
 	Init_IconInfoItem( *xml_doc, "commumity_big_icon",      eCommunityBigIcon     );
 	Init_IconInfoItem( *xml_doc, "commumity_big_icon_over", eCommunityBigIconOver );
-*/
+
 	VERIFY( m_icons[eIcon] );
 	m_deadbody_color = color_argb(160,160,160,160);
 	if ( xml_doc->NavigateToNode( "icon:deadbody", 0 ) )
@@ -201,9 +201,9 @@ void CUICharacterInfo::InitCharacter(u16 id)
 
 	m_texture_name				= chInfo.IconName();
 	if ( m_icons[eIcon            ] ) { m_icons[eIcon            ]->InitTexture( m_texture_name.c_str()     ); }
-//	if ( m_icons[eRankIcon        ] ) { m_icons[eRankIcon        ]->InitTexture( chInfo.Rank().id().c_str() ); }
+	if ( m_icons[eRankIcon        ] ) { m_icons[eRankIcon        ]->InitTexture( chInfo.Rank().id().c_str() ); }
 	
-/*
+
 	if ( Actor()->ID() != m_ownerID && !ignore_community( comm_id ) )
 	{
 		if ( m_icons[eCommunityIcon   ] ) { m_icons[eCommunityIcon   ]->InitTexture( community1 ); }
@@ -232,7 +232,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
 	if ( m_icons[eCommunityBigIcon]     ) { m_icons[eCommunityBigIcon]->Show( false ); }
 	if ( m_icons[eCommunityIconOver   ] ) { m_icons[eCommunityIconOver]->Show( false ); }
 	if ( m_icons[eCommunityBigIconOver] ) { m_icons[eCommunityBigIconOver]->Show( false ); }
-*/
+
 }
 
 void CUICharacterInfo::InitCharacterMP(CInventoryOwner* invOwner)
@@ -393,13 +393,12 @@ void CUICharacterInfo::ClearInfo()
 // ------- static ---------
 bool CUICharacterInfo::get_actor_community( shared_str* our, shared_str* enemy )
 {
-	VERIFY( our && enemy );
 	our->_set( nullptr );
 	enemy->_set( nullptr );
 	shared_str const& actor_team = Actor()->CharacterInfo().Community().id();
 
-	LPCSTR vs_teams  = pSettings->r_string( "actor_communities", actor_team.c_str() );
-	if ( _GetItemCount( vs_teams ) != 2 )
+    const char* vs_teams = READ_IF_EXISTS(pSettings, r_string, "actor_communities", actor_team.c_str(), nullptr);
+    if (!vs_teams || _GetItemCount(vs_teams) != 2)
 	{
 		return false;
 	}
@@ -421,7 +420,8 @@ bool CUICharacterInfo::get_actor_community( shared_str* our, shared_str* enemy )
 bool CUICharacterInfo::ignore_community( shared_str const& check_community )
 {
 	LPCSTR comm_section_str = "ignore_icons_communities";
-	VERIFY2(pSettings->section_exist(comm_section_str), make_string<const char*>("Section [%s] does not exist !", comm_section_str));
+	if (!pSettings->section_exist(comm_section_str))
+		return false;
 
 	CInifile::Sect&		faction_section = pSettings->r_section( comm_section_str );
 	CInifile::SectIt_	ib = faction_section.Data.begin();
