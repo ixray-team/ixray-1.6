@@ -85,3 +85,8 @@ ENGINE_API CEngineExternal& EngineExternal()
 	}
 	return *g_pEngineExternal;
 }
+
+float CEngineExternal::GetWeaponIconScaling() const
+{
+	return READ_IF_EXISTS(pOptions, r_float, "ui", "WeaponIconScale", 0.8f);
+}
