@@ -98,10 +98,12 @@ const char* CEngineExternal::PlatformMode() const
 
 bool CEngineExternal::ClearSkyMode() const
 {
-	return PlatformMode() == "cs";
+	//return PlatformMode() == "cs";
+	return !xr_strcmp(PlatformMode(), "cs");
 }
 
 bool CEngineExternal::CallOfPripyatMode() const
 {
-	return PlatformMode() == "cop";
+	//return PlatformMode() == "cop";
+	return !xr_strcmp(PlatformMode(), "cop");
 }
