@@ -274,7 +274,11 @@ void UITopBarForm::Draw()
 			ImGui::SetTooltip("Open 'gamedata' folder");
 		}
 	}
-	ImGui::SameLine(0,1);
+	ImGui::SameLine();
+
+	ImGui::SetNextItemWidth(150);
+	ImGui::SliderFloat("Volume", &psSoundVEffects, 0, 1, "%.2f");
+
 	ImGui::End();
 	ImGui::PopStyleVar(5);
 	

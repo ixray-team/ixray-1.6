@@ -59,14 +59,14 @@ void CSoundManager::OnDestroy()
 
 void CSoundManager::OnFrame()
 {
-	::psSoundVEffects		= psDeviceFlags.is(rsMuteSounds)?0.f:1.f;
+	::psSoundVEffects		= psDeviceFlags.is(rsMuteSounds)?0.f: psSoundVEffects;
 	//Sound->update			(UI->CurrentView().m_Camera.GetPosition(), UI->CurrentView().m_Camera.GetDirection(), UI->CurrentView().m_Camera.GetNormal());
 }
 
 void CSoundManager::MuteSounds(BOOL bVal)
 {
 	if (bVal) 	::psSoundVEffects = 0.f;
-    else		::psSoundVEffects = psDeviceFlags.is(rsMuteSounds)?0.f:1.f;
+    else		::psSoundVEffects = psDeviceFlags.is(rsMuteSounds)?0.f: psSoundVEffects;
 }
 
 void CSoundManager::RenameSound(LPCSTR nm0, LPCSTR nm1, EItemType type)
