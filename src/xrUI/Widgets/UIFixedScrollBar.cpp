@@ -33,10 +33,6 @@ void CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, LPCSTR prof
 	inherited::SetWndPos(pos);
 	m_bIsHorizontal = horizontal;
 
-	// Workarounds for compatibility with old resources (SoC, CS)
-	CUIStatic* tempScroll = nullptr;
-	CUIStatic* tempBackground = nullptr;
-
 	if(m_bIsHorizontal)
 	{
 		inherited::SetWndSize(Fvector2().set(width, height));

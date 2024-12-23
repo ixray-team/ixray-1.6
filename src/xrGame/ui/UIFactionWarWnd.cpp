@@ -126,7 +126,7 @@ void CUIFactionWarWnd::Init()
 
 	for ( u8 i = 0; i < max_bonuce; ++i )
 	{
-		m_our_bonuces[i] = UIHelper::CreateTextWnd( xml, "static_our_bonuce", this );
+		m_our_bonuces[i] = UIHelper::CreateStatic( xml, "static_our_bonuce", this );
 	}
 	dx = xml.ReadAttribFlt( "static_our_bonuce", 0, "dx" );
 	pos = m_our_bonuces[0]->GetWndPos();
@@ -138,7 +138,7 @@ void CUIFactionWarWnd::Init()
 
 	for ( u8 i = 0; i < max_bonuce; ++i )
 	{
-		m_enemy_bonuces[i] = UIHelper::CreateTextWnd( xml, "static_enemy_bonuce", this );
+		m_enemy_bonuces[i] = UIHelper::CreateStatic( xml, "static_enemy_bonuce", this );
 	}
 	dx = xml.ReadAttribFlt( "static_enemy_bonuce", 0, "dx" );
 	pos = m_enemy_bonuces[0]->GetWndPos();
@@ -357,12 +357,12 @@ void CUIFactionWarWnd::set_amount_our_bonus( int value )
 {
 	for ( u32 i = 0; i < max_bonuce; ++i )
 	{
-		m_our_bonuces[i]->SetTextColor( color_rgba( 255, 255, 255, 70) );
+		m_our_bonuces[i]->TextItemControl()->SetTextColor( color_rgba( 255, 255, 255, 70) );
 	}
 	u32 cr = color_rgba( 0, 255, 0, 255);
 	for ( int i = 0; i < value; ++i )
 	{
-		m_our_bonuces[i]->SetTextColor( cr );
+		m_our_bonuces[i]->TextItemControl()->SetTextColor( cr );
 	}
 }
 
@@ -370,12 +370,12 @@ void CUIFactionWarWnd::set_amount_enemy_bonus( int value )
 {
 	for ( u32 i = 0; i < max_bonuce; ++i )
 	{
-		m_enemy_bonuces[i]->SetTextColor( color_rgba( 255, 255, 255, 70) );
+		m_enemy_bonuces[i]->TextItemControl()->SetTextColor( color_rgba( 255, 255, 255, 70) );
 	}
 	u32 cr = color_rgba( 0, 255, 0, 255);
 	for ( int i = 0; i < value; ++i )
 	{
-		m_enemy_bonuces[i]->SetTextColor( cr );
+		m_enemy_bonuces[i]->TextItemControl()->SetTextColor( cr );
 	}
 }
 

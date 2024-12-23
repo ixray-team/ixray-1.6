@@ -72,8 +72,8 @@ private:
 	UIWarState*			m_war_state[max_war_state];
 
 	enum				{ max_bonuce = 6 };
-	CUITextWnd*			m_our_bonuces[max_bonuce];
-	CUITextWnd*			m_enemy_bonuces[max_bonuce];
+	CUIStatic*			m_our_bonuces[max_bonuce];
+	CUIStatic*			m_enemy_bonuces[max_bonuce];
 
 	// ----------------------------------------
 	//shared_str			m_our_faction_id;
