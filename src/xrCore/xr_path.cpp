@@ -38,7 +38,11 @@ bool CFilePath::exists(const CFilePath& Path)
 
 XRCORE_API CFilePath operator/(const CFilePath& _Left, const CFilePath& _Right)
 {
-	return _Left._parent_class() / _Right._parent_class();
+	CFilePath Path = _Left;
+	Path += "\\";
+	Path += _Right;
+
+	return std::move(Path);
 }
 
 CFilePath operator/(const xr_string& _Left, const xr_string& _Right)

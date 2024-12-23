@@ -5,5 +5,6 @@ public:
 	UIMainMenuForm();
 	virtual ~UIMainMenuForm();
 	virtual void Draw();
+	void ExportLevelAsArchive();
 };
 

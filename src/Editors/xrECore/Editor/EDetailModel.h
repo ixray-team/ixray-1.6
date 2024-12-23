@@ -64,6 +64,7 @@ class ECORE_API EDetail: public CDetail{
 	bool                m_bLoadFromLibrary;
 	float 				m_fDensityFactor;
 
+public:
 	// references
 	xr_string			m_sRefs;
 	CEditableObject*	m_pRefs;

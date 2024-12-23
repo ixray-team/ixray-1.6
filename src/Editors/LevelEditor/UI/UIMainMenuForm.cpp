@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "../xrEUI/xrUITheme.h"
 #include "../xrEUI/Windows/Help.h"
+#include "../xrECore/Editor/EThumbnail.h"
 
 UIMainMenuForm::UIMainMenuForm()
 {
@@ -42,7 +43,19 @@ void UIMainMenuForm::Draw()
 		{
 			{
 				bool selected = !MainForm->GetWorldPropertiesFrom()->IsClosed();
-				if (ImGui::MenuItem("World Properties", "", &selected)) { if (selected)MainForm->GetWorldPropertiesFrom()->Open(); else MainForm->GetWorldPropertiesFrom()->Close(); }
+				if (ImGui::MenuItem("World Properties", "", &selected)) 
+				{
+					if (selected)
+						MainForm->GetWorldPropertiesFrom()->Open();
+					else 
+						MainForm->GetWorldPropertiesFrom()->Close(); 
+				}
+
+				if (ImGui::MenuItem("Export as archive"))
+				{
+					ExportLevelAsArchive();
+
+				}
 			}
 			ImGui::Separator();
 
@@ -523,6 +536,159 @@ void UIMainMenuForm::Draw()
 		//ImGui::EndMenu();
 
 		ImGui::EndMainMenuBar();
+	}
+}
+
+void UIMainMenuForm::ExportLevelAsArchive()
+{
+	if (!std::filesystem::exists("export"))
+	{
+		std::filesystem::create_directory("export");
+	}
+
+	xr_path File = LTools->m_LastFileName;
+	const xr_string LevelName = File.xfilename();
+
+	xr_string FullPath = "export\\" + LevelName;
+	if (std::filesystem::exists(FullPath.data()))
+	{
+		std::filesystem::remove_all(FullPath.data());
+	}
+	std::filesystem::create_directory(FullPath.data());
+
+	ObjectIt _F = Scene->FirstObj(OBJCLASS_SCENEOBJECT);
+	ObjectIt _E = Scene->LastObj(OBJCLASS_SCENEOBJECT);
+
+	xr_path RawPath = (FullPath + "\\rawdata").data();
+	xr_path GamePath = (FullPath + "\\gamedata").data();
+	xr_path RawObjectPath = (RawPath.xstring() + "\\objects").data();
+	xr_path LevelPath = (RawPath.xstring() + "\\levels").data();
+	xr_path TexturesObjectPath = (GamePath.xstring() + "\\textures").data();
+
+
+	std::filesystem::create_directory(RawPath);
+	std::filesystem::create_directory(RawObjectPath);
+	std::filesystem::create_directory(LevelPath);
+	std::filesystem::create_directory(GamePath);
+	std::filesystem::create_directory(TexturesObjectPath);
+
+
+	string_path GameTextures = {};
+	FS.update_path(GameTextures, "$game_textures$", "");
+	string_path Rawdata = {};
+	FS.update_path(Rawdata, "$server_data_root$", "");
+
+	auto ParseBumpFromTexture = [&](const xr_string& InFileThm)
+	{
+
+		ETextureThumbnail* pThmTexture = (ETextureThumbnail*)CreateThumbnail(InFileThm.c_str(), ECustomThumbnail::ETTexture);
+		pThmTexture->Load(InFileThm.c_str(), "");
+
+		if (pThmTexture != nullptr)
+		{
+			shared_str Temp = *pThmTexture->_Format().bump_name;
+
+			if (Temp.size() > 0)
+			{
+				xr_string BumpTextureIn = xr_string(GameTextures) + *Temp + ".dds";
+				xr_string BumpTextureOut = TexturesObjectPath.xstring() + "\\" + *Temp + ".dds";
+				FS.file_copy(BumpTextureIn.c_str(), BumpTextureOut.c_str());
+
+				BumpTextureIn = xr_string(GameTextures) + *Temp + "#.dds";
+				BumpTextureOut = TexturesObjectPath.xstring() + "\\" + *Temp + "#.dds";
+				FS.file_copy(BumpTextureIn.c_str(), BumpTextureOut.c_str());
+			}
+		}
+	};
+	
+	auto ParseObject = [&](auto Obj, xr_path FilePath)
+	{
+		xr_path DirFilePath = RawObjectPath;
+
+		auto Dirs = FilePath.xstring().Split('\\');
+		for (size_t Iter = 0; Iter < Dirs.size() - 1; Iter++)
+		{
+			DirFilePath += ("\\" + Dirs[Iter]).data();
+			if (!std::filesystem::exists(DirFilePath))
+			{
+				std::filesystem::create_directories(DirFilePath);
+			}
+		}
+
+		xr_string InFile = xr_string(Rawdata) + "objects\\" + FilePath.xstring() + ".object";
+		xr_string OutFile = DirFilePath.xstring() + "\\" + Dirs[Dirs.size() - 1] + ".object";
+		FS.file_copy(InFile.c_str(), OutFile.c_str());
+
+		// Parse textures
+		for (CSurface* Surface : Obj->m_Surfaces)
+		{
+			DirFilePath = TexturesObjectPath;
+			xr_string TextureName = Surface->m_Texture.c_str();
+			TextureName += ".dds";
+
+			auto Dirs = TextureName.Split('\\');
+
+			for (size_t Iter = 0; Iter < Dirs.size() - 1; Iter++)
+			{
+				DirFilePath += ("\\" + Dirs[Iter]).data();
+				if (!std::filesystem::exists(DirFilePath))
+				{
+					std::filesystem::create_directories(DirFilePath);
+				}
+			}
+
+			InFile = GameTextures + TextureName;
+			OutFile = DirFilePath.xstring() + "\\" + Dirs[Dirs.size() - 1];
+			xr_string BaseFileName = DirFilePath.xstring() + "\\" + Dirs[Dirs.size() - 1];
+			xr_string OutFileThm = BaseFileName.substr(0, BaseFileName.size() - 3) + "thm";
+			xr_string InFileThm = InFile.substr(0, InFile.size() - 3) + "thm";
+			FS.file_copy(InFile.c_str(), OutFile.c_str());
+			FS.file_copy(InFileThm.c_str(), OutFileThm.c_str());
+
+			// Parse bumps
+			ParseBumpFromTexture(InFileThm);
+		}
+	};
+
+	// Parse objects
+	for (; _F != _E; _F++)
+	{
+		CSceneObject* Obj = (CSceneObject *)*_F;
+		ParseObject(Obj, Obj->GetReference()->GetName());
+	}
+
+	// Parse levels
+	FS.file_copy(File.xstring().c_str(), (LevelPath / LevelName).xstring().c_str());
+
+	xr_path LevelDir = File.xstring().substr(0, File.xstring().size() - xr_strlen(".level")).c_str();
+	xr_path OutLevelDir = LevelPath / File.xfilename().substr(0, File.xfilename().size() - xr_strlen(".level")).c_str();
+	std::filesystem::copy(LevelDir, OutLevelDir, std::filesystem::copy_options::update_existing | std::filesystem::copy_options::recursive);
+
+	// Parse details 
+	EDetailManager* pDetTool = (EDetailManager*)Scene->GetTool(OBJCLASS_DO);
+	xr_string TexturePath = GameTextures;
+	TexturePath += *pDetTool->m_Base.name;
+	TexturePath += ".dds";
+
+	xr_string TexturePathOut = TexturesObjectPath;
+	TexturePathOut += "\\";
+	TexturePathOut += *pDetTool->m_Base.name;
+	TexturePathOut += ".dds";
+
+	xr_path TextureMask = TexturePathOut;
+	TextureMask = TextureMask.parent_path();
+
+	if (!std::filesystem::exists(TextureMask))
+	{
+		std::filesystem::create_directories(TextureMask);
+	}
+
+	std::filesystem::copy(TexturePath.data(), TexturePathOut.data(), std::filesystem::copy_options::update_existing);
+
+	for (CDetail* DetObjPtr : pDetTool->objects)
+	{
+		EDetail* NormalPtr = (EDetail*)DetObjPtr;
+		ParseObject(NormalPtr->m_pRefs, NormalPtr->m_pRefs->GetName());
 	}
 }
 
