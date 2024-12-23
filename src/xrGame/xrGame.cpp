@@ -41,8 +41,11 @@ static LPVOID __cdecl luabind_allocator(
 
 void setup_luabind_allocator		()
 {
-	luabind::allocator				= &luabind_allocator;
-	luabind::allocator_parameter	= 0;
+	if (!Device.IsEditorMode())
+	{
+		luabind::allocator = &luabind_allocator;
+		luabind::allocator_parameter = 0;
+	}
 }
 
 extern "C" 
