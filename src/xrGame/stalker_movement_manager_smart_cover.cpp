@@ -236,8 +236,7 @@ void stalker_movement_manager_smart_cover::reach_enter_location			(u32 const& ti
 	if (!object().sight().current_action().target_reached())
 		return;
 
-	if (target_params().cover()->can_fire() || target_params().cover()->is_combat_cover()) 
-	{
+	if (target_params().cover()->can_fire()) {
 		CInventoryItem const* const		inventory_item = object().inventory().ActiveItem();
 		if (!inventory_item) {
 			if (!object().CObjectHandler::goal_reached())
