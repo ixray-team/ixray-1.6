@@ -5,7 +5,7 @@
 #include "UIListBoxItem.h"
 #include "../../xrEngine/string_table.h"
 
-#define CB_HEIGHT 20.0f
+float CB_HEIGHT = EngineExternal().ClearSkyMode() ? 23.0f : 20.0f;
 
 CUIComboBox::CUIComboBox()
 {

@@ -38,7 +38,7 @@ FactionState::FactionState():
 
 FactionState::FactionState( shared_str const& id )
 {
-	FactionState();
+	this->FactionState::FactionState();
 	set_faction_id2( id );
 }
 
