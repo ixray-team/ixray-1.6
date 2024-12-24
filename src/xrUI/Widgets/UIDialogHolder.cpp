@@ -220,14 +220,6 @@ void CDialogHolder::StopDialog(CUIDialogWnd* pDialog)
 	StopMenu(pDialog);
 }
 
-void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
-{
-	if (pDialog->IsShown())
-		StopDialog(pDialog);
-	else
-		StartDialog(pDialog, bDoHideIndicators);
-}
-
 void CDialogHolder::OnFrame()
 {
 	m_b_in_update = true;
