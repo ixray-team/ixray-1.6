@@ -384,9 +384,10 @@ protected:
 	float					fireDispersionConditionFactor;
 	//вероятность осечки при максимальной изношености
 
-// modified by Peacemaker [17.10.08]
-//	float					misfireProbability;
-//	float					misfireConditionK;
+	// CS System
+	float					misfireProbability;
+	float					misfireConditionK;
+	// CoP system
 	float misfireStartCondition;			//изношенность, при которой появляется шанс осечки
 	float misfireEndCondition;				//изношеность при которой шанс осечки становится константным
 	float misfireStartProbability;			//шанс осечки при изношености больше чем misfireStartCondition

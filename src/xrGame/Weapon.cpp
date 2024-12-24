@@ -409,15 +409,19 @@ void CWeapon::Load		(LPCSTR section)
 	m_first_bullet_controller.load	(section);
 	fireDispersionConditionFactor = pSettings->r_float(section,"fire_dispersion_condition_factor");
 
-// modified by Peacemaker [17.10.08]
-//	misfireProbability			  = pSettings->r_float(section,"misfire_probability"); 
-//	misfireConditionK			  = READ_IF_EXISTS(pSettings, r_float, section, "misfire_condition_k",	1.0f);
-	misfireStartCondition			= pSettings->r_float(section, "misfire_start_condition");
-	misfireEndCondition				= READ_IF_EXISTS(pSettings, r_float, section, "misfire_end_condition", 0.f);
-	misfireStartProbability			= READ_IF_EXISTS(pSettings, r_float, section, "misfire_start_prob", 0.f);
-	misfireEndProbability			= pSettings->r_float(section, "misfire_end_prob");
-	conditionDecreasePerShot		= pSettings->r_float(section,"condition_shot_dec"); 
-	conditionDecreasePerQueueShot	= READ_IF_EXISTS(pSettings, r_float, section, "condition_queue_shot_dec", conditionDecreasePerShot); 
+	if (EngineExternal().ClearSkyMode()) {
+		misfireProbability = pSettings->r_float(section, "misfire_probability");
+		misfireConditionK = READ_IF_EXISTS(pSettings, r_float, section, "misfire_condition_k", 1.0f);
+		conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
+	}
+	else {
+		misfireStartCondition = pSettings->r_float(section, "misfire_start_condition");
+		misfireEndCondition = READ_IF_EXISTS(pSettings, r_float, section, "misfire_end_condition", 0.f);
+		misfireStartProbability = READ_IF_EXISTS(pSettings, r_float, section, "misfire_start_prob", 0.f);
+		misfireEndProbability = pSettings->r_float(section, "misfire_end_prob");
+		conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
+		conditionDecreasePerQueueShot = READ_IF_EXISTS(pSettings, r_float, section, "condition_queue_shot_dec", conditionDecreasePerShot);
+	}
 
 
 
@@ -1350,22 +1354,31 @@ int CWeapon::GetAmmoCount_forType( shared_str const& ammo_type ) const
 
 float CWeapon::GetConditionMisfireProbability() const
 {
-// modified by Peacemaker [17.10.08]
-//	if(GetCondition() > 0.95f) 
-//		return 0.0f;
-	if(GetCondition() > misfireStartCondition) 
-		return 0.0f;
-	if(GetCondition() < misfireEndCondition) 
-		return misfireEndProbability;
-//	float mis = misfireProbability+powf(1.f-GetCondition(), 3.f)*misfireConditionK;
-	float mis = misfireStartProbability + (
-		(misfireStartCondition - GetCondition()) *				// condition goes from 1.f to 0.f
-		(misfireEndProbability - misfireStartProbability) /		// probability goes from 0.f to 1.f
-		((misfireStartCondition == misfireEndCondition) ?		// !!!say "No" to devision by zero
-			misfireStartCondition : 
-			(misfireStartCondition - misfireEndCondition))
-										  );
-	clamp(mis,0.0f,0.99f);
+	// modified by Peacemaker [17.10.08]
+	if (EngineExternal().ClearSkyMode())
+	{
+		if (GetCondition() > 0.95f)
+			return 0.0f;
+	}
+	else {
+		if (GetCondition() > misfireStartCondition)
+			return 0.0f;
+		if (GetCondition() < misfireEndCondition)
+			return misfireEndProbability;
+	}
+	float mis;
+	if (EngineExternal().ClearSkyMode())
+		mis = misfireProbability + powf(1.f - GetCondition(), 3.f) * misfireConditionK;
+	else {
+		mis = misfireStartProbability + (
+			(misfireStartCondition - GetCondition()) *				// condition goes from 1.f to 0.f
+			(misfireEndProbability - misfireStartProbability) /		// probability goes from 0.f to 1.f
+			((misfireStartCondition == misfireEndCondition) ?		// !!!say "No" to devision by zero
+				misfireStartCondition :
+				(misfireStartCondition - misfireEndCondition))
+			);
+	}
+	clamp(mis, 0.0f, 0.99f);
 	return mis;
 }
 
