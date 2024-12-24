@@ -1,0 +1,76 @@
+[settings]
+glory_0 = 0
+glory_1 = 0
+glory_2 = 0
+glory_3 = 0
+glory_4 = 0
+glory_5 = 0
+
+[spawn_by_resource]
+0 = bloodsucker_marsh, 1
+1 = flesh_weak, 1, flesh_normal, 1, flesh_strong, 1
+2 = boar_weak, 1, boar_normal, 1, boar_strong, 1
+3 = dog_weak, 1, dog_normal, 1, dog_strong, 1, pseudodog_weak, 1, pseudodog_normal, 1, pseudodog_strong, 1
+4 = snork_weak, 1, snork_normal, 1, snork_strong, 1
+5 = bloodsucker_weak, 1, bloodsucker_normal, 1, bloodsucker_strong, 1
+6 = psy_dog, 1
+
+[spawn_by_level]
+marsh 		= bloodsucker_marsh, 100, flesh_weak, 70, flesh_normal, 30, boar_weak, 70, boar_normal, 30, dog_weak, 80, dog_normal, 20
+escape 		= flesh_weak, 60, flesh_normal, 40, boar_weak, 60, boar_normal, 40, dog_weak, 70, dog_normal, 30
+garbage 	= flesh_normal, 70, flesh_strong, 30, boar_normal, 70, boar_strong, 30, dog_normal, 60, dog_strong, 30, pseudodog_weak, 10, snork_weak, 100
+darkvalley	= flesh_normal, 60, flesh_strong, 40, boar_normal, 60, boar_strong, 40, dog_normal, 40, dog_strong, 30, pseudodog_weak, 20, pseudodog_normal, 10, snork_weak, 70, snork_normal, 30, bloodsucker_weak, 100
+agroprom 	= flesh_normal, 20, flesh_strong, 80, boar_normal, 20, boar_strong, 80, dog_normal, 30, dog_strong, 20, pseudodog_weak, 30, pseudodog_normal, 20, snork_weak, 60, snork_normal, 40, bloodsucker_weak, 70, bloodsucker_normal, 30
+yantar 		= dog_normal, 20, dog_strong, 30, pseudodog_normal, 30, pseudodog_strong, 20, snork_normal, 70, snork_strong, 30, bloodsucker_weak, 60, bloodsucker_normal, 40, psy_dog, 100
+red_forest 	= dog_normal, 10, dog_strong, 20, pseudodog_normal, 40, pseudodog_strong, 30, snork_normal, 60, snork_strong, 40
+military 	= flesh_normal, 20, flesh_strong, 80, boar_normal, 20, boar_strong, 80, dog_normal, 10, dog_strong, 20, pseudodog_normal, 40, pseudodog_strong, 30, snork_normal, 60, snork_strong, 40, bloodsucker_normal, 60, bloodsucker_strong, 40
+
+
+
+
+
+
+
+
+
+[expansion_0]
+base_squad_number = 5
+respawn_idle_time = 100 ;Время между двумя попытками доспауна отрядов в игровых минутах.
+respawn_hours = 0,1,2,3,4,5,6,7,8,9,10,21,22,23 ;Время, в который можно спаунить отряды (задаются времена суток)
+precondition_cond = {+esc_join_stalker_on} true, false
+
+[expansion_1]
+base_squad_number = 30
+respawn_idle_time = 100 ;Время между двумя попытками доспауна отрядов в игровых минутах.
+respawn_hours = 0,1,2,3,4,5,6,7,8,9,10,21,22,23 ;Время, в который можно спаунить отряды (задаются времена суток)
+
+
+[start_position]
+mar_boars_generic = mar_smart_terrain_3_10, mar_smart_terrain_3_10, mar_smart_terrain_3_7, mar_smart_terrain_3_7, mar_smart_terrain_5_10, mar_smart_terrain_6_10
+esc_dogs_lair_guard_2_14 = esc_smart_terrain_2_14
+;esc_dogs_lair_guard_3_4 = esc_smart_terrain_3_4
+esc_boars_lair_guard_5_4 = esc_smart_terrain_5_4
+esc_boars_lair_guard_3_10 = esc_smart_terrain_4_10
+esc_dogs_lair_guard_6_3 = esc_smart_terrain_6_3
+esc_boars_lair_guard_5_6 = esc_smart_terrain_5_6
+esc_boars_lair_guard_6_5 = esc_smart_terrain_6_5
+esc_boars_lair_guard_8_10 = esc_smart_terrain_8_10
+esc_dogs_lair_8_6 = esc_smart_terrain_8_6
+esc_dogs_lair_9_7 = esc_smart_terrain_9_7
+gar_boar_smart_terrain_7_3_squad_1 = gar_smart_terrain_7_3
+gar_dog_smart_terrain_3_2_squad_1 = gar_smart_terrain_3_2
+val_boars_lair_guard_5_10 = val_smart_terrain_5_10
+val_flesh_lair_guard_8_9 = val_smart_terrain_8_9
+val_flesh_lair_guard_7_8 = val_smart_terrain_7_8
+agr_smart_terrain_5_2_dogs_1_lair = agr_smart_terrain_5_2
+agr_smart_terrain_2_2_dogs_1_lair = agr_smart_terrain_2_2
+;agr_smart_terrain_4_2_snorks_4_lair = agr_smart_terrain_4_2
+agr_smart_terrain_3_5_snorks_1_lair = agr_smart_terrain_3_5
+agr_smart_terrain_7_5_dogs_1_lair = agr_smart_terrain_7_5
+;red_snork_attack_1 = red_smart_terrain_monsters
+;red_snork_dangeon_keepers_1 = red_smart_terrain_monsters
+red_snork_dangeon_keepers_2 = red_smart_terrain_monsters_2
+mil_dogs_lair_3 = mil_smart_terrain_7_8
+mil_dogs_lair_4 = mil_smart_terrain_2_1
+mil_dogs_lair_5 = mil_smart_terrain_2_1
+red_forest_monsters_1 = red_smart_terrain_monsters_3

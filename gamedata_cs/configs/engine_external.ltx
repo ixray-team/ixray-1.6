@@ -1,0 +1,47 @@
+[general]
+Platform = cs ; Platform mode. Supported values: cop (Call of Pripyat), cs (Clear Sky)
+title = st_ixray_title ; Mod name
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Engine features
+[ui]
+HQIcons = false
+DisableCharacterInfo = false
+DisableInventoryGrid = false ; Uses ui\ui_grid_alt.dds instead of ui\ui_grid.dds
+WeaponIconScale = 0.65 ; Scale factor for static_wpn_icon in maingame.xml. For CoP it's 0.8, for CS - 0.65, for SoC - 0.9
+ShowLoadingStages = true ; Loading stages from CS/SoC
+
+[physics]
+DeadBodyRagdoll = false
+
+[gameplay]
+EnableThirst = false
+EnableSleepiness = false
+EnableAiDieInAnomaly = false
+EnableNPCLookAtActor = false
+EnableBlockSprintInReload = true
+EnableAutoreload = false
+EnableMonstersInventory = true
+EnableWeaponInertion = false            ; Shoker Mod Style
+EnableWeaponCollision = false           ; Shoker Mod Style
+EnableArtefactDegradation = false
+DisableSprintWhileOverweight = false
+EnableActorStepWallmarks = false        ; AIW Style
+
+[render]
+DisableLoadScreenTips = false
+
+[environment]
+ReadSunConfig = false
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Extended sections
+
+[player_hud]
+;PlayerHudOmfAdditional = dynamics\weapons\hud_hands_animation\*.omf ; Place your omf file pathes 
+
+; Need [gameplay]:EnableActorStepWallmarks
+[step_wallmark] 
+materials = earth, test1    ; Material names
+left_mark = l_foot          ; left foot wallmark section
+right_mark = r_foot         ; right foot wallmark section

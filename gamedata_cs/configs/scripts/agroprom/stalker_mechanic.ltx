@@ -1,0 +1,25 @@
+[logic]
+active = walker
+on_death = death
+level_spot = mechanic
+
+[remark@enemy]
+out_restr = agr_stalker_mechanic_restr
+path_walk = agr_stalker_trader_walk
+path_look = agr_stalker_trader_look
+anim = hands_up
+target = actor
+meet = no_meet
+on_info = {!is_smart_in_combat(agr_smart_terrain_4_4)} walker
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+
+[walker]
+path_walk = agr_stalker_mechanic_walk
+path_look = agr_stalker_mechanic_look
+on_info = {=is_smart_in_combat(agr_smart_terrain_4_4)} remark@enemy
+out_restr = agr_stalker_mechanic_restr
+combat_ignore_cond = true
+
+[death]
+on_info = %+agr_stalker_mechanic_dead%

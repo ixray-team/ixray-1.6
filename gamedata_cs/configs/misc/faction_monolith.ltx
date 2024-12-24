@@ -1,0 +1,41 @@
+[settings]
+glory_0 = 0
+glory_1 = 0
+glory_2 = 0
+glory_3 = 0
+glory_4 = 0
+glory_5 = 0
+
+
+
+[spawn_by_resource]
+0 = sim_default_monolith_0, 40, sim_default_monolith_1, 30, sim_default_monolith_2, 15, sim_default_monolith_3, 10, sim_default_monolith_4, 5
+
+
+[spawn_by_level]
+marsh 		= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+escape 		= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+garbage 	= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+darkvalley	= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+agroprom 	= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+yantar 		= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+red_forest 	= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+military 	= sim_default_monolith_0, 1, sim_default_monolith_1, 1, sim_default_monolith_2, 1, sim_default_monolith_3, 1, sim_default_monolith_4, 1
+
+
+
+[expansion_0]
+base_squad_number = 0
+respawn_idle_time = 100 ;Время между двумя попытками доспауна отрядов в игровых минутах.
+precondition_cond = {+mil_start_after_red_forest_completed} true, false
+
+
+[expansion_1]
+base_squad_number = 5
+respawn_idle_time = 100 ;Время между двумя попытками доспауна отрядов в игровых минутах.
+
+
+[start_position]
+mil_smart_terrain_2_6_monolith_squad = mil_smart_terrain_2_6
+;lim_enemy_stalker_smart_9_squad_1 = lim_smart_terrain_9
+;lim_enemy_stalker_smart_9_squad_2 = lim_smart_terrain_9

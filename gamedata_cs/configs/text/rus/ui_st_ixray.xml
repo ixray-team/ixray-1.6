@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+    <string id="st_ixray_title">
+        <text>S.T.A.L.K.E.R.: Чистое Небо</text>
+    </string>
+    <string id="st_discord_menu">
+        <text>Главное меню</text>
+    </string>
+    <string id="st_discord_level">
+        <text>Уровень:</text>
+    </string>
+    <string id="quicksave">
+        <text>быстрое сохранение</text>
+    </string>
+    <string id="autosave">
+        <text>автоматическое сохранение</text>
+    </string>
+
+    <string id="ui_mm_r_actor_shadow">
+        <text>Тень от протагониста</text>
+    </string>
+    <string id="ui_mm_r2_details_shadows">
+        <text>Тень от травы</text>
+    </string>
+    <string id="ui_mm_r4_hud_shadows">
+        <text>Тени на руках</text>
+    </string>
+    <string id="ui_mm_r2_cloud_shadows">
+        <text>Тени от облаков</text>
+    </string>
+    <string id="ui_mm_vid_scale">
+        <text>Масштаб визуализации</text>
+    </string>
+    <string id="fxaa">
+        <text>FXAA</text>
+    </string>
+    <string id="smaa">
+        <text>SMAA</text>
+    </string>
+    <string id="ui_mm_r_scale_mode">
+        <text>Масштабирование</text>
+    </string>
+    <string id="st_filter_linear">
+        <text>Стандарное (Линейное)</text>
+    </string>
+    <string id="st_filter_point">
+        <text>Целочисленное</text>
+    </string>
+    <string id="st_filter_dlss">
+        <text>DLSS</text>
+    </string>
+    <string id="st_filter_fsr">
+        <text>FSR2</text>
+    </string>
+
+    <string id="st_freemp">
+        <text>Свободный</text>
+    </string>
+    <string id="ui_mm_mt_tex_load">
+        <text>Многопот. загрузка текстур</text>
+    </string>
+    <string id="ui_mm_r__smap_size">
+        <text>Карта теней</text>
+    </string>
+    <string id="1024">
+        <text>1024x1024</text>
+    </string>
+    <string id="2048">
+        <text>2048x2048</text>
+    </string>
+    <string id="3072">
+        <text>3072x3072</text>
+    </string>
+    <string id="4096">
+        <text>4096x4096</text>
+    </string>
+    <string id="ui_rs_device_active">
+        <text>Always Active</text>
+    </string>
+    <string id="car_trunk_use">
+        <text>Открыть багажник ($$ACTION_USE$$)</text>
+    </string>
+    <string id="car_use">
+        <text>Использовать ($$ACTION_USE$$)</text>
+    </string>
+    <string id="st_m">
+        <text>м</text>
+    </string>
+    <string id="ui_inv_dist">
+        <text>Дистанция удара</text>
+    </string>
+    <string id="ui_mm_dof_reload">
+        <text>DoF при перезарядке</text>
+    </string>
+    <string id="ui_rs_fps_show">
+        <text>Счетчик фпс</text>
+    </string>
+    <string id="ui_mm_cas_sharpening">
+        <text>Резкость</text>
+    </string>
+    <string id="ui_mm_hashed_alpha_test">
+        <text>Фильтр. прозрачности</text>
+    </string>
+    <string id="ui_mm_gtao">
+        <text>GTAO</text>
+    </string>
+    <string id="ui_mm_vignette">
+        <text>Виньетка</text>
+    </string>
+    <string id="ui_mm_aberration">
+        <text>Хромат. аберрация</text>
+    </string>
+    <string id="ui_mm_sslr_water">
+        <text>Отражения на воде</text>
+    </string>
+    <string id="ui_mm_r_scale_preset">
+        <text>Качество масштаб.</text>
+    </string>
+    <string id="st_scale_native">
+        <text>Сглаживание</text>
+    </string>
+    <string id="st_scale_quality">
+        <text>Качество</text>
+    </string>
+    <string id="st_scale_balanced">
+        <text>Сбалансированное</text>
+    </string>
+    <string id="st_scale_performance">
+        <text>Производительность</text>
+    </string>
+    <string id="st_scale_ultraperformance">
+        <text>Ультрапроизводительность</text>
+    </string>
+    <string id="st_scale_custom">
+        <text>Пользовательское</text>
+    </string>
+    <string id="st_common_settings">
+        <text>Общие настройки</text>
+    </string>
+    <string id="st_surface_options">
+        <text>Настройки поверхностей</text>
+    </string>
+    <string id="st_aa_options">
+        <text>Настройки сглаживания и масштабирования</text>
+    </string>
+    <string id="st_lights_options">
+        <text>Настройки освещения</text>
+    </string>
+    <string id="st_sunlight_options">
+        <text>Настройки солнечного света</text>
+    </string>
+    <string id="st_effects_options">
+        <text>Эффекты</text>
+    </string>
+    <string id="st_postprocess_options">
+        <text>Постобработка</text>
+    </string>
+    <string id="ui_mm_saturation">
+        <text>Насыщенность</text>
+    </string>
+    <string id="st_take_to">
+        <text>взять</text>
+    </string>
+    <string id="st_take_all">
+        <text>взять все</text>
+    </string>
+    <string id="ui_st_put_all">
+        <text>Сложить все</text>
+    </string>
+    <string id="ui_st_put_all_hint">
+        <text>Переместить все вещи</text>
+    </string>
+    <string id="st_move_to">
+        <text>переместить</text>
+    </string>
+    <string id="st_move_all">
+        <text>переместить всё</text>
+    </string>
+    <string id="renderer_r4_dx10">
+        <text>Ул. полное освещение (DX10)</text>
+    </string>
+	<string id="st_proc">
+		<text>%</text>
+	</string>
+	<string id="st_parse">
+		<text>разобрать</text>
+	</string>
+</string_table>
