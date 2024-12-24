@@ -317,7 +317,7 @@ void	CBlender_Compile::Stage_Matrix		(LPCSTR name, int iChannel)
 {
 	sh_list& lst	= L_matrices; 
 	int id			= ParseName(name);
-	CMatrix*	M	= DEV->_CreateMatrix	((id>=0)?*lst[id]:name);
+	CMatrix* M = DEV->_CreateMatrix((id >= 0 && id < lst.size()) ? *lst[id] : name);
 	passMatrices.push_back(M);
 
 	// Setup transform pipeline

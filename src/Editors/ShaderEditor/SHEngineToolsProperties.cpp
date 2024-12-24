@@ -152,21 +152,21 @@ void CSHEngineTools::RealUpdateProperties()
             }break;
             case xrPID_MATRIX:{
             	sz				= sizeof(string64);
-              /*  LPSTR V			= (LPSTR)data.pointer();
+                LPSTR V			= (LPSTR)data.pointer();
                 CListValue* P	= PHelper().CreateCList(items,PrepareKey(marker_text.c_str(),key),V,sz,&*MCString.begin(),MCString.size());
                 xr_string pref = xr_string(PrepareKey(marker_text.c_str(),"Custom ").c_str())+key;
 				if (V&&V[0]&&(*V!='$')) FillMatrixProps(items,pref.c_str(),V);
 				P->OnAfterEditEvent.bind(this,&CSHEngineTools::MatrixOnAfterEdit);
-				P->Owner()->OnDrawTextEvent.bind(this,&CSHEngineTools::MCOnDraw);*/
+				P->Owner()->OnDrawTextEvent.bind(this,&CSHEngineTools::MCOnDraw);
             }break;
             case xrPID_CONSTANT:{
             	sz              = sizeof(string64);
-              /*  LPSTR V			= (LPSTR)data.pointer();
+               LPSTR V			= (LPSTR)data.pointer();
                 CListValue* P	= PHelper().CreateCList(items,PrepareKey(marker_text.c_str(),key),V,sz,&*MCString.begin(),MCString.size());
                 xr_string pref = xr_string(PrepareKey(marker_text.c_str(),"Custom ").c_str())+key;
 				if (V&&V[0]&&(*V!='$')) FillConstProps(items,pref.c_str(),V);
 				P->OnAfterEditEvent.bind(this,&CSHEngineTools::ConstOnAfterEdit);
-				P->Owner()->OnDrawTextEvent.bind(this,&CSHEngineTools::MCOnDraw);*/
+				P->Owner()->OnDrawTextEvent.bind(this,&CSHEngineTools::MCOnDraw);
             }break;
             case xrPID_TEXTURE:
             	sz=sizeof(string64);
