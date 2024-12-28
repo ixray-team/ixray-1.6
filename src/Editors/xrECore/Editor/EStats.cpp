@@ -16,7 +16,7 @@ CEStats::CEStats()
     dwLevelSelFaceCount = 0;
     dwLevelSelVertexCount = 0;
 
-    pFont = g_FontManager->GetFont("sdk_font_statistic", CGameFont::fsDeviceIndependent);// new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
+    pFont = g_FontManager->GetFont("stat_font", CGameFont::fsDeviceIndependent);// new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
 }
 
 CEStats::~CEStats() {}
