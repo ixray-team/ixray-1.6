@@ -18,7 +18,8 @@ class CUITaskWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
-class UIHint;
+
+class CMapSpot;
 
 
 class CUIPdaWnd: public CUIDialogWnd
@@ -48,6 +49,8 @@ public:
 	CUIRankingWnd*			pUIRankingWnd;
 	CUILogsWnd*				pUILogsWnd;
 
+	CMapSpot*				pSelectedMapSpot;
+
 	virtual void			Reset				();
 
 public:
@@ -72,10 +75,15 @@ public:
 			void			Show_SecondTaskWnd	(bool status);
 			void			Show_MapLegendWnd	(bool status);
 
+			void 			SetActiveDialog		(CUIWindow* pUI) 	{ m_pActiveDialog = pUI; };
+			CUIWindow*		GetActiveDialog		() 					{return m_pActiveDialog;};
+			LPCSTR			GetActiveSection	()					{return m_sActiveSection.c_str();};
+		
+
 			void			SetActiveSubdialog	(const shared_str& section);
 	virtual bool			StopAnyMove			(){return false;}
 
 			void			UpdatePda			();
 			void			UpdateRankingWnd	();
-
+			DECLARE_SCRIPT_REGISTER_FUNCTION
 };
