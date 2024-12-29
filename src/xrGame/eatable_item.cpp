@@ -92,7 +92,7 @@ bool CEatableItem::Useful() const
 	if(!inherited::Useful()) return false;
 
 	//проверить не все ли еще съедено
-	if (GetRemainingUses() == 0 && CanDelete()) return false;
+	if (Empty() && CanDelete()) return false;
 
 	return true;
 }
@@ -138,11 +138,6 @@ bool CEatableItem::UseBy (CEntityAlive* entity_alive)
 			entity_alive->conditions().ApplyBooster(B, m_physic_item->cNameSect());
 		}
 	}
-
-	if (m_iPortionsMarker > 0)
-		m_iPortionsMarker -= m_eat_condition;
-	else
-		m_iPortionsMarker = 0;
 
 	if (bUseHUDAnim)
 	{
