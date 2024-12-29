@@ -22,6 +22,7 @@ LPCSTR immunity_names[]=
 	"telepatic_immunity",
 	"wound_immunity",		
 	"fire_wound_immunity",
+	"explosion_immunity",		//Alundaio: uncommented
 };
 
 LPCSTR immunity_st_names[]=
@@ -33,6 +34,7 @@ LPCSTR immunity_st_names[]=
 	"ui_inv_outfit_telepatic_protection",
 	"ui_inv_outfit_wound_protection",
 	"ui_inv_outfit_fire_wound_protection",
+	"ui_inv_outfit_explosion_protection", //Alundaio: uncommented
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()

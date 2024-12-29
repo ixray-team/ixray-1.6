@@ -1057,21 +1057,24 @@ bool CInventory::Eat(PIItem pIItem)
 			return false;
 	}
 
-	if (IsGameTypeSingle() && Actor()->m_inventory == this)
+	if (Actor()->m_inventory == this)
 	{
-		Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+		if (IsGameTypeSingle())
+			Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+
+		if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+			CurrentGameUI()->ActorMenu().RefreshCurrentItemCell();
+		
 		CurrentGameUI()->ActorMenu().SetCurrentItem(NULL);
 	}
 
-	if (pItemToEat->GetMaxUses() < 255 && pItemToEat->CanConsumeCharge()) // If uses 255, then skip the decrement for infinite usages
+	if (pItemToEat->Empty())
 	{
-		u8 remaining = pItemToEat->GetRemainingUses();
-		if (remaining > 0)
-			pItemToEat->SetRemainingUses(remaining - 1);
-	}
+		if (!pItemToEat->CanDelete())
+			return false;
 
-	if (pItemToEat->Empty() && pItemToEat->CanDelete())
 		pIItem->SetDropManual(TRUE);
+	}
 
 	return			true;
 }
