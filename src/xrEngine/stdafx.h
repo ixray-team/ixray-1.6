@@ -45,7 +45,7 @@
 extern ENGINE_API CInifile *pGameIni;
 
 
-#ifndef DEBUG
+#if !defined(DEBUG) && !defined(LUA_DEBUG)
 #	define LUABIND_NO_ERROR_CHECKING
 #endif
 

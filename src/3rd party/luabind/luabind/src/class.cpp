@@ -280,7 +280,7 @@ namespace luabind { namespace detail {
 #else
     void class_base::add_setter(
         const char* name
-        , std::function<int(lua_State*, int)> s
+        , std::function<int(lua_State*, ptrdiff_t)> s
         , int (*match)(lua_State*, int)
         , void (*get_sig_ptr)(lua_State*, string_class&))
 #endif
