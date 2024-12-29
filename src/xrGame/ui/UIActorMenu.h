@@ -249,7 +249,6 @@ protected:
 	void						CurModeToScript				();
 	void						RepairEffect_CurItem		();
 
-	CUICellItem*				CurrentItem					();
 	PIItem						CurrentIItem				();
 
 	void						InfoCurItem					(CUICellItem* cell_item); //on update item
@@ -313,6 +312,7 @@ public:
 								CUIActorMenu				();
 	virtual						~CUIActorMenu				();
 
+	CUICellItem*				CurrentItem					();
 	void						SetCurrentItem				(CUICellItem* itm);
 	virtual bool				StopAnyMove					();
 	virtual void				SendMessage					(CUIWindow* pWnd, s16 msg, void* pData = NULL);
