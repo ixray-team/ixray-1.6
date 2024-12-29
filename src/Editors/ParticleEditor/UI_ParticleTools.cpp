@@ -149,6 +149,10 @@ void CParticleTool::Render()
          	int cnt 		= m_EditPG->items.size();
             for (int k=0; k<cnt; k++){
                 PS::CParticleEffect* E		= (PS::CParticleEffect*)m_EditPG->items[k]._effect;
+
+                if (m_LibPGD == nullptr || m_LibPGD->m_Effects[k] == nullptr)
+                    continue;
+
 				if (E&&E->GetDefinition()&&m_LibPGD->m_Effects[k]->m_Flags.is(PS::CPGDef::SEffect::flEnabled))
                 	E->GetDefinition()->Render(m_Transform);
             }
@@ -354,6 +358,9 @@ void CParticleTool::Reload()
     ResetCurrent	();
 	RImplementation.PSLibrary.Reload();
     // visual part
+    m_EditPE->Compile(nullptr);
+    m_EditPG->Compile(nullptr);
+
     m_ItemProps->ClearProperties();
     UpdateProperties(true);
 }
