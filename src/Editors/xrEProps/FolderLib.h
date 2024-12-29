@@ -35,6 +35,10 @@ public:
 			strchr(name, '\\')[0] = 0;
 			N = FindFolder(N, name);
 			VERIFY(N);
+
+			if (!N)
+				return nullptr;
+
 			N->Selected = true;
 			return SelectObject(N, strchr(path, '\\') + 1);
 		}
