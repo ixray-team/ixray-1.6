@@ -121,7 +121,7 @@ void CPolterFlame::select_state(SFlameElement *elem, EFlameState state)
 		break;
 	case eStop:		
 		// stop fire particles
-		if (elem->particles_object) CParticlesObject::Destroy(elem->particles_object);
+		if (elem->particles_object) Particles::Details::Destroy(elem->particles_object);
 		
 		// start finish particles
 		m_object->PlayParticles(m_particles_stop,elem->position,elem->target_dir,TRUE);
@@ -233,7 +233,7 @@ void CPolterFlame::on_destroy()
 	// Пройти по всем объектам и проверить на хит врага
 	for ( ;I != E; ++I) {
 		if ((*I)->sound._feedback()) (*I)->sound.stop();
-		if ((*I)->particles_object) CParticlesObject::Destroy((*I)->particles_object);
+		if ((*I)->particles_object) Particles::Details::Destroy((*I)->particles_object);
 
 		xr_delete((*I));
 	}

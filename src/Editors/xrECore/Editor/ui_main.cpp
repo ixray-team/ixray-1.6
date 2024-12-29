@@ -410,7 +410,7 @@ void TUI::PrepareRedraw()
 	RCache.set_xform_world	(Fidentity);
 }
 
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API xr_atomic_bool g_bRendering;
 void TUI::Redraw()
 {
 	PrepareRedraw();

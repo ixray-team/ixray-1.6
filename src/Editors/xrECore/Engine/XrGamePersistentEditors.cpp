@@ -67,9 +67,8 @@ void XrGamePersistentEditors::Start		(LPCSTR op)
 		if (*m_game_params.m_game_type)
 			OnGameStart					();
 	}
-	else UpdateGameType();
-
-	VERIFY							(ps_destroy.empty());
+	else 
+		UpdateGameType();
 }
 
 void XrGamePersistentEditors::Disconnect	()

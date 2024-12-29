@@ -111,6 +111,7 @@ void CSector::traverse			(CFrustum &F, _scissor& R_scissor)
 		} else {
 			pSector = PORTAL->getSectorBack					(PortalTraverser.i_vBase);
 			if (pSector==this)								continue;
+			if (pSector==nullptr)							continue;
 			if (pSector==PortalTraverser.i_start)			continue;
 		}
 
@@ -213,7 +214,8 @@ void CSector::traverse			(CFrustum &F, _scissor& R_scissor)
 		Clip.CreateFromPortal	(P, PORTAL->P.n, PortalTraverser.i_vBase,PortalTraverser.i_mXFORM);
 		PORTAL->marker			= PortalTraverser.i_marker;
 		PORTAL->bDualRender		= FALSE;
-		pSector->traverse		(Clip,scissor);
+		if(pSector)
+			pSector->traverse		(Clip,scissor);
 	}
 }
 

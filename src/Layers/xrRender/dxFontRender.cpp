@@ -4,7 +4,7 @@
 
 #include "../../xrEngine/GameFont.h"
 
-extern ENGINE_API BOOL g_bRendering;
+extern ENGINE_API xr_atomic_bool g_bRendering;
 
 dxFontRender::dxFontRender() {}
 

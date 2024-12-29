@@ -216,7 +216,7 @@ CLevel::~CLevel()
 
 	// destroy PSs
 	for (POIt p_it=m_StaticParticles.begin(); m_StaticParticles.end()!=p_it; ++p_it)
-		CParticlesObject::Destroy(*p_it);
+		Particles::Details::Destroy(*p_it);
 	m_StaticParticles.clear		();
 
 	// Unload sounds
@@ -592,14 +592,6 @@ void CLevel::OnFrame()
 			Device.seqParallel.push_back(xr_make_delegate(m_map_manager, &CMapManager::Update));
 		else
 			MapManager().Update();
-
-		if (Device.dwPrecacheFrame == 0)
-		{
-			//if (g_mt_config.test(mtMap)) 
-			//	Device.seqParallel.push_back	(fastdelegate::FastDelegate0<>(m_game_task_manager,&CGameTaskManager::UpdateTasks));
-			//else								
-			GameTaskManager().UpdateTasks();
-		}
 	}
 	// Inherited update
 	inherited::OnFrame();
@@ -694,11 +686,6 @@ void CLevel::OnFrame()
 #endif
 	g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
 
-	ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->update();
-
-	m_ph_commander->update();
-	m_ph_commander_scripts->update();
-
 	//  
 	Device.Statistic->TEST0.Begin();
 	BulletManager().CommitRenderSet();
@@ -729,6 +716,13 @@ void CLevel::OnFrame()
 int		psLUA_GCSTEP					= 10			;
 void	CLevel::script_gc				()
 {
+	{
+		PROF_EVENT("m_ph_commander");
+		ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->update();
+
+		m_ph_commander->update();
+		m_ph_commander_scripts->update();
+	}
 	PROF_EVENT("CLevel::script_gc");
 	lua_gc	(ai().script_engine().lua(), LUA_GCSTEP, psLUA_GCSTEP);
 }

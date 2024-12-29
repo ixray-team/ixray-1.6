@@ -2180,7 +2180,7 @@ public:
 			sscanf(args, "%s %d", &string, &count);
 			for (int i = 0; i < count; ++i)
 			{
-				CParticlesObject* pParticle = CParticlesObject::Create(string, FALSE);
+				xr_shared_ptr<CParticlesObject> pParticle = Particles::Details::Create(string, FALSE);
 
 				// вычислить позицию и направленность партикла
 				Fmatrix pos;

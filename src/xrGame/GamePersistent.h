@@ -16,7 +16,7 @@ class CGamePersistent:
 	using inherited = IGame_Persistent;
 
 	// ambient particles
-	CParticlesObject*	ambient_particles; 
+	xr_shared_ptr<CParticlesObject>	ambient_particles; 
 	u32					ambient_sound_next_time		[20]; //max snd channels
 	u32					ambient_effect_next_time;
 	u32					ambient_effect_stop_time;

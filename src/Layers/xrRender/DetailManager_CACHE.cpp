@@ -1,6 +1,41 @@
 #include "stdafx.h"
 #include "DetailManager.h"
 
+//--------------------------------------------------- Decompression
+static int magic4x4[4][4] =
+{
+ 	{ 0, 14,  3, 13},
+	{11,  5,  8,  6},
+	{12,  2, 15,  1},
+	{ 7,  9,  4, 10}
+};
+
+void bwdithermap	(int levels, int magic[16][16])
+{
+	/* Get size of each step */
+    float N = 255.0f / (levels - 1);
+
+	/*
+	* Expand 4x4 dither pattern to 16x16.  4x4 leaves obvious patterning,
+	* and doesn't give us full intensity range (only 17 sublevels).
+	*
+	* magicfact is (N - 1)/16 so that we get numbers in the matrix from 0 to
+	* N - 1: mod N gives numbers in 0 to N - 1, don't ever want all
+	* pixels incremented to the next level (this is reserved for the
+	* pixel value with mod N == 0 at the next level).
+	*/
+
+    float	magicfact = (N - 1) / 16;
+    for ( int i = 0; i < 4; i++ )
+		for ( int j = 0; j < 4; j++ )
+			for ( int k = 0; k < 4; k++ )
+				for ( int l = 0; l < 4; l++ )
+					magic[4*k+i][4*l+j] =
+					(int)(0.5 + magic4x4[i][j] * magicfact +
+					(magic4x4[k][l] / 16.) * magicfact);
+}
+//--------------------------------------------------- Decompression
+
 void CDetailManager::cache_Initialize	()
 {
 	// Centroid
@@ -8,22 +43,34 @@ void CDetailManager::cache_Initialize	()
 	cache_cz			= 0;
 
 	// Initialize cache-grid
-	Slot*	slt 		= cache_pool;
-	for (u32 i=0; i<dm_cache_line; i++)
-		for (u32 j=0; j<dm_cache_line; j++, slt++){
-			cache			[i][j]	= slt;
-			cache_Task		(j,i,slt);
-		}
+	for (u32 i = 0; i < dm_cache_line; i++)
+	{
+	    for (u32 j = 0; j < dm_cache_line; j++)
+	    {
+	        Slot* slt = &cache_pool[i * dm_cache_line + j];
+	
+	        cache[i][j] = slt;
+	        cache_Task(j, i, slt);
+	    }
+	}
 	VERIFY	(cache_Validate());
 
-    for (u32 _mz1=0; _mz1<dm_cache1_line; _mz1++){
-    	for (u32 _mx1=0; _mx1<dm_cache1_line; _mx1++){
-		    CacheSlot1& MS 	= cache_level1[_mz1][_mx1];
-			for (int _z=0; _z<dm_cache1_count; _z++)
-				for (int _x=0; _x<dm_cache1_count; _x++)
-					MS.slots[_z*dm_cache1_count+_x] = &cache[_mz1*dm_cache1_count+_z][_mx1*dm_cache1_count+_x];
-        }
+	u32 max_index = dm_cache1_line*dm_cache1_line;
+	for (u32 index = 0; index < max_index; index++)
+	{
+		u32 _mz = index / dm_cache1_line;
+		u32 _mx = index % dm_cache1_line;
+		CacheSlot1& MS = cache_level1[_mz][_mx];
+		for (int i = 0; i < dm_cache_count; i++)
+		{
+			int _z = i / dm_cache1_count;
+			int _x = i % dm_cache1_count;
+			MS.slots[_z * dm_cache1_count + _x] = &cache[_mz * dm_cache1_count + _z][_mx * dm_cache1_count + _x];
+		}
     }
+
+	// Make dither matrix
+	bwdithermap		(2,dither);
 }
 
 CDetailManager::Slot*	CDetailManager::cache_Query	(int r_x, int r_z)
@@ -54,17 +101,19 @@ void 	CDetailManager::cache_Task		(int gx, int gz, Slot* D)
 	D->vis.box.max.set		(D->vis.box.min.x+dm_slot_size,	DS.r_ybase()+DS.r_yheight(),	D->vis.box.min.z+dm_slot_size);
 	D->vis.box.grow			(EPS_L);
 
-	for (u32 i=0; i<dm_obj_in_slot; i++)	{
-		D->G[i].id			= DS.r_id	(i);
-		for (u32 clr=0; clr<D->G[i].items.size(); clr++)
-			poolSI.destroy(D->G[i].items[clr]);
+	for (u32 i=0; i<dm_obj_in_slot; i++)
+	{
+		D->G[i].id = DS.r_id(i);
 		D->G[i].items.clear	();
 	}
 
 	if (old_type != stPending)
 	{
 		VERIFY		(stPending == D->type);
-		cache_task.push_back(D);
+		if (ps_r2_ls_flags.test(R2FLAG_FAST_DETAILS_UPDATE))
+			cache_Decompress(D);
+		else
+			cache_task.push_back(D);
 	}
 }
 
@@ -86,120 +135,134 @@ BOOL	CDetailManager::cache_Validate	()
 	return TRUE;
 }
 
-void	CDetailManager::cache_Update	(int v_x, int v_z, Fvector& view, int limit)
+void	CDetailManager::cache_Update(Fvector& view)
 {
+	PROF_EVENT("cache_Update");
+	int v_x = iFloor(view.x / dm_slot_size + .5f);
+	int v_z = iFloor(view.z / dm_slot_size + .5f);
+
 	bool bNeedMegaUpdate	= (cache_cx!=v_x)||(cache_cz!=v_z);
 	// *****	Cache shift
-	while (cache_cx!=v_x)
 	{
-		if (v_x>cache_cx)	{
-			// shift matrix to left
-			cache_cx ++;
-			for (u32 z=0; z<dm_cache_line; z++)
+		PROF_EVENT("cache_Tasks");
+		while (cache_cx != v_x)
+		{
+			if (v_x > cache_cx)
 			{
-				Slot*	S	= cache[z][0];
-				for			(u32 x=1; x<dm_cache_line; x++)		cache[z][x-1] = cache[z][x];
-				cache		[z][dm_cache_line-1] = S;
-				cache_Task	(dm_cache_line-1, z, S);
+				// shift matrix to left
+				cache_cx++;
+				for (u32 z = 0; z < dm_cache_line; z++)
+				{
+					Slot* S = cache[z][0];
+					for (u32 x = 1; x < dm_cache_line; x++)		cache[z][x - 1] = cache[z][x];
+					cache[z][dm_cache_line - 1] = S;
+					cache_Task(dm_cache_line - 1, z, S);
+				}
 			}
-		} else {
-			// shift matrix to right
-			cache_cx --;
-			for (u32 z=0; z<dm_cache_line; z++)
+			else
 			{
-				Slot*	S	= cache[z][dm_cache_line-1];
-				for			(u32 x=dm_cache_line-1; x>0; x--)	cache[z][x] = cache[z][x-1];
-				cache		[z][0]	= S;
-				cache_Task	(0,z,S);
+				// shift matrix to right
+				cache_cx--;
+				for (u32 z = 0; z < dm_cache_line; z++)
+				{
+					Slot* S = cache[z][dm_cache_line - 1];
+					for (u32 x = dm_cache_line - 1; x > 0; x--)	cache[z][x] = cache[z][x - 1];
+					cache[z][0] = S;
+					cache_Task(0, z, S);
+				}
 			}
 		}
-	}
-	while (cache_cz!=v_z)
-	{
-		if (v_z>cache_cz)	{
-			// shift matrix down a bit
-			cache_cz ++;
-			for (u32 x=0; x<dm_cache_line; x++)
+		while (cache_cz != v_z)
+		{
+			if (v_z > cache_cz)
 			{
-				Slot*	S	= cache[dm_cache_line-1][x];
-				for			(u32 z=dm_cache_line-1; z>0; z--)	cache[z][x] = cache[z-1][x];
-				cache		[0][x]	= S;
-				cache_Task	(x,0,S);
+				// shift matrix down a bit
+				cache_cz++;
+				for (u32 x = 0; x < dm_cache_line; x++)
+				{
+					Slot* S = cache[dm_cache_line - 1][x];
+					for (u32 z = dm_cache_line - 1; z > 0; z--)	cache[z][x] = cache[z - 1][x];
+					cache[0][x] = S;
+					cache_Task(x, 0, S);
+				}
 			}
-		} else {
-			// shift matrix up
-			cache_cz --;
-			for (u32 x=0; x<dm_cache_line; x++)
+			else
 			{
-				Slot*	S	= cache[0][x];
-				for			(u32 z=1; z<dm_cache_line; z++)		cache[z-1][x] = cache[z][x];
-				cache		[dm_cache_line-1][x]	= S;
-				cache_Task	(x,dm_cache_line-1,S);
+				// shift matrix up
+				cache_cz--;
+				for (u32 x = 0; x < dm_cache_line; x++)
+				{
+					Slot* S = cache[0][x];
+					for (u32 z = 1; z < dm_cache_line; z++)		cache[z - 1][x] = cache[z][x];
+					cache[dm_cache_line - 1][x] = S;
+					cache_Task(x, dm_cache_line - 1, S);
+				}
 			}
 		}
 	}
 
 	// Task performer
-	if(ps_r2_ls_flags.test(R2FLAG_FAST_DETAILS_UPDATE))
 	{
-		for (u32 iteration=0; iteration<cache_task.size(); iteration++)
+		PROF_EVENT("cache_Decompress");
+		if (!ps_r2_ls_flags.test(R2FLAG_FAST_DETAILS_UPDATE))
 		{
-			// Decompress and remove task
-			cache_Decompress	(cache_task[iteration]);
-			cache_task.erase	(iteration);
-		}
-	}
-	else
-	{
-		BOOL	bFullUnpack		= FALSE;
-		if (cache_task.size() == dm_cache_size)	{ limit = dm_cache_size; bFullUnpack=TRUE; }
+			BOOL	bFullUnpack = FALSE;
+			int limit = dm_max_decompress;
+			if (cache_task.size() == dm_cache_size) { limit = dm_cache_size; bFullUnpack = TRUE; }
 
-		for (int iteration=0; cache_task.size() && (iteration<limit); iteration++){
-			u32		best_id		= 0;
-			float	best_dist	= flt_max;
+			for (int iteration = 0; cache_task.size() && (iteration < limit); iteration++) {
+				u32		best_id = 0;
+				float	best_dist = flt_max;
 
-			if (bFullUnpack){
-				best_id			= cache_task.size()-1;
-			} else {
-				for (u32 entry=0; entry<cache_task.size(); entry++){
-					// Gain access to data
-					Slot*		S	= cache_task[entry];
-					VERIFY		(stPending == S->type);
-
-					// Estimate
-					Fvector		C;
-					S->vis.box.getcenter	(C);
-					float		D	= view.distance_to_sqr	(C);
-
-					// Select
-					if (D<best_dist)
+				if (bFullUnpack)
+					best_id = cache_task.size() - 1;
+				else
+				{
+					for (u32 entry = 0; entry < cache_task.size(); entry++)
 					{
-						best_dist	= D;
-						best_id		= entry;
+						// Gain access to data
+						Slot* S = cache_task[entry];
+						VERIFY(stPending == S->type);
+
+						// Estimate
+						Fvector		C;
+						S->vis.box.getcenter(C);
+						float		D = view.distance_to_sqr(C);
+
+						// Select
+						if (D < best_dist)
+						{
+							best_dist = D;
+							best_id = entry;
+						}
 					}
 				}
-			}
 
-			// Decompress and remove task
-			cache_Decompress	(cache_task[best_id]);
-			cache_task.erase	(best_id);
+				// Decompress and remove task
+				cache_Decompress(cache_task[best_id]);
+				cache_task.erase(cache_task.begin() + best_id);
+			}
 		}
 	}
 
-    if (bNeedMegaUpdate){
-        for (u32 _mz1=0; _mz1<dm_cache1_line; _mz1++){
-            for (u32 _mx1=0; _mx1<dm_cache1_line; _mx1++){
-                CacheSlot1& MS 	= cache_level1[_mz1][_mx1];
-				MS.empty		= TRUE;
-                MS.vis.clear	();
-                for (int _i=0; _i<dm_cache1_count*dm_cache1_count; _i++){
-                    Slot*	PS		= *MS.slots[_i];
-                    Slot& 	S 		= *PS;
-                    MS.vis.box.merge(S.vis.box);
-					if (!S.empty)	MS.empty = FALSE;
-                }
-                MS.vis.box.getsphere(MS.vis.sphere.P,MS.vis.sphere.R);
+    if (bNeedMegaUpdate)
+	{
+		PROF_EVENT("MegaUpdate");
+		u32 max_index = dm_cache1_line*dm_cache1_line;
+		for (u32 index = 0; index < max_index; index++)
+		{
+			u32 _mz = index / dm_cache1_line;
+			u32 _mx = index % dm_cache1_line;
+            CacheSlot1& MS 	= cache_level1[_mz][_mx];
+			MS.empty		= TRUE;
+            MS.vis.clear	();
+            for (int _i=0; _i<dm_cache_count; _i++)
+			{
+                Slot& 	S 		= **MS.slots[_i];
+                MS.vis.box.merge(S.vis.box);
+				if (!S.empty)	MS.empty = FALSE;
             }
+            MS.vis.box.getsphere(MS.vis.sphere.P,MS.vis.sphere.R);
         }
     }
 }

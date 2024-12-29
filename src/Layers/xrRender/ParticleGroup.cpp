@@ -196,7 +196,7 @@ void CParticleGroup::SItem::Clear()
 	{
 	    //::Render->model_Delete(*it);
 		IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-		::Render->model_Delete(pVisual);
+		::Render->model_Delete_Deffered(pVisual);
 		*it = 0;
 	}
 
@@ -282,14 +282,14 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
 		{
 			//::Render->model_Delete(*it);
 			IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-			::Render->model_Delete(pVisual);
+			::Render->model_Delete_Deffered(pVisual);
 			*it = 0;
 		}
         for (it=_children_free.begin(); it!=_children_free.end(); it++)			
 		{
 			//::Render->model_Delete(*it);
 			IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-			::Render->model_Delete(pVisual);
+			::Render->model_Delete_Deffered(pVisual);
 			*it = 0;
 		}
         _children_related.clear();
@@ -392,7 +392,7 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
                 	rem_cnt++	;
 					//::Render->model_Delete(*it);
 					IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-					::Render->model_Delete(pVisual);
+					::Render->model_Delete_Deffered(pVisual);
 					*it = 0;                    
                 }
             }
@@ -448,6 +448,7 @@ CParticleGroup::~CParticleGroup()
 
 void CParticleGroup::OnFrame(u32 u_dt)
 {
+    xrCriticalSectionGuard guard(&onframe_lock);
     if (m_Def && m_RT_Flags.is(flRT_Playing))
     {
         float fdeltaTime = float(u_dt) / 1000.f;
@@ -525,6 +526,7 @@ void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOO
 
 BOOL CParticleGroup::Compile(CPGDef* def)
 {
+    xrCriticalSectionGuard guard(&onframe_lock);
 	m_Def 						= def;
 	// destroy existing
     for (SItemVecIt i_it=items.begin(); i_it!=items.end(); i_it++) 
@@ -551,6 +553,7 @@ void CParticleGroup::Play()
 
 void CParticleGroup::Stop(BOOL bDefferedStop)
 {
+    xrCriticalSectionGuard guard(&onframe_lock);
 	if (bDefferedStop){
 		m_RT_Flags.set	(flRT_DefferedStop,TRUE);
     }else{
@@ -561,11 +564,13 @@ void CParticleGroup::Stop(BOOL bDefferedStop)
 
 void CParticleGroup::OnDeviceCreate()
 {
+    xrCriticalSectionGuard guard(&onframe_lock);
     for (SItemVecIt i_it=items.begin(); i_it!=items.end(); i_it++) i_it->OnDeviceCreate();
 }
 
 void CParticleGroup::OnDeviceDestroy()
 {
+    xrCriticalSectionGuard guard(&onframe_lock);
     for (SItemVecIt i_it=items.begin(); i_it!=items.end(); i_it++) i_it->OnDeviceDestroy();
 }
 

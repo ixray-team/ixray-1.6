@@ -35,7 +35,7 @@ CHUDManager::~CHUDManager()
 	xr_delete		(pUIGame);
 	xr_delete		(m_pHUDTarget);
 }
-
+#include "GametaskManager.h"
 //--------------------------------------------------------------------
 void CHUDManager::OnFrame()
 {
@@ -44,12 +44,32 @@ void CHUDManager::OnFrame()
 
 	if(!b_online)						
 		return;
-	PROF_EVENT("CHUDManager::OnFrame");
 
+	PROF_EVENT("CHUDManager::OnFrame");
+	m_pHUDTarget->CursorOnFrame();
+
+	if (Device.IsEditorMode())
+	{
+		OnFrameMT();
+	}
+}
+
+xrCriticalSection ui_lock;
+void CHUDManager::OnFrameMT()
+{
+	if (!psHUD_Flags.is(HUD_DRAW_RT2))	
+		return;
+
+	if(!b_online)						
+		return;
+	PROF_EVENT("CHUDManager::OnFrameMT");
+
+	if (Device.dwPrecacheFrame == 0)
+		Level().GameTaskManager().UpdateTasks();
+
+	xrCriticalSectionGuard guard(&ui_lock);
 	if (pUIGame) 
 		pUIGame->OnFrame();
-
-	m_pHUDTarget->CursorOnFrame();
 }
 //--------------------------------------------------------------------
 
@@ -137,7 +157,10 @@ void  CHUDManager::RenderUI()
 	{
 		HitMarker.Render			();
 		if(pUIGame)
-			pUIGame->Render			();
+		{
+			xrCriticalSectionGuard guard(&ui_lock);
+			pUIGame->Render();
+		}
 
 		UI().RenderFont				();
 	}

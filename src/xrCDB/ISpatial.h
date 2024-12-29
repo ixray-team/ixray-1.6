@@ -90,7 +90,7 @@ public:
 	}							spatial;
 public:
 	BOOL						spatial_inside		()			;
-				void			spatial_updatesector_internal()	;
+	virtual		void			spatial_updatesector_internal()	;
 public:
 	virtual		void			spatial_register	()	;
 	virtual		void			spatial_unregister	()	;

@@ -192,10 +192,12 @@ void		CDetailManager::cache_Decompress(Slot* S)
 			u32 index = selected[0];
 #endif
 
-			CDetail*	Dobj	= objects[DS.r_id(index)];
-			SlotItem*	ItemP	= poolSI.create();
-			SlotItem&	Item	= *ItemP;
-
+#ifndef _EDITOR 
+			const CDetail& Dobj	=	objects[DS.r_id(index)];
+#else
+			const CDetail& Dobj	=	*objects[DS.r_id(index)];
+#endif
+			CDetail::SlotItem	Item	= CDetail::SlotItem();
 			// Position (XZ)
 			float		rx = (float(x)/float(d_size))*dm_slot_size + D.vis.box.min.x;
 			float		rz = (float(z)/float(d_size))*dm_slot_size + D.vis.box.min.z;
@@ -235,12 +237,10 @@ RDEVICE.Statistic->TEST0.End		();
 				CDB::TRI&	T		= tris[xrc.r_begin()[tid].id];
 				SGameMtl* mtl		= GMLib.GetMaterialByIdx(T.material);
 
-				//Detect sector
-				Item.sector_id = T.sector;
-
 				if(mtl->Flags.test(SGameMtl::flPassable))	
 					continue;
 
+				//Detect sector
 				CSector* sector = (CSector*)RImplementation.getSector(T.sector);
 				if(sector != RImplementation.pOutdoorSector)
 				{
@@ -265,9 +265,9 @@ RDEVICE.Statistic->TEST0.End		();
 
 			// Angles and scale
 #ifndef		DBG_SWITCHOFF_RANDOMIZE
-			Item.scale	= r_scale.randF		(Dobj->m_fMinScale*0.5f,Dobj->m_fMaxScale*0.9f);
+			Item.scale	= r_scale.randF		(Dobj.m_fMinScale*0.5f,Dobj.m_fMaxScale*0.9f);
 #else
-			Item.scale	= (Dobj->m_fMinScale*0.5f+Dobj->m_fMaxScale*0.9f)/2;
+			Item.scale	= (Dobj.m_fMinScale*0.5f+Dobj.m_fMaxScale*0.9f)/2;
 			//Item.scale	= 0.1f;
 #endif
 			// X-Form BBox
@@ -283,7 +283,7 @@ RDEVICE.Statistic->TEST0.End		();
 			Item.mRotY.translate_over		(Item_P);
 			mScale.scale					(Item.scale,Item.scale,Item.scale);
 			mXform.mul_43					(Item.mRotY,mScale);
-			ItemBB.xform					(Dobj->bv_bb,mXform);
+			ItemBB.xform					(Dobj.bv_bb,mXform);
 			Bounds.merge					(ItemBB);
 
 #ifndef _EDITOR
@@ -310,27 +310,24 @@ RDEVICE.Statistic->TEST0.End		();
 			Item.c_rgb.x					=	DS.r_qclr	(DS.c_r,	15);
 			Item.c_rgb.y					=	DS.r_qclr	(DS.c_g,	15);
 			Item.c_rgb.z					=	DS.r_qclr	(DS.c_b,	15);
+			Item.c_sun						=	DS.r_qclr	(DS.c_dir,	15);
 #endif
 			Item.c_hemi						=	DS.r_qclr	(DS.c_hemi,	15);
-			Item.c_sun						=	DS.r_qclr	(DS.c_dir,	15);
 
 			//? hack: RGB = hemi
 			//? Item.c_rgb.add					(ps_r__Detail_rainbow_hemi*Item.c_hemi);
 
 			// Vis-sorting
 #ifndef		DBG_SWITCHOFF_RANDOMIZE
-			if (!UseVS() || Device.IsEditorMode())
+			if (UseHW())
 			{
-				// Always still on CPU pipe
-				Item.vis_ID	= 0;
-			} else {
-				if (Dobj->m_Flags.is(DO_NO_WAVING))	Item.vis_ID	= 0;
+				if (Dobj.m_Flags.is(DO_NO_WAVING))
+					Item.vis_ID	= 0;
 				else
-				{
-					if (::Random.randI(0,3)==0)	Item.vis_ID	= 2;	// Second wave
-					else						Item.vis_ID = 1;	// First wave
-				}
+					Item.vis_ID = Random.randI(1,3);
 			}
+			else
+				Item.vis_ID	= 0;
 #else
 			Item.vis_ID = 0;
 #endif
@@ -339,7 +336,7 @@ RDEVICE.Statistic->TEST0.End		();
 
 			ground_correction(Item.mRotY, normal);
 			// Save it
-			D.G[index].items.push_back(ItemP);
+			D.G[index].items.emplace_back(xr_make_shared<CDetail::SlotItem>(Item));
 		}
 	}
 

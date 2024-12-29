@@ -29,7 +29,7 @@ ENGINE_API CLoadScreenRenderer load_screen_renderer;
 #endif
 ENGINE_API CTimer loading_save_timer;
 ENGINE_API bool loading_save_timer_started = false;
-ENGINE_API BOOL g_bRendering = FALSE;
+ENGINE_API xr_atomic_bool g_bRendering = false;
 extern ENGINE_API float psHUD_FOV;
 static HANDLE Event3rdFirstStep = nullptr;
 
@@ -69,7 +69,7 @@ BOOL CRenderDevice::Begin()
 	m_pRender->Begin();
 
 	FPU::m24r();
-	g_bRendering = TRUE;
+	g_bRendering = true;
 #endif
 
 	return TRUE;
@@ -118,7 +118,7 @@ void CRenderDevice::End		(void)
 		}
 	}
 
-	g_bRendering		= FALSE;
+	g_bRendering		= false;
 	// end scene
 
 	m_pRender->End();
@@ -138,23 +138,22 @@ static void mt_3rdThread(void* ptr)
 			PROF_EVENT("Discord Sync");
 			g_Discord.Update();
 		}
+		{
+			PROF_EVENT("Process Render");
+			for (auto& it : Device.seqParallelRender)
+				it();
+		}
 
-		if (Device.ParticleWorkerCallback)
 		{
 			PROF_EVENT("Process Particles");
-			Device.ParticleWorkerCallback();
+			if (Device.ParticleWorkerCallback)
+				Device.ParticleWorkerCallback();
 		}
-
-		PROF_EVENT("Process Render");
-		for (u32 pit = 0; pit < Device.seqParallelRender.size(); pit++)
-		{
-			Device.seqParallelRender[pit]();
-		}
-
 		ResetEvent(Event3rdFirstStep);
 	}
 }
-
+#include "CustomHUD.h"
+#include "IGame_Level.h"
 volatile u32 mt_Thread_marker = 0x12345678;
 static void mt_Thread(void* ptr)
 {
@@ -170,6 +169,13 @@ static void mt_Thread(void* ptr)
 			// we has granted permission to execute
 			mt_Thread_marker = Device.dwFrame;
 			{
+				if(g_hud)
+					g_hud->OnFrameMT();
+				if (g_pGameLevel && g_pGameLevel->bReady)
+					g_pGameLevel->SoundEvent_Dispatch();
+
+				if (!Device.Paused())
+					Engine.Sheduler.Update();
 				PROF_EVENT("Parallel Sync");
 				for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
 					Device.seqParallel[pit]();
@@ -367,7 +373,11 @@ void CRenderDevice::on_idle		()
 	}
 
 	// Ensure, that second thread gets chance to execute anyway
-	if (dwFrame!=mt_Thread_marker)			{
+	if (dwFrame!=mt_Thread_marker)
+	{
+		if (!Device.Paused())
+			Engine.Sheduler.Update();
+
 		for (u32 pit=0; pit<seqParallel.size(); pit++)
 			seqParallel[pit]();
 		seqParallel.resize(0);

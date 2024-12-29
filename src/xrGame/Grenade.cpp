@@ -311,7 +311,7 @@ void CGrenade::OnAnimationEnd(u32 state)
 
 void CGrenade::UpdateCL() 
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CGrenade::UpdateCL")
 	inherited::UpdateCL			();
 	CExplosive::UpdateCL		();
 

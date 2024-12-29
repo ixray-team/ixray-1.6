@@ -183,10 +183,7 @@ void CRender::render_main	(bool deffered, bool zfill)
 				}
 			}
 
-			Fbox sp_box;
-			sp_box.setb(spatial->spatial.sphere.P,Fvector().set(spatial->spatial.sphere.R, spatial->spatial.sphere.R, spatial->spatial.sphere.R));
-			HOM.Enable();
-			if(!HOM.visible(sp_box)) continue;
+			if(!HOM.visible(spatial->spatial.sphere)) continue;
 
 			if ((spatial->spatial.type & STYPE_LIGHTSOURCE) && deffered)
 			{
@@ -200,14 +197,6 @@ void CRender::render_main	(bool deffered, bool zfill)
 							Lights.add_light(L);
 						else
 						{
-							if(Sectors.size()>1)
-							{
-								if(L->b_need_detect_sectors)
-								{
-									L->get_sectors();
-									L->b_need_detect_sectors = false;
-								}
-							}
 							for (u32 s_it = 0; s_it < L->m_sectors.size(); s_it++)
 							{
 								CSector* sector_ = (CSector*)L->m_sectors[s_it];
@@ -505,26 +494,29 @@ void CRender::Render		()
 
 	//*******
 	// Sync point
-	Device.Statistic->RenderDUMP_Wait_S.Begin	();
-	if (1)
 	{
-		CTimer	T;							T.Start	();
-		BOOL	result						= FALSE;
-		HRESULT	hr							= S_FALSE;
-		//while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
-		while	((hr=GetData (q_sync_point[q_sync_count], &result,sizeof(result)))==S_FALSE) 
+		PROF_EVENT("CPUWaitGPU");
+		Device.Statistic->RenderDUMP_Wait_S.Begin();
+		if (1)
 		{
-			if (!SwitchToThread())			Sleep(ps_r2_wait_sleep);
-			if (T.GetElapsed_ms() > 500)	{
-				result	= FALSE;
-				break;
+			CTimer	T;							T.Start();
+			BOOL	result = FALSE;
+			HRESULT	hr = S_FALSE;
+			//while	((hr=q_sync_point[q_sync_count]->GetData	(&result,sizeof(result),D3DGETDATA_FLUSH))==S_FALSE) {
+			while ((hr = GetData(q_sync_point[q_sync_count], &result, sizeof(result))) == S_FALSE)
+			{
+				if (!SwitchToThread())			Sleep(ps_r2_wait_sleep);
+				if (T.GetElapsed_ms() > 500) {
+					result = FALSE;
+					break;
+				}
 			}
 		}
+		Device.Statistic->RenderDUMP_Wait_S.End();
+		q_sync_count = (q_sync_count + 1) % 2;
+		//CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
+		CHK_DX(EndQuery(q_sync_point[q_sync_count]));
 	}
-	Device.Statistic->RenderDUMP_Wait_S.End		();
-	q_sync_count								= (q_sync_count+1) % 2;
-	//CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
-	CHK_DX										(EndQuery(q_sync_point[q_sync_count]));
 
 	//******* Main calc - DEFERRER RENDERER
 	// Main calc
@@ -533,6 +525,11 @@ void CRender::Render		()
 	if (bSUN)									set_Recorder	(&main_coarse_structure);
 	else										set_Recorder	(nullptr);
 	phase										= PHASE_NORMAL;
+	{
+		PROF_EVENT("lights_spatial_move");
+		for (light* L : v_all_lights)
+			L->spatial_move();
+	}
 	render_main									(true);
 	set_Recorder								(nullptr);
 	r_pmask										(true,false);	// disable priority "1"
@@ -724,7 +721,6 @@ void CRender::Render		()
 	{
 		PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
 		Target->phase_accumulator				();
-		HOM.Disable								();
 		render_lights							(LP_normal);
 	}
 
@@ -755,7 +751,6 @@ void CRender::render_forward				()
 	//******* Main render - second order geometry (the one, that doesn't support deffering)
 	//.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
 	{
-		HOM.Enable();
 		// level
 		r_pmask									(false,true);			// enable priority "1"
 		phase									= PHASE_NORMAL;

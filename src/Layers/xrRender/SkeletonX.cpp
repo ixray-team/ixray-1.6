@@ -272,7 +272,7 @@ void CSkeletonX::_Copy		(CSkeletonX *B)
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
-	PROF_EVENT("CSkeletonX::_Render");
+	//PROF_EVENT("CSkeletonX::_Render");
 
 #ifdef USE_DX11
 	if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
@@ -293,7 +293,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 		break;
 	case RM_SINGLE:	
 		{
-			PROF_EVENT("RM_SINGLE")
+			//PROF_EVENT("RM_SINGLE")
 			Fmatrix	W;	W.mul_43(RCache.xforms.m_w, Parent->LL_GetTransform_R(u16(RMS_boneid)));
 
 			RCache.set_xform_world	(W);
@@ -315,7 +315,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 	case RM_SKINNING_3B:
 	case RM_SKINNING_4B:
 		{
-			PROF_EVENT("RM_SKINNING")
+			//PROF_EVENT("RM_SKINNING")
 			// transfer matrices
 			ref_constant array = RCache.get_c(s_bones_array_const);
 
@@ -323,7 +323,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 			ref_constant array_old = RImplementation.phase == RImplementation.PHASE_NORMAL ? RCache.get_c(s_bones_array_const_old) : array;
 #endif // USE_DX11
 			{
-				PROF_EVENT("SEND_MATRICES")
+				//PROF_EVENT("SEND_MATRICES")
 				u16 count = u16(RMS_bonecount);
 				for (u16 mid = 0; mid < count; mid++)
 				{
@@ -364,7 +364,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 }
 void CSkeletonX::_Render_soft	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
-	PROF_EVENT("CSkeletonX::_Render_soft")
+	//PROF_EVENT("CSkeletonX::_Render_soft")
 	u32 vOffset				= cache_vOffset;
 
 	_VertexStream&	_VS		= RCache.Vertex;

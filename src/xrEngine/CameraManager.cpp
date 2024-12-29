@@ -232,10 +232,12 @@ CCameraManager::~CCameraManager()
 CEffectorCam* CCameraManager::GetCamEffector(ECamEffectorType type)	
 { 
 	for (EffectorCamIt it=m_EffectorsCam.begin(); it!=m_EffectorsCam.end(); it++ )
-		if ((*it)->eType==type)
+	{
+		if ((*it)->eType == type)
 		{
 			return *it;
 		}
+	}
 	return 0;
 }
 
@@ -252,39 +254,46 @@ void CCameraManager::UpdateDeffered()
 		RemoveCamEffector(Effector->eType);
 
 		if (Effector->AbsolutePositioning())
-			m_EffectorsCam.push_front(Effector);
-		else
 			m_EffectorsCam.push_back(Effector);
+		else
+			m_EffectorsCam.push_front(Effector);
 	}
 
-	m_bAbsolutePositioning = m_EffectorsCam.empty() ? false : m_EffectorsCam.front()->AbsolutePositioning();
-	m_EffectorsCam_added_deffered.clear	();
+	m_bAbsolutePositioning = m_EffectorsCam.empty() ? false : m_EffectorsCam.back()->AbsolutePositioning();
+	m_EffectorsCam_added_deffered.clear();
 }
 
 void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 {
 	for (EffectorCamIt it=m_EffectorsCam.begin(); it!=m_EffectorsCam.end(); it++ )
-		if ((*it)->eType==type)
-		{ 
-			OnEffectorReleased	(*it);
+	{
+		if ((*it)->eType == type)
+		{
+			OnEffectorReleased(*it);
 			m_EffectorsCam.erase(it);
 			return;
 		}
+	}
 }
 
 CEffectorPP* CCameraManager::GetPPEffector(EEffectorPPType type)	
 { 
 	for (EffectorPPIt it=m_EffectorsPP.begin(); it!=m_EffectorsPP.end(); it++ )
-		if ((*it)->Type()==type) return *it;
+	{
+		if ((*it)->Type() == type)
+		{
+			return *it;
+		}
+	}
 	return 0;
 }
 
-ECamEffectorType   CCameraManager::RequestCamEffectorId ()
+ECamEffectorType CCameraManager::RequestCamEffectorId ()
 {
 	ECamEffectorType index;
 	for (index	=	(ECamEffectorType)effCustomEffectorStartID;
-							GetCamEffector(index);
-							index	=	(ECamEffectorType)(index+1) ) { ; }
+					 GetCamEffector(index);
+					 index = (ECamEffectorType)(index+1) ) { ; }
 	return index;
 }
 
@@ -292,30 +301,32 @@ EEffectorPPType   CCameraManager::RequestPPEffectorId ()
 {
 	EEffectorPPType index;
 	for (index	=	(EEffectorPPType)effCustomEffectorStartID;
-							GetPPEffector(index);
-							index	=	(EEffectorPPType)(index+1) ) { ; }
+					 GetPPEffector(index);
+					 index = (EEffectorPPType)(index+1) ) { ; }
 	return index;
 }
 
 CEffectorPP* CCameraManager::AddPPEffector(CEffectorPP* ef) 
 {
-	RemovePPEffector				(ef->Type());
-	m_EffectorsPP.push_back			(ef);
-	return m_EffectorsPP.back		();
+	RemovePPEffector(ef->Type());
+	m_EffectorsPP.push_back(ef);
+	return m_EffectorsPP.back();
 }
 
 void CCameraManager::RemovePPEffector(EEffectorPPType type)
 {
 	for (EffectorPPIt it=m_EffectorsPP.begin(); it!=m_EffectorsPP.end(); it++ )
-		if ((*it)->Type()==type){ 
+	{
+		if ((*it)->Type() == type)
+		{
 			if ((*it)->FreeOnRemove())
 			{
-				OnEffectorReleased		(*it);
-//				xr_delete				(*it);
+				OnEffectorReleased(*it);
 			}
-			m_EffectorsPP.erase			(it);
+			m_EffectorsPP.erase(it);
 			return;
 		}
+	}
 }
 
 void CCameraManager::OnEffectorReleased(SBaseEffector* e)
@@ -379,41 +390,44 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 
 bool CCameraManager::ProcessCameraEffector(CEffectorCam* eff)
 {
-	bool res = false;
 	if(eff->Valid() && eff->ProcessCam(m_cam_info))
 	{
-		res = true;
-	}else
+		return true;
+	}
+	else
 	{
 		if(eff->AllowProcessingIfInvalid())
 		{
 			eff->ProcessIfInvalid(m_cam_info);
-			res = true;
 		}
 
-		EffectorCamVec::iterator it = std::find(m_EffectorsCam.begin(), m_EffectorsCam.end(), eff);
-
-		m_EffectorsCam.erase(it);
-		OnEffectorReleased	(eff);
+		return false;
 	}
-	return res;
+	return true;
 }
 
 void CCameraManager::UpdateCamEffectors()
 {
-	if (m_EffectorsCam.empty()) 	return;
-	EffectorCamVec::reverse_iterator rit	= m_EffectorsCam.rbegin();
+	if (m_EffectorsCam.empty()) return;
 
-	for(; rit != m_EffectorsCam.rend(); ++rit) {
-		if(!ProcessCameraEffector(*rit)) {
-			--rit;
+	for(auto it	= m_EffectorsCam.begin(); it != m_EffectorsCam.end();)
+	{
+		CEffectorCam* eff = (*it);
+		if(!ProcessCameraEffector(eff))
+		{
+			it = m_EffectorsCam.erase(it);
+			OnEffectorReleased(eff);
+		}
+		else
+		{
+			++it;
 		}
 	}
 
-	m_cam_info.d.normalize			();
-	m_cam_info.n.normalize			();
-	m_cam_info.r.crossproduct		(m_cam_info.n,m_cam_info.d);
-	m_cam_info.n.crossproduct		(m_cam_info.d,m_cam_info.r);
+	m_cam_info.d.normalize();
+	m_cam_info.n.normalize();
+	m_cam_info.r.crossproduct(m_cam_info.n,m_cam_info.d);
+	m_cam_info.n.crossproduct(m_cam_info.d,m_cam_info.r);
 }
 
 void CCameraManager::UpdatePPEffectors()

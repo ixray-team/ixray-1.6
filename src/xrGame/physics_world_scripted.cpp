@@ -13,7 +13,7 @@ using namespace luabind;
 
 void	cphysics_world_scripted::	AddCall			(	CPHCondition*c, CPHAction*a )	
 {
-	Level().ph_commander_physics_worldstep().add_call_threadsafety(c,a);
+	Level().ph_commander_physics_worldstep().add_call(c,a);
 }
 
 

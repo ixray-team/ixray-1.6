@@ -20,7 +20,7 @@ ITEM_INFO::ITEM_INFO()
 ITEM_INFO::~ITEM_INFO()
 {
 	if(pParticle)
-		CParticlesObject::Destroy(pParticle);
+		Particles::Details::Destroy(pParticle);
 }
 #include "WeaponBinoculars.h"
 bool CCustomDetector::CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate)
@@ -264,7 +264,7 @@ void CCustomDetector::Load(LPCSTR section)
 
 void CCustomDetector::shedule_Update(u32 dt) 
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CCustomDetector::shedule_Update")
 	inherited::shedule_Update(dt);
 	
 	if( !IsWorking() )			return;
@@ -346,7 +346,7 @@ extern u32 hud_adj_mode;
 
 void CCustomDetector::UpdateCL() 
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CCustomDetector::UpdateCL")
 	inherited::UpdateCL();
 
 	if(H_Parent()!=Level().CurrentEntity() )			return;

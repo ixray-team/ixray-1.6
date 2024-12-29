@@ -318,6 +318,12 @@ BOOL CHOM::visible		(Fbox3& B)
 	return _visible		(B,m_xform_01)		;
 }
 
+BOOL CHOM::visible		(Fsphere& S)
+{
+	Fbox B;B.setb(S.P,Fvector().set(S.R, S.R, S.R));
+	return visible(B);
+}
+
 BOOL CHOM::visible		(Fbox2& B, float depth)
 {
 	if (!bEnabled)		return TRUE;

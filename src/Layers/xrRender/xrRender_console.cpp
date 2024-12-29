@@ -598,11 +598,22 @@ public:
 	virtual void Execute(LPCSTR args) {
 		CCC_Integer::Execute(args);
 
-		dm_current_size = iFloor((float)ps_r__detail_radius / 4) * 2;
-		dm_current_cache1_line = dm_current_size * 2 / 4;		// assuming cache1_count = 4
-		dm_current_cache_line = dm_current_size + 1 + dm_current_size;
-		dm_current_cache_size = dm_current_cache_line * dm_current_cache_line;
-		dm_current_fade = float(2 * dm_current_size) - .5f;
+		dm_current_size				= iFloor((float)ps_r__detail_radius/4)*2;
+		dm_current_cache1_line		= dm_current_size*2/4;		// assuming cache1_count = 4
+		dm_current_cache_line		= dm_current_size+1+dm_current_size;
+		dm_current_cache_size		= dm_current_cache_line*dm_current_cache_line;
+		dm_current_fade				= float(2*dm_current_size)-.5f;
+
+		if (RImplementation.b_loaded && (dm_current_size != dm_size))
+		{
+			RImplementation.Details->MT_CALC.cancel();
+
+			RImplementation.Details->cache_task.clear();
+
+			RImplementation.Details->cache_Free();
+			RImplementation.Details->cache_Alloc();
+			RImplementation.Details->cache_Initialize();
+		}
 	}
 	
 	virtual void Status(TStatus& S) {
@@ -623,7 +634,7 @@ void		xrRender_initconsole	()
 	CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
 
 	CMD4(CCC_Float,		"r__geometry_lod",		&ps_r__LOD,					0.1f,	1.2f		);
-	CMD4(CCC_Float,		"r__detail_density",	&ps_current_detail_density,		0.2f,	0.8f	);
+	CMD4(CCC_Float,		"r__detail_density",	&ps_current_detail_density,		0.1f,	0.8f	);
 
 #ifdef DEBUG
 	CMD4(CCC_Float,		"r__detail_l_ambient",	&ps_r__Detail_l_ambient,	.5f,	.95f	);
@@ -736,7 +747,7 @@ void		xrRender_initconsole	()
 
 	// IX-Ray
 	CMD3(CCC_Mask, "r__fast_details_update",&ps_r2_ls_flags, R2FLAG_FAST_DETAILS_UPDATE);
-	CMD4(CCC_DetailRadius, "r__detail_radius", &ps_r__detail_radius, 49, 250);
+	CMD4(CCC_DetailRadius, "r__detail_radius", &ps_r__detail_radius, 10, 5000);
 	CMD3(CCC_Mask, "r__no_ram_textures", &ps_r__common_flags, RFLAG_NO_RAM_TEXTURES);
 	CMD3(CCC_Mask, "r__mt_texture_load", &ps_r__common_flags, RFLAG_MT_TEX_LOAD);
 	CMD3(CCC_Token, "r_aa", &ps_r2_aa_type, aa_type_token);

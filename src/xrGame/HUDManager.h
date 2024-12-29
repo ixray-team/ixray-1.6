@@ -25,6 +25,8 @@ public:
 	virtual		void		Render_Last			();	   
 	virtual		void		OnFrame				();
 
+	virtual		void		OnFrameMT			();
+
 	virtual		void		RenderUI			();
 
 //.				CUI*		GetUI				(){return pUI;}

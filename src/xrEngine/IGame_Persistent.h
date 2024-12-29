@@ -45,9 +45,8 @@ public:
 	};
 	params							m_game_params;
 public:
-	xr_set<CPS_Instance*>			ps_active;
-	xr_vector<CPS_Instance*>		ps_destroy;
-	xr_vector<CPS_Instance*>		ps_needtoplay;
+	xr_vector<xr_shared_ptr<CPS_Instance>> ps_active;
+	xr_vector<xr_shared_ptr<CPS_Instance>> ps_needtoplay;
 
 public:
 			void					destroy_particles	(const bool &all_particles);

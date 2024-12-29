@@ -29,6 +29,7 @@ CSpaceRestrictionHolder::~CSpaceRestrictionHolder			()
 
 void CSpaceRestrictionHolder::clear							()
 {
+#define IXR_ASAN
 #ifdef IXR_ASAN
 	// FX: Сначала нужно удалять групповые рестрикторы, 
 	// т.к. они используют ref_counter. Если чистить простые, то в IntrusivePtr остаются битые указатели

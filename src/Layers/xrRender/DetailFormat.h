@@ -7,7 +7,7 @@
 #define DETAIL_VERSION		3
 #define DETAIL_SLOT_SIZE	2.f
 #define DETAIL_SLOT_SIZE_2	DETAIL_SLOT_SIZE*0.5f
- 
+
 //	int s_x	= iFloor			(EYE.x/slot_size+.5f)+offs_x;		// [0...size_x)
 //	int s_z	= iFloor			(EYE.z/slot_size+.5f)+offs_z;		// [0...size_z)
 

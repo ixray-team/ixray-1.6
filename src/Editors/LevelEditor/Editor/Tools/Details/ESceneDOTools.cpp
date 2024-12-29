@@ -63,10 +63,6 @@ void EDetailManager::Clear(bool bSpecific)
 
 void EDetailManager::InvalidateCache()
 {
-	// resize visible
-	m_visibles[0].resize	(objects.size());	// dump(visible[0]);
-	m_visibles[1].resize	(objects.size());	// dump(visible[1]);
-	m_visibles[2].resize	(objects.size());	// dump(visible[2]);
 	// Initialize 'vis' and 'cache'
 	cache_Initialize	();
 }

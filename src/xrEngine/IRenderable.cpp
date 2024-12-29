@@ -12,7 +12,7 @@ IRenderable::IRenderable()
 	if (self)		self->spatial.type	|= STYPE_RENDERABLE;
 }
 
-extern ENGINE_API BOOL g_bRendering; 
+extern ENGINE_API xr_atomic_bool g_bRendering; 
 IRenderable::~IRenderable()
 {
 	VERIFY								(!g_bRendering); 

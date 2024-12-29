@@ -152,6 +152,13 @@ void CRender::reset_end()
 void					CRender::OnFrame				()
 {
 	Models->DeleteQueue	();
+
+	{
+		//Lights Delete queue
+		for (light*L:v_all_lights_dque)
+			xr_delete(L);
+		v_all_lights_dque.clear();
+	}
 }
 
 // Implementation
@@ -164,6 +171,12 @@ void					CRender::model_Delete			(IRenderVisual* &V, BOOL bDiscard)
 { 
 	dxRender_Visual* pVisual = (dxRender_Visual*)V;
 	Models->Delete(pVisual, bDiscard);
+	V = 0;
+}
+void					CRender::model_Delete_Deffered			(IRenderVisual* &V)		
+{ 
+	dxRender_Visual* pVisual = (dxRender_Visual*)V;
+	Models->DeleteDeffered(pVisual);
 	V = 0;
 }
 IRender_DetailModel*	CRender::model_CreateDM			(IReader*F)
@@ -231,7 +244,7 @@ void					CRender::flush					()					{ r_dsgraph_render_graph	(0);						}
 BOOL					CRender::occ_visible			(vis_data& P)		{ return HOM.visible(P);								}
 BOOL					CRender::occ_visible			(sPoly& P)			{ return HOM.visible(P);								}
 BOOL					CRender::occ_visible			(Fbox& P)			{ return HOM.visible(P);								}
-ENGINE_API	extern BOOL g_bRendering;
+ENGINE_API	extern xr_atomic_bool g_bRendering;
 void					CRender::add_Visual				(IRenderVisual* V, bool ignore_opt)
 {
 	VERIFY				(g_bRendering);
@@ -427,6 +440,11 @@ void CRender::Calculate				()
 	marker	++;
 	if (pLastSector)
 	{
+		{
+			PROF_EVENT("lights_spatial_move");
+			for (light* L : v_all_lights)
+				L->spatial_move();
+		}
 		// Traverse sector/portal structure
 		PortalTraverser.traverse	
 			(
@@ -620,7 +638,6 @@ void	CRender::Render		()
 
 	r_pmask										(true,false);	// disable priority "1"
 	o.vis_intersect								= TRUE			;
-	HOM.Disable									();
 	L_Dynamic->render							(0);				// addititional light sources
 	if(Wallmarks){
 		g_r										= 0;

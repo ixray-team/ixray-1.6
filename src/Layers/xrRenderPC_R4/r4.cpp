@@ -315,6 +315,13 @@ void CRender::reset_end() {
 void CRender::OnFrame() 
 {
 	Models->DeleteQueue();
+
+	{
+		//Lights Delete queue
+		for (light*L:v_all_lights_dque)
+			xr_delete(L);
+		v_all_lights_dque.clear();
+	}
 }
 
 // Implementation
@@ -341,6 +348,12 @@ IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) {
 void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard) {
 	dxRender_Visual* pVisual = (dxRender_Visual*)V;
 	Models->Delete(pVisual, bDiscard);
+	V = 0;
+}
+
+void CRender::model_Delete_Deffered(IRenderVisual*& V) {
+	dxRender_Visual* pVisual = (dxRender_Visual*)V;
+	Models->DeleteDeffered(pVisual);
 	V = 0;
 }
 
@@ -393,8 +406,12 @@ IRender_Portal* CRender::getPortal(int id) {
 	VERIFY(id<int(Portals.size()));	return Portals[id];
 }
 
-IRender_Sector* CRender::getSector(int id) {
-	VERIFY(id<int(Sectors.size()));	return Sectors[id];
+IRender_Sector* CRender::getSector(int id)
+{
+	if(id>=0 && id<int(Sectors.size()))
+		return Sectors[id];
+
+	return NULL;
 }
 
 IRender_Sector* CRender::getSectorActive() {

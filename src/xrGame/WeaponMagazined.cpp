@@ -532,7 +532,7 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 
 void CWeaponMagazined::UpdateCL			()
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CWeaponMagazined::UpdateCL")
 	inherited::UpdateCL	();
 	float dt = Device.fTimeDelta;
 

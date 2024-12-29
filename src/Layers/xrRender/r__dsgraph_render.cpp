@@ -28,7 +28,7 @@ IC	bool	cmp_normal_items		(const _NormalItem& N1, const _NormalItem& N2)
 
 void __fastcall pLandscape_0(mapLandscape_Node* N)
 {
-	PROF_EVENT("pLandscape_0");
+	//PROF_EVENT("pLandscape_0");
 	VERIFY(N);
 	dxRender_Visual* V = N->val.pVisual;
 	VERIFY(V && V->shader._get());
@@ -42,7 +42,7 @@ void __fastcall pLandscape_0(mapLandscape_Node* N)
 
 void __fastcall pLandscape_1(mapLandscape_Node* N)
 {
-	PROF_EVENT("pLandscape_1");
+	//PROF_EVENT("pLandscape_1");
 	VERIFY(N);
 	dxRender_Visual* V = N->val.pVisual;
 	VERIFY(V && V->shader._get());
@@ -72,7 +72,7 @@ void R_dsgraph_structure::r_dsgraph_render_landscape(u32 pass, bool bClear)
 
 void __fastcall mapNormal_Render	(mapNormalItems& N)
 {
-	PROF_EVENT("mapNormal_Render");
+	//PROF_EVENT("mapNormal_Render");
 	// *** DIRECT ***
 	std::sort				(N.begin(),N.end(),cmp_normal_items);
 	_NormalItem				*I=&*N.begin(), *E = &*N.end();
@@ -92,7 +92,7 @@ IC	bool	cmp_matrix_items		(const _MatrixItem& N1, const _MatrixItem& N2)
 
 void __fastcall mapMatrix_Render	(mapMatrixItems& N)
 {
-	PROF_EVENT("mapMatrix_Render");
+	//PROF_EVENT("mapMatrix_Render");
 	// *** DIRECT ***
 	std::sort				(N.begin(),N.end(),cmp_matrix_items);
 	_MatrixItem				*I=&*N.begin(), *E = &*N.end();
@@ -114,7 +114,7 @@ void __fastcall mapMatrix_Render	(mapMatrixItems& N)
 // ALPHA
 void __fastcall sorted_L1		(mapSorted_Node *N)
 {
-	PROF_EVENT("sorted_L1");
+	//PROF_EVENT("sorted_L1");
 	VERIFY (N);
 	dxRender_Visual *V				= N->val.pVisual;
 	VERIFY (V && V->shader._get());
@@ -380,7 +380,6 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 								sort_tlist_nrm						(nrmTextures,nrmTexturesTemp,tex,true);
 								for (u32 tex_id=0; tex_id<nrmTextures.size(); tex_id++)
 								{
-									PROF_EVENT("nrmTextures");
 									mapNormalTextures::TNode*	Ntex	= nrmTextures[tex_id];
 									RCache.set_Textures					(Ntex->key);
 									RImplementation.apply_lmaterial		();
@@ -417,7 +416,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 	// Perform sorting based on ScreenSpaceArea
 	// Sorting by SSA and changes minimizations
 	// Render several passes
-	PROF_EVENT("MATERIAL_SHADER_PASSES");
+	PROF_EVENT("MATRIX_SHADER_PASSES");
 	for ( u32 iPass = 0; iPass<SHADER_PASSES_MAX; ++iPass)
 	{
 		//mapMatrixVS&	vs				= mapMatrix	[_priority];
@@ -476,7 +475,6 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 							sort_tlist_mat						(matTextures,matTexturesTemp,tex,true);
 							for (u32 tex_id=0; tex_id<matTextures.size(); tex_id++)
 							{
-								PROF_EVENT("matTextures");
 								mapMatrixTextures::TNode*	Ntex	= matTextures[tex_id];
 								RCache.set_Textures					(Ntex->key);
 								RImplementation.apply_lmaterial		();
@@ -511,6 +509,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 // HUD render
 void R_dsgraph_structure::r_dsgraph_render_hud	()
 {
+	PROF_EVENT("r_dsgraph_render_hud");
 	CHudInitializer initalizer(true);
 
 	// Rendering
@@ -528,6 +527,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud	()
 
 void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 {
+	PROF_EVENT("r_dsgraph_render_hud_ui");
 	VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
 	CHudInitializer initalizer(true);
@@ -568,6 +568,7 @@ void	R_dsgraph_structure::r_dsgraph_render_sorted	()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 {
+	PROF_EVENT("r_dsgraph_render_emissive");
 #if	RENDER!=R_R1
 	// Rendering
 	// Sorted (back to front)
@@ -589,6 +590,7 @@ void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_wmarks	()
 {
+	PROF_EVENT("r_dsgraph_render_wmarks");
 #if	RENDER!=R_R1
 	// Sorted (back to front)
 	mapWmark.traverseLR	(sorted_L1);
@@ -600,6 +602,7 @@ void	R_dsgraph_structure::r_dsgraph_render_wmarks	()
 // strict-sorted render
 void	R_dsgraph_structure::r_dsgraph_render_distort	()
 {
+	PROF_EVENT("r_dsgraph_render_distort");
 	// Sorted (back to front)
 	mapDistort.traverseRL	(sorted_L1);
 	mapDistort.clear		();
@@ -609,6 +612,7 @@ void	R_dsgraph_structure::r_dsgraph_render_distort	()
 // sub-space rendering - shortcut to render with frustum extracted from matrix
 void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals, CObject* O)
 {
+	if(!_sector) return;
 	CFrustum	temp;
 	temp.CreateFromMatrix			(mCombined,	FRUSTUM_P_ALL &(~FRUSTUM_P_NEAR));
 	r_dsgraph_render_subspace		(_sector,&temp,mCombined,_cop,_dynamic,_precise_portals, O);
@@ -657,7 +661,7 @@ void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, CF
 
 	if (_dynamic)
 	{
-		PROF_EVENT("add__dynamic")
+		PROF_EVENT("add_dynamic")
 		set_Object						(0);
 
 		// Traverse object database

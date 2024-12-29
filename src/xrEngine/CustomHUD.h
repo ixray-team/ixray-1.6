@@ -30,6 +30,7 @@ public:
 	virtual		void		Render_Last				(){;}
 
 	virtual		void		OnFrame					(){;}
+	virtual		void		OnFrameMT				(){;}
 	virtual		void		OnEvent					(EVENT E, u64 P1, u64 P2){;}
 
 	virtual		void		Load					(){;}

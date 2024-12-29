@@ -194,7 +194,7 @@ void CWeaponAmmo::renderable_Render()
 
 void CWeaponAmmo::UpdateCL() 
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CWeaponAmmo::UpdateCL")
 	VERIFY2								(_valid(renderable.xform),*cName());
 	inherited::UpdateCL	();
 	VERIFY2								(_valid(renderable.xform),*cName());

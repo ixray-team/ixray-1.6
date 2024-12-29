@@ -46,7 +46,7 @@ public:
 	}
 	virtual void 			run								()
 	{
-		CParticlesObject* ps = CParticlesObject::Create(ps_name,TRUE);
+		xr_shared_ptr<CParticlesObject> ps = Particles::Details::Create(ps_name,TRUE);
 
 		Fmatrix pos; 
 		Fvector zero_vel_ = {0.f,0.f,0.f};

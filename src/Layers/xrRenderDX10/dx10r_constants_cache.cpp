@@ -5,7 +5,7 @@
 
 dx10ConstantBuffer& R_constants::GetCBuffer(R_constant* C, BufferType BType)
 {
-	PROF_EVENT("R_constants::GetCBuffer")
+	//PROF_EVENT("R_constants::GetCBuffer")
 	if (BType==BT_PixelBuffer)
 	{
 		//	Decode index
@@ -70,7 +70,7 @@ dx10ConstantBuffer& R_constants::GetCBuffer(R_constant* C, BufferType BType)
 
 void R_constants::flush_cache()
 {
-	PROF_EVENT("R_constants::flush_cache")
+	//PROF_EVENT("R_constants::flush_cache")
 	for (int i=0; i < CBackend::MaxCBuffers; ++i)
 	{
 		if (RCache.m_aVertexConstants[i])

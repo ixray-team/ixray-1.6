@@ -179,33 +179,35 @@ void ISpatial_DB::initialize(Fbox& BB)
 	if (m_root == nullptr)
 	{
 		// initialize
-		allocator_pool.reserve(128);
+		allocator_pool.reserve(512);
 		rt_insert_object = nullptr;
 		m_root = _node_create();
 		m_root->_init(nullptr);
 	}
 }
 
-ISpatial_NODE*	ISpatial_DB::_node_create		()
+ISpatial_NODE* ISpatial_DB::_node_create()
 {
-	stat_nodes	++;
-	if (allocator_pool.empty())			return allocator.create();
-	else								
+	stat_nodes++;
+	if (allocator_pool.empty())			
+		return allocator.create();
+	else
 	{
-		ISpatial_NODE*	N		= allocator_pool.back();
-		allocator_pool.pop_back	();
+		ISpatial_NODE* N = allocator_pool.back();
+		allocator_pool.pop_back();
 		return			N;
 	}
 }
-void			ISpatial_DB::_node_destroy(ISpatial_NODE* &P)
+
+void ISpatial_DB::_node_destroy(ISpatial_NODE* &P)
 {
-	VERIFY						(P->_empty());
-	stat_nodes					--;
-	allocator_pool.push_back	(P);
-	P							= nullptr;
+	//VERIFY						(P->_empty());
+	stat_nodes--;
+	allocator_pool.push_back(P);
+	P = nullptr;
 }
 
-void			ISpatial_DB::_insert	(ISpatial_NODE* N, Fvector& n_C, float n_R)
+void ISpatial_DB::_insert(ISpatial_NODE* N, Fvector& n_C, float n_R)
 {
 	//*** we are assured that object lives inside our node
 	float	n_vR	= 2*n_R;

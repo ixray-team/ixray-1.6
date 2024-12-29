@@ -331,7 +331,7 @@ void CBaseMonster::update_enemy_accessible_and_at_home_info	()
 
 void CBaseMonster::UpdateCL()
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CBaseMonster::UpdateCL")
 #ifdef DEBUG
 	if ( Level().CurrentEntity() == this )
 	{
@@ -370,7 +370,7 @@ void CBaseMonster::UpdateCL()
 
 void CBaseMonster::shedule_Update(u32 dt)
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CBaseMonster::shedule_Update")
 #ifdef DEBUG
 	if ( is_paused () )
 	{
@@ -831,7 +831,7 @@ void CBaseMonster::set_action(EAction action)
 
 CParticlesObject* CBaseMonster::PlayParticles(const shared_str& name, const Fvector &position, const Fvector &dir, BOOL auto_remove, BOOL xformed)
 {
-	CParticlesObject* ps = CParticlesObject::Create(name.c_str(),auto_remove);
+	CParticlesObject* ps = Particles::Details::Create(name.c_str(),auto_remove).get();
 	
 	// вычислить позицию и направленность партикла
 	Fmatrix	matrix; 

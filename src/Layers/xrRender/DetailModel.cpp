@@ -4,6 +4,9 @@
 
 CDetail::~CDetail()
 {
+	for (u32 i = 0; i < 3; ++i)
+		for (u32 j = 0; j < 2; ++j)
+			m_items[i][j].clear();
 }
 
 void CDetail::Unload	()

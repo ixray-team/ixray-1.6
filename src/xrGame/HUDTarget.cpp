@@ -131,7 +131,7 @@ void CHUDTarget::CursorOnFrame ()
 	}
 }
 
-extern ENGINE_API BOOL g_bRendering; 
+extern ENGINE_API xr_atomic_bool g_bRendering; 
 void CHUDTarget::Render()
 {
 	BOOL  b_do_rendering = ( psHUD_Flags.is(HUD_CROSSHAIR|HUD_CROSSHAIR_RT|HUD_CROSSHAIR_RT2) );

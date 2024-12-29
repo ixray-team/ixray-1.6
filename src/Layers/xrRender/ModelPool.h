@@ -40,7 +40,7 @@ private:
 	BOOL						bLogging;
     BOOL						bForceDiscard;
     BOOL						bAllowChildrenDuplicate;
-
+	xrCriticalSection			deffered_del_lock;
 	void						Destroy	();
 public:
                             CModelPool			();
@@ -57,6 +57,7 @@ public:
 	dxRender_Visual*			Create				(LPCSTR name, IReader* data=0);
 	dxRender_Visual*			CreateChild			(LPCSTR name, IReader* data);
 	void					Delete				(dxRender_Visual* &V, BOOL bDiscard=FALSE);
+	void					DeleteDeffered		(dxRender_Visual* &V);
 	void					Discard				(dxRender_Visual* &V, BOOL b_complete);
 	void					DeleteInternal		(dxRender_Visual* &V, BOOL bDiscard=FALSE);
 	void					DeleteQueue			();

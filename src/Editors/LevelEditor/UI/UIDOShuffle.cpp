@@ -177,10 +177,6 @@ void UIDOShuffle::Draw()
 				{
 					if (!FindItem(l.c_str())) 
 					{
-						if (m_list.size() >= dm_max_objects) {
-							ELog.DlgMsg(mtInformation, "Maximum detail objects in scene '%d'", dm_max_objects);
-							return;
-						}
 						DM->AppendDO(l.c_str());
 						m_list_selected = m_list.size();
 						m_list.push_back(l);

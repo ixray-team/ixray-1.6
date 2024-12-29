@@ -20,10 +20,8 @@ protected:
 	bool				m_bStopping;		//вызвана функция Stop()
 	bool				NeedUpdate = false;
 
-protected:
-	virtual				~CParticlesObject	();
-
 public:
+	virtual				~CParticlesObject	();
 						CParticlesObject	(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load);
 
 	virtual bool		shedule_Needed		()	{return true;};
@@ -49,19 +47,22 @@ public:
 	void				SetAutoRemove		(bool auto_remove);
 
 	const shared_str	Name				();
+};
 
-public:
-	static CParticlesObject*	Create		(LPCSTR p_name, BOOL bAutoRemove=TRUE, bool remove_on_game_load = true)
+
+namespace Particles::Details
+{
+	PARTICLES_API xr_shared_ptr<CParticlesObject> Create(LPCSTR p_name, BOOL bAutoRemove = TRUE, bool remove_on_game_load = true);
+
+	template <class T>
+	static void Destroy(T& p)
 	{
-		return new CParticlesObject(p_name, bAutoRemove, remove_on_game_load);
-	}
-	static void					Destroy		(CParticlesObject*& p)
-	{
-		if (p){ 
-			p->PSI_destroy		();
-			p					= 0;
+		if (p)
+		{
+			p->PSI_destroy();
+			p = 0;
 		}
 	}
-};
+}
 
 #endif /*ParticlesObjectH*/

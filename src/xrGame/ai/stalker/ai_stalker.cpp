@@ -901,7 +901,6 @@ void CAI_Stalker::destroy_anim_mov_ctrl	()
 
 void CAI_Stalker::UpdateCL()
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
 	START_PROFILE("client_update")
 	VERIFY2						(PPhysicsShell()||getEnabled(), *cName());
 
@@ -1000,7 +999,7 @@ CPHDestroyable*		CAI_Stalker::		ph_destroyable	()
 
 void CAI_Stalker::shedule_Update		( u32 DT )
 {
-	PROF_EVENT_DYNAMIC(cNameSect_str())
+	PROF_EVENT("CAI_Stalker::shedule_Update")
 	VERIFY2				(getEnabled()||PPhysicsShell(), *cName());
 
 #if USE_OLD_OBJECT_PLANNER
@@ -1149,7 +1148,7 @@ void CAI_Stalker::Think			()
 	START_PROFILE("stalker/schedule_update/think/brain")
 //	try {
 //		try {
-			brain().update			(update_delta);
+			try{brain().update(update_delta);}catch(...){}
 //		}
 #ifdef DEBUG
 //		catch (luabind::cast_failed &message) {

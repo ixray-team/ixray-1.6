@@ -68,6 +68,7 @@ void CParticlesObject::Init	(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 //----------------------------------------------------
 CParticlesObject::~CParticlesObject()
 {
+	CPS_Instance::~CPS_Instance();
 	CParticlesAsync::Pop(this);
 }
 
@@ -105,6 +106,14 @@ const shared_str CParticlesObject::Name()
 
 	IParticleCustom* V	= smart_cast<IParticleCustom*>(renderable.visual); VERIFY(V);
 	return (V) ? V->Name() : "";
+}
+
+xr_shared_ptr<CParticlesObject> Particles::Details::Create(LPCSTR p_name, BOOL bAutoRemove, bool remove_on_game_load)
+{
+	auto Particle = xr_make_shared<CParticlesObject>(p_name, bAutoRemove, remove_on_game_load);
+	g_pGamePersistent->ps_active.push_back(Particle);
+
+	return Particle;
 }
 
 //----------------------------------------------------
@@ -268,4 +277,4 @@ bool CParticlesObject::IsPlaying()
 	IParticleCustom* V	= smart_cast<IParticleCustom*>(renderable.visual); 
 	VERIFY(V);
 	return !!V->IsPlaying();
-}
+} 
