@@ -420,6 +420,11 @@ u16 map_has_object_spot(u16 id, LPCSTR spot_type)
 	return Level().MapManager().HasMapLocation(spot_type, id);
 }
 
+CMapManager* get_map_manager()
+{
+	return &Level().MapManager();
+}
+
 bool patrol_path_exists(LPCSTR patrol_path)
 {
 	return		(!!ai().patrol_paths().path(patrol_path,true));
@@ -831,6 +836,13 @@ void stop_tutorial()
 		g_tutorial->Stop();	
 }
 
+LPCSTR tutorial_name()
+{
+	if (g_tutorial)
+		return g_tutorial->m_name;
+	return "invalid";
+}
+
 LPCSTR translate_string(LPCSTR str)
 {
 	return *g_pStringTable->translate(str);
@@ -950,6 +962,11 @@ xrTime get_start_time()
 	return (xrTime(Level().GetStartGameTime()));
 }
 
+void reload_language()
+{
+	g_pStringTable->ReloadLanguage(); 
+}
+
 CScriptGameObject* get_view_entity_script()
 {
 	CGameObject* pGameObject = smart_cast<CGameObject*>(Level().CurrentViewEntity());
@@ -996,7 +1013,14 @@ namespace level_nearest
 		return pObj->lua_game_object();
 	}
 }
+void patrol_path_add(LPCSTR patrol_path, CPatrolPath* path) {
+	ai().patrol_paths_raw().add_path(shared_str(patrol_path), path);
+								
+}
 
+void patrol_path_remove(LPCSTR patrol_path) {
+	ai().patrol_paths_raw().remove_path(shared_str(patrol_path));
+}
 #pragma optimize("s",on)
 void CLevel::script_register(lua_State *L)
 {
@@ -1086,6 +1110,13 @@ void CLevel::script_register(lua_State *L)
 		def("spawn_phantom",					spawn_phantom),
 
 		def("get_bounding_volume",				get_bounding_volume),
+		def("map_add_object_spot_ser", map_add_object_spot_ser),
+		def("map_add_object_spot", map_add_object_spot),
+		//-		def("map_add_object_spot_complex",		map_add_object_spot_complex),
+		def("map_remove_object_spot", map_remove_object_spot),
+		def("map_has_object_spot", map_has_object_spot),
+		def("map_change_spot_hint", map_change_spot_hint),
+		def("map_manager",						get_map_manager),
 
 		def("iterate_sounds",					&iterate_sounds1),
 		def("iterate_sounds",					&iterate_sounds2),
@@ -1111,6 +1142,32 @@ void CLevel::script_register(lua_State *L)
 		def("vertex_id",						&vertex_id),
 
 		def("game_id", &GameID),
+		def("get_bounding_volume", get_bounding_volume),
+
+		def("iterate_sounds", &iterate_sounds1),
+		def("iterate_sounds", &iterate_sounds2),
+		def("physics_world", &physics_world_scripted),
+		def("get_snd_volume", &get_snd_volume),
+		def("set_snd_volume", &set_snd_volume),
+		def("add_cam_effector", &add_cam_effector),
+		def("add_cam_effector2", &add_cam_effector2),
+		def("remove_cam_effector", &remove_cam_effector),
+		def("add_pp_effector", &add_pp_effector),
+		def("set_pp_effector_factor", &set_pp_effector_factor),
+		def("set_pp_effector_factor", &set_pp_effector_factor2),
+		def("remove_pp_effector", &remove_pp_effector),
+		def("get_compass_direction", &get_compass_direction),
+
+		def("add_complex_effector", &add_complex_effector),
+		def("remove_complex_effector", &remove_complex_effector),
+
+		def("valid_vertex_id", valid_vertex_id),
+		def("is_accessible_vertex_id", is_accessible_vertex_id),
+		def("disable_vertex", disable_vertex),
+		def("enable_vertex", enable_vertex),
+		def("vertex_id", &vertex_id),
+
+		def("game_id", &GameID),
 
 		def("block_action", &block_action_script),
 		def("is_block_action", &is_block_action_script),
@@ -1120,7 +1177,9 @@ void CLevel::script_register(lua_State *L)
 		def("release_action", &release_action_script),
 		def("lock_actor", &LockActorWithCameraRotation_script),
 		def("unlock_actor", &UnLockActor_script),
-		
+
+		def("patrol_path_add", &patrol_path_add),
+		def("patrol_path_remove", &patrol_path_remove),
 		def("u_event_gen", &u_event_gen), //Send events via packet
 		def("u_event_send", &u_event_send),
 		def("send", &g_send), //allow the ability to send netpacket to level
@@ -1266,6 +1325,8 @@ void CLevel::script_register(lua_State *L)
 		def("start_tutorial",		&start_tutorial),
 		def("stop_tutorial",		&stop_tutorial),
 		def("has_active_tutorial",	&has_active_tutotial),
-		def("translate_string",		&translate_string)
+		def("translate_string",		&translate_string),
+		def("reload_language",		&reload_language)
+//				def("log_stack_trace",		&LogStackTrace)
 	];
 }
