@@ -18,6 +18,20 @@ int& GetLinkDrawCounter()
 	return CurrentViewport->LinkDrawCounter;
 }
 
+int CNodeViewport::GetHoveredMode() const
+{
+	int HoveredNodeID = -1;
+	for (auto Node : Nodes)
+	{
+		if (ImNodes::IsNodeSelected(Node->NodeID))
+		{
+			HoveredNodeID = Node->NodeID;
+		}
+	}
+
+	return HoveredNodeID;
+}
+
 bool CNodeViewport::CanCreateLink(size_t LinkID, size_t RightID)
 {
 	bool CheckLeft = LinksStorage.contains(LinkID);

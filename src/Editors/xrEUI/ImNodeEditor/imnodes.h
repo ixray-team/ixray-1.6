@@ -356,7 +356,7 @@ namespace IMNODES_NAMESPACE
     // The following functions return true if a UI element is being hovered over by the mouse cursor.
     // Assigns the id of the UI element being hovered over to the function argument. Use these functions
     // after EndNodeEditor() has been called.
-    bool IsNodeHovered(int* node_id);
+    IMGUI_API bool IsNodeHovered(int* node_id);
     bool IsLinkHovered(int* link_id);
     bool IsPinHovered(int* attribute_id);
 
@@ -380,7 +380,7 @@ namespace IMNODES_NAMESPACE
     // known.
     void SelectNode(int node_id);
     void ClearNodeSelection(int node_id);
-    bool IsNodeSelected(int node_id);
+    IMGUI_API bool IsNodeSelected(int node_id);
     void SelectLink(int link_id);
     void ClearLinkSelection(int link_id);
     bool IsLinkSelected(int link_id);

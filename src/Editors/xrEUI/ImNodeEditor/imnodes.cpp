@@ -2794,7 +2794,7 @@ namespace IMNODES_NAMESPACE
 
     bool IsEditorHovered() { return MouseInCanvas(); }
 
-    bool IsNodeHovered(int* const node_id)
+    IMGUI_API bool IsNodeHovered(int* const node_id)
     {
         IM_ASSERT(GImNodes->CurrentScope == ImNodesScope_None);
         IM_ASSERT(node_id != NULL);
@@ -2910,7 +2910,7 @@ namespace IMNODES_NAMESPACE
         SelectObject(editor.Links, editor.SelectedLinkIndices, link_id);
     }
 
-    bool IsNodeSelected(int node_id)
+    IMGUI_API bool IsNodeSelected(int node_id)
     {
         ImNodesEditorContext& editor = EditorContextGet();
         return IsObjectSelected(editor.Nodes, editor.SelectedNodeIndices, node_id);

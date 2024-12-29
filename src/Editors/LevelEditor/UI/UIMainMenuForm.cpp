@@ -1,7 +1,10 @@
 #include "stdafx.h"
-#include "../xrEUI/xrUITheme.h"
-#include "../xrEUI/Windows/Help.h"
-#include "../xrECore/Editor/EThumbnail.h"
+
+#include "../Nodes/UIMacroView.h"
+
+#include "../../xrEUI/xrUITheme.h"
+#include "../../xrEUI/Windows/Help.h"
+#include "../../xrECore/Editor/EThumbnail.h"
 
 UIMainMenuForm::UIMainMenuForm()
 {
@@ -517,6 +520,18 @@ void UIMainMenuForm::Draw()
 		if (ImGui::MenuItem("Light Anim Editor", "")) 
 		{ 
 			ExecCommand(COMMAND_LIGHTANIM_EDITOR);
+		}
+
+		if (ImGui::MenuItem("Macro Editor", "")) 
+		{
+			static CUIMacroView* View = nullptr;
+			if (View == nullptr)
+			{
+				View = new CUIMacroView;
+				UI->Push(View);
+			}
+
+			View->Show(true);
 		}
 
 		{

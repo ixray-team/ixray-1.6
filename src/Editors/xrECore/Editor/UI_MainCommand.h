@@ -1,7 +1,7 @@
 #ifndef UI_MainCommandH
 #define UI_MainCommandH
 
-enum
+enum ECoreCommands
 {
 	COMMAND_INITIALIZE=0,		// p1 - D3DWindow, p2 - TPanel
 	COMMAND_DESTROY,

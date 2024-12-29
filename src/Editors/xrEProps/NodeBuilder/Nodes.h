@@ -4,7 +4,8 @@ enum ELinkType
 {
 	eDefault,
 	eShape,
-	eJoint
+	eJoint,
+	eCommand
 };
 
 void RegNode(size_t NodeID, ELinkType Type);
@@ -19,11 +20,10 @@ struct LinkData
 	bool IsIn = false;
 };
 
-class INodeUnknown
+class XREPROPS_API INodeUnknown
 {
 protected:
 	xr_string NodeName;
-	size_t NodeID = 0;
 
 	LinkData ContactLinkIn;
 	LinkData ContactLinkOut;
@@ -37,10 +37,13 @@ protected:
 	ImColor Header = { 32, 32, 132};
 	
 	bool WeStarted = false;
+	bool IsHovered = false;
+
 	ImVec2 StartPostion = { 0, 0 };
 
 public:
 	xr_vector<INodeUnknown*> Childs;
+	size_t NodeID = 0;
 
 public:
 	INodeUnknown() = delete;

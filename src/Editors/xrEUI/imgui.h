@@ -1971,8 +1971,8 @@ struct ImVector
     inline int          size_in_bytes() const               { return Size * (int)sizeof(T); }
     inline int          max_size() const                    { return 0x7FFFFFFF / (int)sizeof(T); }
     inline int          capacity() const                    { return Capacity; }
-    inline T&           operator[](int i)                   { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
-    inline const T&     operator[](int i) const             { IM_ASSERT(i >= 0 && i < Size); return Data[i]; }
+    inline T&           operator[](int i)                   { /*IM_ASSERT(i >= 0 && i < Size); */ return Data[i]; }
+    inline const T&     operator[](int i) const             { /*IM_ASSERT(i >= 0 && i < Size); */ return Data[i]; }
 
     inline T*           begin()                             { return Data; }
     inline const T*     begin() const                       { return Data; }

@@ -18,6 +18,7 @@ public:
 
 protected:
 	bool CanCreateLink(size_t LeftID, size_t RightID);
+	int GetHoveredMode() const;
 
 public:
 	CNodeViewport();
