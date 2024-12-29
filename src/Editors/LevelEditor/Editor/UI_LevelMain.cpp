@@ -539,32 +539,46 @@ CCommandVar CommandSaveSelection(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandUndo(CCommandVar p1, CCommandVar p2)
 {
-	if( !Scene->locked() ){
-		if( !Scene->Undo() ) 	ELog.DlgMsg( mtInformation, "Undo buffer empty" );
-		else{
-			LTools->Reset		();
-			ExecCommand			(COMMAND_CHANGE_ACTION, etaSelect);
-			return 				TRUE;
+	LTools->GetProperties()->ClearProperties();
+
+	if (!Scene->locked())
+	{
+		if (!Scene->Undo())
+			ELog.DlgMsg(mtInformation, "Undo buffer empty");
+		else
+		{
+			LTools->Reset();
+			ExecCommand(COMMAND_CHANGE_ACTION, etaSelect);
+			return TRUE;
 		}
-	} else {
-		ELog.DlgMsg				( mtError, "Scene sharing violation" );
 	}
-	return 						FALSE;
+	else
+	{
+		ELog.DlgMsg(mtError, "Scene sharing violation");
+	}
+	return FALSE;
 }
 
 CCommandVar CommandRedo(CCommandVar p1, CCommandVar p2)
 {
-	if( !Scene->locked() ){
-		if( !Scene->Redo() ) 	ELog.DlgMsg( mtInformation, "Redo buffer empty" );
-		else{
-			LTools->Reset		();
-			ExecCommand			(COMMAND_CHANGE_ACTION, etaSelect);
-			return 				TRUE;
+	LTools->GetProperties()->ClearProperties();
+
+	if (!Scene->locked()) 
+	{
+		if (!Scene->Redo()) 
+			ELog.DlgMsg(mtInformation, "Redo buffer empty");
+		else 
+		{
+			LTools->Reset();
+			ExecCommand(COMMAND_CHANGE_ACTION, etaSelect);
+			return TRUE;
 		}
-	} else {
-		ELog.DlgMsg				( mtError, "Scene sharing violation" );
 	}
-	return 						FALSE;
+	else
+	{
+		ELog.DlgMsg(mtError, "Scene sharing violation");
+	}
+	return FALSE;
 }
 
 CCommandVar CommandClearSceneSummary(CCommandVar p1, CCommandVar p2)

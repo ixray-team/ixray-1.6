@@ -154,6 +154,15 @@ public:
     virtual void		GetBBox 				(Fbox& bb, bool bSelOnly)=0;
 	virtual const CCustomObject* LastSelected	() const {return NULL;}
     virtual class ESceneCustomOTool* CastObjectTool() { return nullptr; }
+
+    enum class ETestResult
+    {
+        None,
+        Found,
+        All
+    };
+
+    virtual ETestResult TestSelectedObjectsFlag(size_t Flag) const { return ETestResult::Found; };
 };
 
 using SceneToolsMap = xr_map<ObjClassID,ESceneToolBase*>;

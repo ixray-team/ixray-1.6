@@ -431,5 +431,32 @@ const CCustomObject* ESceneCustomOTool::LastSelected() const
     return NULL;
 }
 
+ESceneCustomOTool::ETestResult ESceneCustomOTool::TestSelectedObjectsFlag(size_t Flag) const
+{
+    size_t TestFlagCounter = 0;
+    size_t SelectedFlagCounter = 0;
 
+    for (const CCustomObject* Object : m_Objects)
+    {
+        if (!Object->Selected())
+            continue;
 
+        SelectedFlagCounter++;
+
+        bool TestFlag = Object->m_CO_Flags.test((u32)Flag);
+        TestFlag = TestFlag || Object->m_RT_Flags.test((u32)Flag);
+
+        if (TestFlag)
+        {
+            TestFlagCounter++;
+        }
+    }
+
+    ETestResult OutValue = ETestResult::None;
+    if (TestFlagCounter > 0)
+    {
+        OutValue = TestFlagCounter == SelectedFlagCounter ? ETestResult::All : ETestResult::Found;
+    }
+
+    return OutValue;
+}

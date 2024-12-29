@@ -276,6 +276,7 @@ void ESceneAIMapTool::SaveLTX(CInifile& ini, int id)
 
 bool ESceneAIMapTool::LoadStream(IReader& F)
 {
+    IsLoaded = false;
     inherited::LoadStream(F);
 
     u16 version = 0;

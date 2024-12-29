@@ -250,7 +250,6 @@ void ESceneGroupTool::SetCurrentObject(LPCSTR nm)
     frame->lbCurrent->Caption 	= m_CurrentObject.c_str();*/
 }
 
-
 void ESceneGroupTool::OnActivate()
 {
 	inherited::OnActivate		();

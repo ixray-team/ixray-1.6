@@ -2,25 +2,27 @@
 
 struct SRayPickInfo;
 struct mesh_build_data;
-class ESceneCustomOTool: public ESceneToolBase
+
+class ESceneCustomOTool:
+	public ESceneToolBase
 {
 	typedef ESceneToolBase inherited;
 protected:
 	ObjectList			m_Objects;
-    
+	
 	bool 				OnLoadSelectionAppendObject(CCustomObject* obj);
 	bool 				OnLoadAppendObject		(CCustomObject* obj);
 public:
 						ESceneCustomOTool		(ObjClassID cls);
 	virtual				~ESceneCustomOTool		();
-                                               
+											   
 	virtual	bool		AllowEnabling    		(){return true;}
-    virtual BOOL 		AllowMouseStart			();
+	virtual BOOL 		AllowMouseStart			();
 
-    // snap 
+	// snap 
 	virtual ObjectList* GetSnapList				();
-    virtual void		UpdateSnapList			();
-    
+	virtual void		UpdateSnapList			();
+	
 	// selection manipulate
 	virtual int			RaySelect				(int flag, float& distance, const Fvector& start, const Fvector& direction, BOOL bDistanceOnly);
 	virtual int			FrustumSelect			(int flag, const CFrustum& frustum);
@@ -30,66 +32,69 @@ public:
 	virtual int 		SelectionCount          (bool testflag);
 	virtual void		ShowObjects				(bool flag, bool bAllowSelectionFlag=false, bool bSelFlag=true);
 
-    virtual void		Clear					(bool bSpecific=false)=0;       
+	virtual void		Clear					(bool bSpecific=false)=0;       
 
-    // validation
-    virtual bool		Valid					();
-    virtual bool		Validate				(bool);
+	// validation
+	virtual bool		Valid					();
+	virtual bool		Validate				(bool);
 
-    // events
+	// events
 	virtual void		OnDeviceCreate			();
 	virtual void		OnDeviceDestroy			();
 	virtual void		OnSynchronize			();
 	virtual void		OnSceneUpdate			();
-    virtual void		OnObjectRemove			(CCustomObject* O, bool bDeleting);
+	virtual void		OnObjectRemove			(CCustomObject* O, bool bDeleting);
 
-    virtual void 		OnBeforeObjectChange	(CCustomObject* O){inherited::OnBeforeObjectChange(O);}
+	virtual void 		OnBeforeObjectChange	(CCustomObject* O){inherited::OnBeforeObjectChange(O);}
 	virtual void		OnFrame					();
-    virtual void		OnRender				(int priority, bool strictB2F);
+	virtual void		OnRender				(int priority, bool strictB2F);
 
-    // IO
-    virtual bool   		IsNeedSave				()=0;
+	// IO
+	virtual bool   		IsNeedSave				()=0;
 
-    virtual bool   		LoadStream            		(IReader&);
-    virtual bool   		LoadLTX            		(CInifile&);
-    virtual void   		SaveStream            		(IWriter&);
-    virtual void   		SaveLTX            		(CInifile&, int id);
+	virtual bool   		LoadStream            		(IReader&);
+	virtual bool   		LoadLTX            		(CInifile&);
+	virtual void   		SaveStream            		(IWriter&);
+	virtual void   		SaveLTX            		(CInifile&, int id);
 
-    virtual bool		LoadSelection      		(IReader&);
-    virtual void		SaveSelection      		(IWriter&);
+	virtual bool		LoadSelection      		(IReader&);
+	virtual void		SaveSelection      		(IWriter&);
 
-    virtual bool		Export          		(LPCSTR path);
-    virtual bool		ExportGame         		(SExportStreams* F);
-    virtual bool		ExportStatic			(SceneBuilder* B, bool b_selected_only);
-    virtual bool 		GetStaticCformData		( mesh_build_data &data, bool b_selected_only );
-    // properties
-    virtual void		FillPropObjects(LPCSTR pref, PropItemVec& items);
-    virtual void		FillProp(LPCSTR pref, PropItemVec& items) {}
+	virtual bool		Export          		(LPCSTR path);
+	virtual bool		ExportGame         		(SExportStreams* F);
+	virtual bool		ExportStatic			(SceneBuilder* B, bool b_selected_only);
+	virtual bool 		GetStaticCformData		( mesh_build_data &data, bool b_selected_only );
+	// properties
+	virtual void		FillPropObjects(LPCSTR pref, PropItemVec& items);
+	virtual void		FillProp(LPCSTR pref, PropItemVec& items) {}
 
-    // utils
+	// utils
 	virtual bool 		GetSummaryInfo			(SSceneSummary* inf);
-    virtual void		GetBBox 				(Fbox& bb, bool bSelOnly);
+	virtual void		GetBBox 				(Fbox& bb, bool bSelOnly);
 
-    IC ObjectList&		GetObjects				(){return m_Objects;}
-    IC int				ObjCount				(){return m_Objects.size();}
+	IC ObjectList&		GetObjects				(){return m_Objects;}
+	IC int				ObjCount				(){return m_Objects.size();}
 
 	virtual BOOL 		_AppendObject			(CCustomObject* object);
 	virtual BOOL 		_RemoveObject			(CCustomObject* object);
 
-    // pick function
-    virtual BOOL 		RayPick					(CCustomObject*& object, float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf);
-    virtual BOOL 		FrustumPick				(ObjectList& lst, const CFrustum& frustum);
-    virtual BOOL 		SpherePick				(ObjectList& lst, const Fvector& center, float radius);
-    virtual int 		GetQueryObjects			(ObjectList& lst, int iSel, int iVis, int iLock);
-    virtual int 		LockObjects				(bool flag, bool bAllowSelectionFlag, bool bSelFlag);
+	// pick function
+	virtual BOOL 		RayPick					(CCustomObject*& object, float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf);
+	virtual BOOL 		FrustumPick				(ObjectList& lst, const CFrustum& frustum);
+	virtual BOOL 		SpherePick				(ObjectList& lst, const Fvector& center, float radius);
+	virtual int 		GetQueryObjects			(ObjectList& lst, int iSel, int iVis, int iLock);
+	virtual int 		LockObjects				(bool flag, bool bAllowSelectionFlag, bool bSelFlag);
 
-    virtual CCustomObject* FindObjectByName		(LPCSTR name, CCustomObject* pass=0);
+	virtual CCustomObject* FindObjectByName		(LPCSTR name, CCustomObject* pass=0);
 
-    virtual CCustomObject* CreateObject			(LPVOID data, LPCSTR name)=0;
+	virtual CCustomObject* CreateObject			(LPVOID data, LPCSTR name)=0;
 
-    virtual int			MultiRenameObjects		();
+	virtual int			MultiRenameObjects		();
 	void				OnSelected				(CCustomObject* object);
 	virtual const CCustomObject* LastSelected			() const;
 
-    virtual class ESceneCustomOTool* CastObjectTool() {return this;}
+	virtual class ESceneCustomOTool* CastObjectTool() {return this;}
+
+
+	virtual ETestResult TestSelectedObjectsFlag(size_t Flag) const override;
 };

@@ -773,11 +773,14 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
 	DWORD version = 0;
 	if (!map_name||(0==map_name[0])) return false;
 
-	xr_string Name = "IX-Ray Level Editor [";
-	Name += map_name;
-	Name += "]";
+	if (!bUndo)
+	{
+		xr_string Name = "IX-Ray Level Editor [";
+		Name += map_name;
+		Name += "]";
 
-	SDL_SetWindowTitle(g_AppInfo.Window, Name.c_str());
+		SDL_SetWindowTitle(g_AppInfo.Window, Name.c_str());
+	}
 
 	xr_string 		full_name;
 	full_name 		= map_name;
@@ -870,11 +873,14 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
 
 	if (!map_name||(0==map_name[0])) return false;
 
-	xr_string Name = "IX-Ray Level Editor [";
-	Name += map_name;
-	Name += "]";
+	if (!bUndo)
+	{
+		xr_string Name = "IX-Ray Level Editor [";
+		Name += map_name;
+		Name += "]";
 
-	SDL_SetWindowTitle(g_AppInfo.Window, Name.c_str());
+		SDL_SetWindowTitle(g_AppInfo.Window, Name.c_str());
+	}
 
 	xr_string 		full_name;
 	full_name 		= map_name;

@@ -21,11 +21,13 @@ enum EEditorState{
     esBuildLevel
 };
 
-struct ECORE_API SPBItem{
+struct ECORE_API SPBItem
+{
 	shared_str	text;
     shared_str	info;
-    float 		max;
-    float 		progress;
+    volatile float max;
+    volatile float progress;
+
 public:
                 SPBItem				(LPCSTR txt, LPCSTR inf, float mx):text(txt),info(inf),max(mx),progress(0.f){}
     void		GetInfo				(xr_string& txt, float& p, float& m);
