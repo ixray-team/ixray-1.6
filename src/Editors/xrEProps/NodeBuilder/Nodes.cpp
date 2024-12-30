@@ -81,6 +81,11 @@ void INodeUnknown::CreateContactLink(int Parent, int Child)
 	LinkStorage.emplace_back(Parent, Child);
 }
 
+INodeUnknown* INodeUnknown::GetNextNode()
+{
+	return nullptr;
+}
+
 void INodeUnknown::AddChild(INodeUnknown* Node, ELinkType Type)
 {
 	Childs.push_back(Node);
