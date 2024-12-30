@@ -5,29 +5,33 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-std::array<size_t, 21> CommandsOneArgs =
+std::array<size_t, 13> CommandsOneArgsInt =
 {
-	COMMAND_CHANGE_ACTION,
-	COMMAND_CHANGE_AXIS,
-	COMMAND_ICON_PICKER,
-	COMMAND_SOUND_EDITOR,
-	COMMAND_SHOW_PROPERTIES,
-	COMMAND_UPDATE_PROPERTIES,
-	COMMAND_ZOOM_EXTENTS,
-	COMMAND_GRID_NUMBER_OF_SLOTS,
-	COMMAND_GRID_SLOT_SIZE,
-	COMMAND_MUTE_SOUND,
-	COMMAND_EXECUTE_COMMAND_LIST,
-	COMMAND_LOG_COMMANDS,
-	COMMAND_ICON_REMOVE,
-	COMMAND_LOAD,
-	COMMAND_UNLOAD_LEVEL_PART,
-	COMMAND_LOAD_LEVEL_PART,
-	COMMAND_HIDE_ALL,
-	COMMAND_HIDE_SEL,
-	COMMAND_LOCK_ALL,
-	COMMAND_LOCK_SEL,
-	COMMAND_SHOWCONTEXTMENU
+	COMMAND_CHANGE_ACTION,    // u32
+	COMMAND_CHANGE_AXIS,      // u32
+	COMMAND_UPDATE_PROPERTIES,// u32
+	COMMAND_ZOOM_EXTENTS,     // u32
+	COMMAND_GRID_NUMBER_OF_SLOTS, // u32
+	COMMAND_GRID_SLOT_SIZE,   // u32
+	COMMAND_MUTE_SOUND,       // u32
+	COMMAND_LOG_COMMANDS,     // u32
+	COMMAND_HIDE_ALL,         // u32
+	COMMAND_HIDE_SEL,		  // u32
+	COMMAND_LOCK_ALL,		  // u32
+	COMMAND_LOCK_SEL,		  // u32
+	COMMAND_SHOWCONTEXTMENU   // u32
+};
+
+std::array<size_t, 8> CommandsOneArgsString =
+{
+	COMMAND_ICON_REMOVE,      // string
+	COMMAND_LOAD,             // string
+	COMMAND_UNLOAD_LEVEL_PART,// string
+	COMMAND_LOAD_LEVEL_PART,  // string
+	COMMAND_EXECUTE_COMMAND_LIST, // string
+	COMMAND_ICON_PICKER,      // string
+	COMMAND_SOUND_EDITOR,     // string
+	COMMAND_SHOW_PROPERTIES   // string ?
 };
 
 std::array<size_t, 9> CommandsTwoArgs =
@@ -46,45 +50,54 @@ std::array<size_t, 9> CommandsTwoArgs =
 
 CUIMacroView::CUIMacroView()
 {
-	for (ECoreCommands StartCommand = (ECoreCommands)(COMMAND_INITIALIZE + 1); StartCommand < COMMAND_MAIN_LAST;)
+	auto ConvertCommandToString = [this](auto& EnumValue)
 	{
-		xr_string CommandStr = magic_enum::enum_name(StartCommand).data();
+		xr_string CommandStr = magic_enum::enum_name(EnumValue).data();
 		CommandStr = CommandStr.substr(xr_strlen("COMMAND_"));
+		
+		bool FirstChar = true;
+		for (char& Word : CommandStr)
+		{
+			if (Word == '_')
+			{
+				Word = ' ';
+			}
+
+			if (!FirstChar)
+			{
+				Word = tolower(Word);
+			}
+
+			FirstChar = false;
+		}
 
 		MacroNodeTypes NodeInst;
-		NodeInst.CommandID = StartCommand;
+		NodeInst.CommandID = EnumValue;
 		NodeInst.RegName = CommandStr;
 
-		bool HasOneArg = std::find(CommandsOneArgs.begin(), CommandsOneArgs.end(), StartCommand) != CommandsOneArgs.end();
-		bool HasTwoArg = std::find(CommandsTwoArgs.begin(), CommandsTwoArgs.end(), StartCommand) != CommandsTwoArgs.end();
+		bool HasOneArg = std::find(CommandsOneArgsInt.begin(), CommandsOneArgsInt.end(), EnumValue) != CommandsOneArgsInt.end();
+		HasOneArg = HasOneArg || std::find(CommandsOneArgsString.begin(), CommandsOneArgsString.end(), EnumValue) != CommandsOneArgsString.end();
+		bool HasTwoArg = std::find(CommandsTwoArgs.begin(), CommandsTwoArgs.end(), EnumValue) != CommandsTwoArgs.end();
 		NodeInst.Type = HasOneArg ? MacroType::eOneArg : (HasTwoArg ? MacroType::eTwoArg : MacroType::eVoid);
 
 		CommandsList.push_back(std::move(NodeInst));
+		(*(u32*)&EnumValue)++;
+	};
 
-		(*(u32*)&StartCommand)++;
+	for (ECoreCommands StartCommand = (ECoreCommands)(COMMAND_INITIALIZE + 1); StartCommand < COMMAND_MAIN_LAST;)
+	{
+		ConvertCommandToString(StartCommand);
 	}
 
 	for (ELECommand StartCommand = (ELECommand)(COMMAND_EXTFIRST_EXT + 1); StartCommand < COMMAND_LE_END;)
 	{
-		xr_string CommandStr = magic_enum::enum_name(StartCommand).data();
-		CommandStr = CommandStr.substr(xr_strlen("COMMAND_"));
-		
-		MacroNodeTypes NodeInst;
-		NodeInst.CommandID = StartCommand;
-		NodeInst.RegName = CommandStr;
-
-		bool HasOneArg = std::find(CommandsOneArgs.begin(), CommandsOneArgs.end(), StartCommand) != CommandsOneArgs.end();
-		bool HasTwoArg = std::find(CommandsTwoArgs.begin(), CommandsTwoArgs.end(), StartCommand) != CommandsTwoArgs.end();
-		NodeInst.Type = HasOneArg ? MacroType::eOneArg : (HasTwoArg ? MacroType::eTwoArg : MacroType::eVoid);
-
-		CommandsList.push_back(std::move(NodeInst));
-		(*(u32*)&StartCommand)++;
+		ConvertCommandToString(StartCommand);
 	}
 
 	std::sort(CommandsList.begin(), CommandsList.end(), [](const MacroNodeTypes& Left, const MacroNodeTypes& Right)
-		{
-			return Left.RegName[0] < Right.RegName[0];
-		});
+	{
+		return Left.RegName[0] < Right.RegName[0];
+	});
 }
 
 CUIMacroView::~CUIMacroView()
@@ -103,6 +116,13 @@ void CUIMacroView::Draw()
 	if (ImGui::Begin("Macro Node Viewer", &IsOpen))
 	{
 		auto& io = ImGui::GetIO();
+		
+		if (ImGui::Button("Run"))
+		{
+			Exec();
+		}
+		ImGui::SameLine();
+
 		ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
 		ImGui::Separator();
@@ -157,4 +177,38 @@ void CUIMacroView::Draw()
 void CUIMacroView::Show(bool State)
 {
 	IsOpen = State;
+}
+
+void CUIMacroView::Exec()
+{
+	CNodeMacro* Node = (CNodeMacro*)Nodes.front();
+	ExecMacro(Node);
+}
+
+void CUIMacroView::ExecMacro(CNodeMacro* Node)
+{
+	MacroType Type = Node->GetType();
+
+	if (Type == MacroType::eVoid)
+	{
+		ExecCommand(Node->MacroCommandID);
+	}
+	else if (Type == MacroType::eOneArg)
+	{
+		bool IsInt = std::find(CommandsOneArgsInt.begin(), CommandsOneArgsInt.end(), Node->MacroCommandID) != CommandsOneArgsInt.end();
+		if (IsInt)
+		{
+			u32 Value = Node->FirstValue.empty() ? 0 : atoi(Node->FirstValue.data());
+			ExecCommand(Node->MacroCommandID, Value);
+		}
+		else
+		{
+			ExecCommand(Node->MacroCommandID, Node->FirstValue);
+		}
+	}
+
+	for (INodeUnknown* Macro : Node->OutNodes)
+	{
+		ExecMacro((CNodeMacro*)Macro);
+	}
 }

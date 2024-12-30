@@ -18,7 +18,8 @@ public:
 	void Draw() override;
 
 	void SetType(MacroType NewType);
-	
+	MacroType GetType() const;
+
 public:
 	size_t MacroCommandID = -1;
 	xr_string FirstValue;

@@ -16,7 +16,6 @@ void CNodeMacro::Draw()
 
 	if (Type == MacroType::eVoid)
 	{
-
 		ImGui::PushItemWidth(60);
 		ImGui::Text("Empty args...");
 		ImGui::PopItemWidth();
@@ -27,6 +26,8 @@ void CNodeMacro::Draw()
 		ImGui::SameLine();
 		ImGui::PushItemWidth(120);
 		string256 Value1 = {};
+		strcpy(Value1, FirstValue.data());
+
 		if (ImGui::InputText("##frstval", (char*)&Value1, sizeof(Value1)))
 		{
 			FirstValue = Value1;
@@ -40,14 +41,21 @@ void CNodeMacro::Draw()
 		ImGui::SameLine();
 		ImGui::PushItemWidth(60);
 		string256 Value2 = {};
+		strcpy(Value2, SecondValue.data());
+
 		if (ImGui::InputText("##scndval", (char*)&Value2, sizeof(Value2)))
 		{
-			FirstValue = Value2;
+			SecondValue = Value2;
 		}
 		ImGui::PopItemWidth();
 	}
 
 	DrawEnd();
+}
+
+MacroType CNodeMacro::GetType() const
+{
+	return Type;
 }
 
 void CNodeMacro::SetType(MacroType NewType)

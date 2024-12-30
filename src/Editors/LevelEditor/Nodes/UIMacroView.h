@@ -21,6 +21,8 @@ public:
 
 	virtual void Draw() override;
 	void Show(bool State);
+	void Exec();
 
 private:
+	void ExecMacro(CNodeMacro* Node);
 };
