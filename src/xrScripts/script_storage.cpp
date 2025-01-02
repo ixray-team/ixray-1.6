@@ -539,7 +539,7 @@ bool CScriptStorage::print_output(lua_State *L, LPCSTR caScriptFileName, int iEr
 	if (iErorCode)
 		print_error		(L,iErorCode);
 
-#if 0
+#if 1
 	lua_getglobal(L, "debug"); // stack: err debug
 	lua_getfield(L, -1, "traceback"); // stack: err debug debug.traceback
 
