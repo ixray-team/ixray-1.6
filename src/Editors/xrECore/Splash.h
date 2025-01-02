@@ -1,11 +1,10 @@
-//---------------------------------------------------------------------------
 #pragma once
 
+#include "xrECore/resource.h"
 
 namespace splash
 {
-    ECORE_API void show(const bool topmost);
+    ECORE_API void show(int);
+    ECORE_API void update(int, const char[]);
     ECORE_API void hide();
-    ECORE_API void update_progress(int progress);
-}   // namespace splash
-//---------------------------------------------------------------------------
+}

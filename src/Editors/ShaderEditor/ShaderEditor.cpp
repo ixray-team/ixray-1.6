@@ -2,20 +2,39 @@
 //
 #include "stdafx.h"
 #include "../../xrEngine/xr_input.h"
+#include "xrECore/Splash.h"
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+    splash::show(IDB_SE);
+
+    splash::update(1, "");
+
     if (!IsDebuggerPresent()) Debug._initialize(false);
+
+    splash::update(5, "");
+
     const char* FSName = "fs.ltx";
     Core._initialize("Shader", ELogCallback, 1, FSName);
 
+    splash::update(25, "");
+
     Tools = new CShaderTool();
     STools = (CShaderTool*)Tools;
+
+    splash::update(55, "");
+
     UI = new CShaderMain();
     UI->RegisterCommands();
+
+    splash::update(80, "");
 
     UIMainForm* MainForm = new UIMainForm();
     ::MainForm = MainForm;
     UI->Push(MainForm, false);
+
+    splash::update(100, "");
+    splash::hide();
 
     bool NeedExit = false;
     while (!NeedExit)
