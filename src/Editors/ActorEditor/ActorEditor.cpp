@@ -5,6 +5,8 @@
 
 #include "../xrEProps/UIBoneView.h"
 
+#include "xrECore/Splash.h"
+
 void DragFile(xr_string File)
 {
 	bool NeedConv = IsUTF8(File.c_str());
@@ -81,21 +83,38 @@ void DragFile(xr_string File)
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+	splash::show(IDB_AE);
+
+	splash::update(1, "");
+
 	if (!IsDebuggerPresent())
 		Debug._initialize(false);
+
+	splash::update(5, "");
 
 	const char* FSName = "fs.ltx";
 	Core._initialize("Actor", ELogCallback, 1, FSName);
 
+	splash::update(20, "");
+
 	Tools = new CActorTools();
 	ATools = (CActorTools*)Tools;
+
+	splash::update(35, "");
+
 	UI = new CActorMain();
 	UI->RegisterCommands();
+
+	splash::update(55, "");
 
 	UIMainForm* MainForm = new UIMainForm();
 	::MainForm = MainForm;
 
+	splash::update(80, "");
+
 	PGMLib->Load();
+
+	splash::update(90, "");
 
 	UI->PushBegin(MainForm, false);
 
@@ -110,6 +129,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 			ExecCommand(COMMAND_LOAD, SecondArg);
 		}
 	}
+
+	splash::update(100, "");
+	splash::hide();
 
 	bool NeedExit = false;
 

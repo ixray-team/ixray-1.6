@@ -26,6 +26,12 @@ file(GLOB_RECURSE ECORE_SOURCE_ERR_FILES CONFIGURE_DEPENDS
     "dxerr/*.*"
 )
 
+file(GLOB_RECURSE ECORE_SOURCE_RES_FILES 
+    "*.ico"
+    "*.rc"
+    "*.bmp"
+)
+
 file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRenderDX9/dx9r_constants_cache.*"
     "../../Layers/xrRender/Animation.*"
@@ -135,11 +141,13 @@ source_group("Render" FILES ${ECORE_SOURCE_RENDER_FILES})
 source_group("RenderEx" FILES ${ECORE_SOURCE_RENDEREX_FILES})
 source_group("Other"  FILES ${ECORE_SOURCE_EXT_FILES})
 source_group("dxerr"  FILES ${ECORE_SOURCE_ERR_FILES})
+source_group("Resources"  FILES ${ECORE_SOURCE_RES_FILES})
 
 # Apply list
 list(APPEND ECORE_SRC_FILES ${ECORE_SOURCE_ALL_FILES})
 list(APPEND ECORE_SRC_FILES ${ECORE_SOURCE_RENDER_FILES})
 list(APPEND ECORE_SRC_FILES ${ECORE_SOURCE_EXT_FILES})
+list(APPEND ECORE_SRC_FILES ${ECORE_SOURCE_RES_FILES})
 
 # Remove unused files
 list(FILTER ECORE_SRC_FILES EXCLUDE REGEX "cl_raypick.cpp$")

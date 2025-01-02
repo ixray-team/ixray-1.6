@@ -20,35 +20,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
 	bIsLevelEditor = true;
 
-	//if (strstr(GetCommandLine(), "-nosplash") == nullptr)
-	{
-		constexpr bool topmost = true;
-		splash::show(topmost);
-	}
+	splash::show(IDB_LE);
 
-	splash::update_progress(1);
+	splash::update(1, "");
 
 	if (!IsDebuggerPresent())
 		Debug._initialize(false);
 	
-	splash::update_progress(5);
+	splash::update(5, "");
 
 	const char* FSName = "fs.ltx";
 	Core._initialize("LevelEditor", ELogCallback, 1, FSName);
 
-	splash::update_progress(24);
+	splash::update(20, "");
 
 	Tools = new CLevelTool();
 	LTools = static_cast<CLevelTool*>(Tools);
 
-	splash::update_progress(5);
+	splash::update(35, "");
 
 	UI = new CLevelMain();
 	UI->RegisterCommands();
 
 	LUI = static_cast<CLevelMain*>(UI);
 
-	splash::update_progress(15);
+	splash::update(55,"");
 
 	Scene = new EScene();
 	EditorScene = Scene;
@@ -59,7 +55,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	g_XrGameManager = new XrGameManager();
 	g_SEFactoryManager = new XrSEFactoryManager();
 
-	splash::update_progress(24);
+	splash::update(80, "");
 
 	// Initialize APP
 	GameMaterialLibraryEditors->Load();
@@ -84,16 +80,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 	::MainForm = MainForm;
 	UI->Push(MainForm, false);
 	
-	splash::update_progress(25);
+	splash::update(90, "");
 	
-	splash::update_progress(1);
+	//splash::update_progress(1);
 
 	bool NeedExit = false;
 	MainForm->GetRenderForm()->DragFunctor = DragDrop;
 	
 	GContentView->Init();
 	UI->PushBegin(GContentView);
-
+	splash::update(100, "");
 	splash::hide();
 	while (!NeedExit)
 	{

@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "../../xrEngine/xr_input.h"
 
+#include "xrECore/Splash.h"
+
 void BeginRender()
 {
 #define D3DCOLOR_RGBA(r,g,b,a) D3DCOLOR_ARGB(a,r,g,b)
@@ -24,23 +26,41 @@ void EndRender()
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+    splash::show(IDB_PE);
+
+    splash::update(1, "");
+
     if (!IsDebuggerPresent()) Debug._initialize(false);
     const char* FSName = "fs.ltx";
 
+    splash::update(5, "");
+
     CoInitialize(nullptr);
 
+    splash::update(28, "");
+
     Core._initialize("Patricle", ELogCallback, 1, FSName);
+
+    splash::update(45, "");
 
     psDeviceFlags.set(rsFullscreen, false);
 
     Tools = new CParticleTool();
     PTools = (CParticleTool*)Tools;
+
+    splash::update(67, "");
+
     UI = new CParticleMain();
     UI->RegisterCommands();
     
+    splash::update(86, "");
+
     UIMainForm* MainForm = new UIMainForm();
     ::MainForm = MainForm;
     UI->Push(MainForm, false);
+
+    splash::update(100, "");
+    splash::hide();
 
     //MainForm->Frame();
     bool NeedExit = false;

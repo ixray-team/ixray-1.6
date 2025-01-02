@@ -1,145 +1,182 @@
 ﻿#include "stdafx.h"
-#include "resource.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <SDL_Ext/SDL_image.h>
+#include <SDL3/SDL.h>
+
 #include "Splash.h"
-#include <CommCtrl.h>
-//---------------------------------------------------------------------------
+#define ErrorMsg(fmt,...) Msg("[Editor Splash]<%s ~ line %d>" fmt, __FUNCTION__, __LINE__, __VA_ARGS__)
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #pragma warning(disable: 4047)
 HINSTANCE hInstanceG = (HINSTANCE)&__ImageBase;
 #pragma warning(default: 4047)
 
-HINSTANCE               hInst;                        // Указатель на экземпляр приложения.
-HWND                    hProgress;                    // Дескриптор прогресс бара.
-int                     nCounter;                     // Счётчик.
-COLORREF                clrBg = RGB(25, 25, 0);   // Цвет фона прогресс бара.
-COLORREF                clrBarRed = RGB(255, 0, 0);   // Цвет индикатора хода выполнения прогресс бара.
-// COLORREF  clrBarYellow = RGB(255, 255, 0); // Цвет индикатора хода выполнения прогресс бара.
-// COLORREF  clrBarGreen  = RGB(0, 255, 0);   // Цвет индикатора хода выполнения прогресс бара.
+SDL_Window* splashWindow = nullptr;
+SDL_Renderer* splashRenderer = nullptr;
+SDL_Texture* texture = nullptr;
+bool isInit = false;
+int WinW = 0, WinH = 0;
 
-HBITMAP                 hSplashBMP;
-HWND                    logoWindow = nullptr;
-
-int                     m_MinPos = 0;
-int                     m_MaxPos = 100;
-
-static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+void Update(int progress = 0)
 {
-    switch (msg)
-    {
-    case WM_PAINT:
-    {
-        char        buffer[64];
-        RECT        rect;
-        PAINTSTRUCT ps;
-        HDC         hdc = BeginPaint(hw, &ps);
-        HBRUSH      brush = CreatePatternBrush(hSplashBMP);
+	int pgHeight = 10;
 
-        GetClientRect(hw, &rect);
-        FillRect(hdc, &rect, brush);
-        DeleteObject(brush);
+	SDL_FRect progressBarBackground = { 0, WinH - pgHeight, WinW, pgHeight };
+	SDL_FRect progressBarFill = 
+	{ 
+		progressBarBackground.x, 
+		progressBarBackground.y,
+		(progress * progressBarBackground.w) / 100,
+		progressBarBackground.h
+	};
 
-        rect.top = 275;
-        // Текст и роценты процесса стадий загрузки.
-        if (nCounter <= 1)
-            sprintf_s(buffer, "Start Load...  %d %%", nCounter);
-        else if (nCounter <= 6)
-            sprintf_s(buffer, "Core initializing...  %d %%", nCounter);
-        else if (nCounter <= 30)
-            sprintf_s(buffer, "Loading...  %d %%", nCounter);
-        else if (nCounter <= 35)
-            sprintf_s(buffer, "Register Commands...  %d %%", nCounter);
-        else if (nCounter <= 50)
-            sprintf_s(buffer, "Loading Editor...  %d %%", nCounter);
-        else if (nCounter <= 74)
-            sprintf_s(buffer, "Loading MainForm...  %d %%", nCounter);
-        else if (nCounter <= 99)
-            sprintf_s(buffer, "Loading...  %d %%", nCounter);
-        else if (nCounter == 100)
-            sprintf_s(buffer, "Loading is Complete!  %d %%", nCounter);
+	SDL_RenderClear(splashRenderer);
 
-        // Устанавливаем Цвет текста.
-        if (nCounter == 100)
-            SetTextColor(hdc, RGB(0x00, 0xFF, 0x00));
-        else
-            SetTextColor(hdc, RGB(0xFF, 0x00, 0x00));
-        SetBkMode(hdc, TRANSPARENT);
-        DrawTextA(hdc, buffer, -1, &rect, DT_SINGLELINE | DT_NOCLIP | DT_CENTER);
-        EndPaint(hw, &ps);
-    }
-    break;
-    case WM_INITDIALOG:
-    {
-        // Здесь мы должны использовать исполняемый модуль для загрузки нашего растрового ресурса.
-        hSplashBMP = LoadBitmap(hInstanceG, MAKEINTRESOURCE(IDB_BITMAP1));
+	SDL_QueryTexture(texture, nullptr, nullptr, &WinW, &WinH);
 
-        hProgress = CreateWindowEx(0,
-            PROGRESS_CLASS,   // Указатель на класс прогресс бара
-            (LPTSTR)NULL, WS_CHILD | WS_VISIBLE | PBS_SMOOTH /* | WS_BORDER*/,
-            (600-370)/2,    // X
-            322-30,   // Y
-            370,   // Ширина
-            13,    // Высота
-            hw, (HMENU)0, hInstanceG, NULL);
-        // Устанавливаем Цвета прогресс бара.
-        SendMessage(hProgress, PBM_SETBKCOLOR, 0, (LPARAM)clrBg);
-        SendMessage(hProgress, PBM_SETBARCOLOR, 0, (LPARAM)clrBarRed);
-        // Устанавливаем диапазон прогресс бара.
-        SendMessage(hProgress, PBM_SETRANGE, 0, MAKELPARAM(m_MinPos, m_MaxPos));
-        SendMessage(hProgress, PBM_SETSTEP, (WPARAM)1, 0);
-        nCounter = 0;
-    }
-    break;
-    case WM_DESTROY:
-        break;
-    case WM_CLOSE:
-        DestroyWindow(hw);
-        break;
-    case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL)
-            DestroyWindow(hw);
-        break;
-    default:
-        return false;
-    }
-    return true;
+	SDL_FRect dstRect = { 0, 0, WinW, WinH };
+	SDL_RenderTexture(splashRenderer, texture, nullptr, &dstRect);
+
+	SDL_SetRenderDrawColor(splashRenderer, 150, 150, 150, 255);
+	SDL_RenderFillRect(splashRenderer, &progressBarBackground);
+
+	SDL_SetRenderDrawColor(splashRenderer, 3, 181, 3, 255);
+	SDL_RenderFillRect(splashRenderer, &progressBarFill);
+
+	SDL_RenderPresent(splashRenderer);
 }
 
-//---------------------------------------------------------------------------
+SDL_Surface* LoadPNGSurfaceFromResource(unsigned char* imageData, LPCTSTR lpName, LPCTSTR lpType) {
+	HMODULE hMODULE = hInstanceG;
+
+	HRSRC hRes = FindResource(hMODULE, lpName, lpType);
+	if (!hRes) {
+		ErrorMsg("Failed to find resource (ID %d)", lpName);
+		return nullptr;
+	}
+
+	HGLOBAL hMem = LoadResource(hInstanceG, hRes);
+	if (!hMem) {
+		ErrorMsg("Failed to load resource (ID %d)", lpName);
+		return nullptr;
+	}
+
+	void* pResData = LockResource(hMem);
+	if (!pResData) {
+		ErrorMsg("Failed to lock resource (ID %d)", lpName);
+		return nullptr;
+	}
+
+	DWORD resSize = SizeofResource(hInstanceG, hRes);
+
+	int width, height, channels;
+	imageData = stbi_load_from_memory((unsigned char*)pResData, resSize, &width, &height, &channels, STBI_rgb_alpha);
+	if (!imageData) {
+		ErrorMsg("Failed to decode PNG (ID %d)", lpName);
+		return nullptr;
+	}
+	
+	SDL_Surface* surface = SDL_CreateSurfaceFrom(
+		imageData,            
+		width,                
+		height,               
+		width * 4,            
+		SDL_PIXELFORMAT_RGBA32
+	);
+
+	if (!surface) {
+		stbi_image_free(imageData);
+		ErrorMsg("Failed to create pixel format (ID %d). %s", lpName, SDL_GetError());
+		return nullptr;
+	}
+
+	WinW = width;
+	WinH = height;
+
+	return surface;
+}
+
+void Destroy()
+{
+	SDL_DestroyRenderer(splashRenderer);
+	SDL_DestroyWindow(splashWindow);
+	SDL_DestroyTexture(texture);
+
+	splashRenderer = nullptr;
+	splashWindow = nullptr;
+	texture = nullptr;
+}
 
 namespace splash
 {
-    ECORE_API void show(const bool topmost)
-    {
-        if (logoWindow)
-            return;
+	ECORE_API void show(int idb)
+	{
+		if (isInit) return;
 
-        //logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
-        logoWindow = CreateDialog(hInstanceG, MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
-        const HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC);
-        RECT       logoRect;
-        GetWindowRect(logoPicture, &logoRect);
-        const HWND prevWindow = topmost ? HWND_TOPMOST : HWND_NOTOPMOST;
-        SetWindowPos(logoWindow, HWND_TOPMOST, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top, SWP_NOMOVE | SWP_SHOWWINDOW);
-        UpdateWindow(logoWindow);
-    }
+		if (SDL_Init(0) != 0) {
+			ErrorMsg("SDL_Init Error: %s", SDL_GetError());
+			return;
+		}
+		
+		unsigned char* imageData = nullptr;
 
-    ECORE_API void update_progress(int progress)
-    {
-        nCounter += progress;
-        clamp(nCounter, m_MinPos, m_MaxPos);
-        SendMessage(hProgress, PBM_SETPOS, nCounter, 0);
-        RedrawWindow(logoWindow, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
-    }
+		SDL_Surface* surface = LoadPNGSurfaceFromResource(imageData, MAKEINTRESOURCE(idb), _T("PNG"));
+		
+		if (!surface)
+		{
+			ErrorMsg("Failed to create surface (ID %d)", idb);
+			return;
+		}
 
-    ECORE_API void hide()
-    {
-        if (logoWindow != nullptr)
-        {
-            DestroyWindow(logoWindow);
-            logoWindow = nullptr;
-        }
-    }
-}   // namespace splash
+		splashWindow = SDL_CreateWindow(
+			"Loading...", 
+			WinW,
+			WinH,
+			SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP | 
+			SDL_WINDOW_NOT_FOCUSABLE | SDL_WINDOW_TRANSPARENT
+		);
+		
+		if (!splashWindow) {
+			Destroy();
+			ErrorMsg("SDL_CreateWindow Error: %s", SDL_GetError());
+			return;
+		}
 
-//---------------------------------------------------------------------------
+		splashRenderer = SDL_CreateRenderer(splashWindow, NULL, NULL
+		/*"splashRenderer", SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC*/);
+		if (!splashRenderer) {
+			Destroy();
+			ErrorMsg("SDL_CreateRenderer Error: %s", SDL_GetError());
+			return;
+		}
+		
+		texture = SDL_CreateTextureFromSurface(splashRenderer, surface);
+		SDL_DestroySurface(surface);
+		stbi_image_free(imageData);
+
+		if (!texture) {
+			ErrorMsg("Failed to create texture (ID %d)", idb);
+			return;
+		}
+
+		Update();
+
+		isInit = true;
+		return;
+	}
+
+	ECORE_API void splash::update(int progress, const char[])
+	{
+		if (!isInit) return;
+		
+		Update(progress);
+
+		return;
+	}
+
+	ECORE_API void hide()
+	{
+		Destroy();
+	}
+}
