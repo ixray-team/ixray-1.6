@@ -8,32 +8,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
     splash::show(IDB_SE);
 
-    splash::update(1, "");
+    splash::update(5, "Initializing Debugger");
 
     if (!IsDebuggerPresent()) Debug._initialize(false);
 
-    splash::update(5, "");
+    splash::update(15, "Initializing Core System");
 
     const char* FSName = "fs.ltx";
     Core._initialize("Shader", ELogCallback, 1, FSName);
 
-    splash::update(25, "");
+    splash::update(35, "Initializing Shader Tools");
 
     Tools = new CShaderTool();
     STools = (CShaderTool*)Tools;
 
-    splash::update(55, "");
+    splash::update(60, "Registering UI Commands");
 
     UI = new CShaderMain();
     UI->RegisterCommands();
 
-    splash::update(80, "");
-
+    splash::update(85, "Creating Main UI Form");
     UIMainForm* MainForm = new UIMainForm();
     ::MainForm = MainForm;
     UI->Push(MainForm, false);
 
-    splash::update(100, "");
+    splash::update(100, "Finalizing");
     splash::hide();
 
     bool NeedExit = false;

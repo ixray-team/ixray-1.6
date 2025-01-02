@@ -85,39 +85,38 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
 	splash::show(IDB_AE);
 
-	splash::update(1, "");
+	splash::update(2, "Initializing Debugger");
 
 	if (!IsDebuggerPresent())
 		Debug._initialize(false);
 
-	splash::update(5, "");
+	splash::update(5, "Core Initialization");
 
 	const char* FSName = "fs.ltx";
 	Core._initialize("Actor", ELogCallback, 1, FSName);
 
-	splash::update(20, "");
+	splash::update(20, "Initializing Actor Tools");
 
 	Tools = new CActorTools();
 	ATools = (CActorTools*)Tools;
 
-	splash::update(35, "");
+	splash::update(35, "Registering UI Commands");
 
 	UI = new CActorMain();
 	UI->RegisterCommands();
 
-	splash::update(55, "");
+	splash::update(50, "Creating Main UI Form");
 
 	UIMainForm* MainForm = new UIMainForm();
 	::MainForm = MainForm;
 
-	splash::update(80, "");
+	splash::update(75, "Loading Game Materials");
 
 	PGMLib->Load();
 
-	splash::update(90, "");
-
+	splash::update(85, "Initializing UI");
 	UI->PushBegin(MainForm, false);
-
+	splash::update(90, "Processing Command-Line Arguments");
 	int ArgsCount = 0;
 	auto Commands = CommandLineToArgvW(GetCommandLine(), &ArgsCount);
 
@@ -130,7 +129,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		}
 	}
 
-	splash::update(100, "");
+	splash::update(100, "Finalizing");
 	splash::hide();
 
 	bool NeedExit = false;
