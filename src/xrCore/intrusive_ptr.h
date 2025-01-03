@@ -14,21 +14,18 @@
 
 #pragma pack(push,4)
 
-struct intrusive_base {
-	u32		m_ref_count;
+struct intrusive_base 
+{
+	xr_atomic_u32 m_ref_count;
 
-	IC			intrusive_base	() : m_ref_count(0)
+	IC intrusive_base() : m_ref_count(0)
 	{
 	}
 
 	template <typename T>
 	IC	void	_release		(T*object)
 	{
-		try {
-			xr_delete	(object);
-		}
-		catch(...) {
-		}
+		xr_delete	(object);
 	}
 };
 
