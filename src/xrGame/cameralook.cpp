@@ -255,13 +255,17 @@ void CCameraLook2::Load(LPCSTR section)
 {
 	CCameraLook::Load		(section);
 
-	m_cam_offset_r = pSettings->r_fvector3(section, "offset_right");
-	m_cam_offset_l = pSettings->r_fvector3(section, "offset_left");
+	Fvector defaultOffsetRight = {};
+	defaultOffsetRight.set(-0.4f, 0.2f, 0.0f);
+	Fvector defaultOffsetLeft = {};
+	defaultOffsetLeft.set(0.314f, 0.2f, 0.0f);
+
+	m_cam_offset_r = READ_IF_EXISTS(pSettings, r_fvector3, section, "offset_right", defaultOffsetRight);
+	m_cam_offset_l = READ_IF_EXISTS(pSettings, r_fvector3, section, "offset_left", defaultOffsetLeft);
 
 	dist = 1.4f;
 	prev_d = 0.0f;
 }
-
 
 void CCameraFixedLook::Load	(LPCSTR section)
 {
