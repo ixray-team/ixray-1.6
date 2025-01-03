@@ -102,7 +102,7 @@ void DragDrop(const xr_string& Path, int Type)
 
 			string256 namebuffer;
 			Scene->GenObjectName(OBJCLASS_SCENEOBJECT, namebuffer, NewPath.data());
-			CSceneObject* obj = new CSceneObject((LPVOID)0, namebuffer);
+			CSceneObject* obj = new CSceneObject(nullptr, namebuffer);
 			CEditableObject* ref = obj->SetReference(NewPath.data());
 			if (!obj->Valid()) {
 				xr_delete(obj);
@@ -118,7 +118,7 @@ void DragDrop(const xr_string& Path, int Type)
 			string256 namebuffer;
 			Scene->GenObjectName(OBJCLASS_SPAWNPOINT, namebuffer, Path.data());
 			auto obj = Scene->GetOTool(OBJCLASS_SPAWNPOINT)->CreateObject((void*)Path.data(), namebuffer);
-			if (!obj->Valid()) 
+			if (!obj->Valid())
 			{
 				xr_delete(obj);
 				return;
@@ -137,9 +137,9 @@ void DragDrop(const xr_string& Path, int Type)
 
 			string256 namebuffer;
 			Scene->GenObjectName(OBJCLASS_GROUP, namebuffer, NewPath.data());
-			CGroupObject* obj = new CGroupObject((LPVOID)0, namebuffer);
+			CGroupObject* obj = new CGroupObject(nullptr, namebuffer);
 
-			if (obj->SetReference(NewPath.data())) 
+			if (obj->SetReference(NewPath.data()))
 			{
 				string256 namebuffer;
 				Scene->GenObjectName(OBJCLASS_GROUP, namebuffer, NewPath.data());
@@ -156,6 +156,9 @@ void DragDrop(const xr_string& Path, int Type)
 			Scene->SelectObjects(false, Type);
 			Scene->AppendObject(obj);
 		}
+		else return;
+
+		ExecCommand(COMMAND_CHANGE_TARGET, Type);
 	}
 }
 
