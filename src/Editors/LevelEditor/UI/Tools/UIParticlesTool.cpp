@@ -60,7 +60,7 @@ void UIParticlesTool::Draw()
 
 void UIParticlesTool::DrawObjectsList()
 {
-    if (ImGui::Begin("Objects List"))
+    if (ImGui::Begin("Edit group items"))
     {
         m_ParticlesList->Draw();
     }

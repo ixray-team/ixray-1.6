@@ -61,16 +61,6 @@ TUI::TUI()
 	int DisplayX = GetSystemMetrics(SM_CXFULLSCREEN);
 	int DisplayY = GetSystemMetrics(SM_CYFULLSCREEN);
 
-	   //RECT rect;
-	   //HWND taskBar = FindWindow(L"Shell_traywnd", NULL);
-	   //if (taskBar && GetWindowRect(taskBar, &rect)) 
-	   //{
-	   //    if (rect.top > 0)
-	   //        DisplayY -= rect.bottom - rect.top;
-	   //
-	   //    DisplayX -= rect.right - rect.left;
-	   //}
-
 	Viewport& MainView = Views.emplace_back();
 	ViewID = 0;
 
@@ -332,33 +322,6 @@ void TUI::ShowHint(const xr_string& s)
 }
 //---------------------------------------------------------------------------
 
-void TUI::ShowObjectHint()
-{
-	/*VERIFY(m_bReady);
-	if (!EPrefs->object_flags.is(epoShowHint)){
-//    	if (m_bHintShowing) HideHint();
-		return;
-	}
-	if (UI->CurrentView().m_Camera.IsMoving()||m_MouseCaptured) return;
-	if (!m_bAppActive) return;
-
-	GetCursorPos(&m_HintPoint);
-	TWinControl* ctr = FindVCLWindow(m_HintPoint);
-	if (ctr!=m_D3DWindow) return;
-
-	AStringVec SS;
-	Tools->OnShowHint(SS);
-	if (!ShowHint(SS)&&m_pHintWindow) HideHint();*/
-}
-//---------------------------------------------------------------------------
-void TUI::CheckWindowPos(HWND* form)
-{
-	/*if (form->Left+form->Width>Screen->Width) 	form->Left	= Screen->Width-form->Width;
-	if (form->Top+form->Height>Screen->Height)	form->Top 	= Screen->Height-form->Height;
-	if (form->Left<0) 							form->Left	= 0;
-	if (form->Top<0) 							form->Top 	= 0;*/
-}
-//---------------------------------------------------------------------------
 #include "..\xrEngine\IGame_Persistent.h"
 void TUI::PrepareRedraw()
 {
@@ -370,14 +333,7 @@ void TUI::PrepareRedraw()
 	u32 fog_color;
 	float fog_start, fog_end;
 	Tools->GetCurrentFog	(fog_color, fog_start, fog_end);
-/*
-	if (0==g_pGamePersistent->Environment().GetWeather().size())
-	{
-		g_pGamePersistent->Environment().CurrentEnv->fog_color.set	(color_get_R(fog_color),color_get_G(fog_color),color_get_B(fog_color));
-		g_pGamePersistent->Environment().CurrentEnv->fog_far		= fog_end;
-		g_pGamePersistent->Environment().CurrentEnv->fog_near		= fog_start;
-	}
-*/    
+
 	EDevice->SetRS( D3DRS_FOGCOLOR,		fog_color			);
 	EDevice->SetRS( D3DRS_RANGEFOGENABLE,	FALSE				);
 	if (Caps.bTableFog)	{
@@ -643,12 +599,8 @@ void TUI::OnFrame()
 	Tools->OnFrame		();
 
 	// show hint
-	ShowObjectHint		();
 	ResetBreak			();
-#if 0
-	// check mail
-	CheckMailslot		();
-#endif
+
 	// Progress
 	ProgressDraw		();
 }
@@ -834,51 +786,6 @@ void TUI::ProgressDraw()
 	}
 }
 
-void TUI::ShowConsole()
-{
-	//if (!m_HConsole)
-	//{
-	//	AllocConsole();
-	//	m_HConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	//	SetConsoleTextAttribute(m_HConsole, 15);
-	//}
-}
-
-void TUI::WriteConsole(TMsgDlgType mt, const char* txt)
-{
-	//if (m_HConsole)
-	//{
-	//	switch (mt)
-	//	{
-	//	case mtError:
-	//		SetConsoleTextAttribute(m_HConsole, 12);
-	//		break;
-	//	case mtInformation:
-	//		SetConsoleTextAttribute(m_HConsole, 11);
-	//		break;
-	//	case mtConfirmation:
-	//		SetConsoleTextAttribute(m_HConsole, 14);
-	//		break;
-	//	default:
-	//		SetConsoleTextAttribute(m_HConsole,15);
-	//		break;
-	//	}
-	//
-	//	DWORD  dw;
-	//	::WriteConsole(m_HConsole, txt, xr_strlen(txt), &dw, NULL);
-	//	::WriteConsole(m_HConsole, "\r\n", 2, &dw, NULL);
-	//}
-}
-
-void TUI::CloseConsole()
-{
-	//if (m_ProgressItems.size() == 0)
-	//{
-	//	FreeConsole();
-	//	m_HConsole = 0;
-	//}
-}
-
 TUI::Viewport& TUI::CurrentView()
 {
 	return Views[ViewID];
@@ -919,37 +826,40 @@ void TUI::RealResetUI()
 	}
 }
 
-void SPBItem::GetInfo			(xr_string& txt, float& p, float& m)
+void SPBItem::GetInfo(xr_string& txt, float& p, float& m)
 {
 	string256 temp_buff = {};
 
-	if (info.size())sprintf(temp_buff, "%s (%s)",text.c_str(),info.c_str());
-	else			sprintf(temp_buff, "%s",text.c_str());
+	if (info.size())sprintf(temp_buff, "%s (%s)", text.c_str(), info.c_str());
+	else			sprintf(temp_buff, "%s", text.c_str());
 
 	txt = temp_buff;
 
-	p				= progress;
-	m				= max;
-}  
-void SPBItem::Inc				(LPCSTR info, bool bWarn)
-{
-	Info						(info,bWarn);
-	Update						(progress+1.f);
-}
-void SPBItem::Update			(float val)
-{
-	progress					= val;
-	UI->ProgressDraw			();
-}
-void SPBItem::Info				(LPCSTR text, bool bWarn)
-{
-	if (text&&text[0]){
-		info					= text;
-		xr_string 				txt;
-		float 					p,m;
-		GetInfo					(txt,p,m);
-		ELog.Msg				(bWarn?mtError:mtInformation,txt.c_str());
-		UI->ProgressDraw		();
-	}
+	p = progress;
+	m = max;
 }
 
+void SPBItem::Inc(LPCSTR info, bool bWarn)
+{
+	Info(info, bWarn);
+	Update(progress + 1.f);
+}
+
+void SPBItem::Update(float val)
+{
+	progress = val;
+	UI->ProgressDraw();
+}
+
+void SPBItem::Info(LPCSTR text, bool bWarn)
+{
+	if (text && text[0])
+	{
+		info = text;
+		xr_string 				txt;
+		float 					p, m;
+		GetInfo(txt, p, m);
+		ELog.Msg(bWarn ? mtError : mtInformation, txt.c_str());
+		UI->ProgressDraw();
+	}
+}

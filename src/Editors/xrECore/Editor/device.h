@@ -33,7 +33,8 @@ class ECORE_API CEditorRenderDevice :
 {
 	friend class CUI_Camera;
 	friend class TUI;
-	HMODULE hPSGP;
+
+private:
 	float m_fNearer;
 
 	ref_shader m_CurrentShader;
@@ -64,7 +65,6 @@ public:
 
 	// Dependent classes
 	CResourceManager* Resources;
-	//CEStats*				EStatistic;
 
 public:
 	CEditorRenderDevice();
@@ -151,12 +151,13 @@ public:
 
 
 	void InitTimer();
+
 	// Mode control
-	virtual void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
+	virtual void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason) override
 	{
 	}
 
-	virtual void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
+	virtual void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input) override
 	{
 	}
 
@@ -166,12 +167,8 @@ public:
 	Shader_xrLC_LIB ShaderXRLC;
 
 private:
-	//virtual		CStatsPhysics* _BCL			StatPhysics();
 	virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
 	virtual void _BCL RemoveSeqFrame(pureFrame* f);
-
-private:
-	WNDCLASSEX m_WC;
 
 public:
 	void CreateWindow();
@@ -198,10 +195,7 @@ enum
 
 #define DEFAULT_CLEARCOLOR 0x00555555
 
-#define		REQ_CREATE()	if (!EDevice->bReady)	return;
-#define		REQ_DESTROY()	if (EDevice->bReady)	return;
-
-//#include "../../../xrCPU_Pipe/xrCPU_Pipe.h"
-//ENGINE_API extern xrDispatchTable	PSGP;
+#define REQ_CREATE()	if (!EDevice->bReady)	return;
+#define REQ_DESTROY()	if (EDevice->bReady)	return;
 
 #include "../../../Layers/xrRender/R_Backend_Runtime.h"

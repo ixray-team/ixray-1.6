@@ -788,7 +788,6 @@ bool EScene::BuildAIMap()
 		{
 			return false;;
 		}
-		UI->CloseConsole();
 		m_game_graph.clear();
 		m_RTFlags.set(flIsBuildedAIMap, TRUE);
 		m_RTFlags.set(flIsBuildedGameGraph, FALSE);
@@ -806,14 +805,12 @@ bool EScene::BuildGameGraph()
 			if (!BuildAIMap())
 				return false;
 		}
-		UI->ShowConsole();
+
 		if (!m_graph_builder.build_graph())
 		{
-			UI->CloseConsole();
 			return false;
 		}
 
-		UI->CloseConsole();
 		m_RTFlags.set(flIsBuildedGameGraph, TRUE);
 		UI->RedrawScene();
 	}

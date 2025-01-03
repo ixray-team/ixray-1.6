@@ -231,7 +231,7 @@ void UIMainMenuForm::Draw()
 		}
 		if (ImGui::BeginMenu("Sounds"))
 		{
-			if (ImGui::MenuItem("Sound Editor", "")) { ExecCommand(COMMAND_SOUND_EDITOR); }
+			if (ImGui::MenuItem("Sound Editor", "")) { ExecCommand(COMMAND_SOUND_EDITOR, xr_string("")); }
 			ImGui::Separator();
 			if (ImGui::MenuItem("Synchronize Sounds", "")) { ExecCommand(COMMAND_SYNC_SOUNDS); }
 			ImGui::Separator();

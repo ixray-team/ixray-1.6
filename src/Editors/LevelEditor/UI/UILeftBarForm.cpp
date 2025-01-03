@@ -40,7 +40,6 @@ void UILeftBarForm::Draw()
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 1));
 		ImGui::Columns(2);
-		ImGui::Separator();
 		for (u32 i = 0; Tools[i] != OBJCLASS_force_dword; i++)
 		{
 			u32 id = 0;

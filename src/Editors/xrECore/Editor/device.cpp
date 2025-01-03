@@ -99,13 +99,12 @@ CEditorRenderDevice::CEditorRenderDevice()
 	setup_luabind_allocator();
 }
 
-CEditorRenderDevice::~CEditorRenderDevice(){
+CEditorRenderDevice::~CEditorRenderDevice()
+{
 	VERIFY(!b_is_Ready);
-	//xr_delete(GameMaterialLibrary);
 	GameMaterialLibraryEditors = nullptr;
 }
 
-//extern void Surface_Init();
 #include "../../../xrCore/API/xrAPI.h"
 #include "../../../Layers/xrRender/dxRenderFactory.h"
 #include "../../../Layers/xrRender/dxUIRender.h"
@@ -126,6 +125,7 @@ void CEditorRenderDevice::Initialize()
 #endif
 
 	SDL_Init(0);
+
 	// compiler shader
     string_path fn;
     FS.update_path(fn,_game_data_,"shaders_xrlc.xr");
@@ -144,7 +144,6 @@ void CEditorRenderDevice::Initialize()
 	UIRenderImpl.CreateUIGeom();
 
 	Resize(EPrefs->start_w, EPrefs->start_h, EPrefs->start_maximized);
-	//HW.updateWindowProps(m_hWnd);
 
 	SDL_GetWindowSizeInPixels(g_AppInfo.Window, &Width, &Height);
 	SDL_GetWindowPosition(g_AppInfo.Window, &PosX, &PosY);
@@ -161,34 +160,20 @@ void CEditorRenderDevice::ShutDown()
 	::RImplementation.ShutDown	();
 
 	ShaderXRLC.Unload	();
-	//GameMaterialLibraryEditors->Unload		();
 
 	// destroy context
 	Destroy				();
-	//xr_delete			(pSystemFont);
-
-	//if (hPSGP)
-	//{
-	//	ttapi_Done_func* ttapi_Done = (ttapi_Done_func*)GetProcAddress(hPSGP, "ttapi_Done");	R_ASSERT(ttapi_Done);
-	//	if (ttapi_Done)
-	//		ttapi_Done();
-	//
-	//	FreeLibrary(hPSGP);
-	//	hPSGP = 0;
-	//	ZeroMemory(&PSGP, sizeof(PSGP));
-	//}
-	// destroy shaders
-//	PSLib.xrShutDown	();
 }
 
-void CEditorRenderDevice::InitTimer(){
-	Timer_MM_Delta	= 0;
+void CEditorRenderDevice::InitTimer()
+{
+	Timer_MM_Delta = 0;
 	{
-		u32 time_mm			= clock	();
-		while (clock()==time_mm);			// wait for next tick
-		u32 time_system		= clock();
-		u32 time_local		= TimerAsync	();
-		Timer_MM_Delta			= time_system-time_local;
+		u32 time_mm = clock();
+		while (clock() == time_mm);			// wait for next tick
+		u32 time_system = clock();
+		u32 time_local = TimerAsync();
+		Timer_MM_Delta = time_system - time_local;
 	}
 }
 
@@ -345,16 +330,10 @@ void CEditorRenderDevice::_Create(IReader* F)
 
 	// signal another objects
     UI->OnDeviceCreate			();           
-//.	seqDevCreate.Process		(rp_DeviceCreate);
-
-	//pSystemFont					= new CGameFont("hud_font_small");
-//	pSystemFont					= new CGameFont("hud_font_medium");
 }
 
 void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 {
-	//xr_delete					(pSystemFont);
-
 	b_is_Ready 						= FALSE;
     m_CurrentShader				= 0;
 
@@ -363,8 +342,6 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 	m_WireShader.destroy		();
 	m_SelectionShader.destroy	();
 	texture_null.destroy		();
-
-//.	seqDevDestroy.Process		(rp_DeviceDestroy);
 
 	::RImplementation.Models->OnDeviceDestroy	();
 
@@ -389,8 +366,6 @@ void  CEditorRenderDevice::Resize(int w, int h, bool maximized)
 void CEditorRenderDevice::Reset(bool)
 {
 	u32 tm_start = TimerAsync();
-
-	//UIChooseForm::SetNullTexture(nullptr);
 
 	Resources->reset_begin();
 	Resources->DeferredUnload();

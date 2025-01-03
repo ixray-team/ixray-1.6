@@ -109,8 +109,8 @@ protected:
 
     // mailslot
     HANDLE			hMailSlot;
+
 public:
-    void ShowObjectHint();
     void ShowHint(const xr_string& s);
     bool ShowHint(const AStringVec& SS);
     void HideHint();
@@ -213,16 +213,6 @@ public:
     void 			OnDeviceCreate		();
     void			OnDeviceDestroy		();
 
-    // mailslot
-#if 0
-	bool 			CreateMailslot		();
-	void 			CheckMailslot		();
-	void 			OnReceiveMail		(LPCSTR msg);
-	void 			SendMail			(LPCSTR name, LPCSTR dest, LPCSTR msg);
-#endif
-
-    void			CheckWindowPos		(HWND* form);
-
     virtual LPCSTR 	EditorName			()=0;
     virtual LPCSTR	EditorDesc			()=0;
 
@@ -246,10 +236,6 @@ public:
 	void 			ProgressEnd			(SPBItem*&);
     virtual void	ProgressDraw();
     SPBItem*		ProgressLast		(){return m_ProgressItems.empty()?0:m_ProgressItems.back();}
-
-	void ShowConsole();
-    void WriteConsole(TMsgDlgType mt, const char* txt);
-    void CloseConsole();
 
 public:
     // Progress load

@@ -112,7 +112,6 @@ void XrUIManager::BeginFrame()
 
 void XrUIManager::EndFrame()
 {
-	ImGui::GetForegroundDrawList()->AddCircle({ 66, 56 }, 55, 512351, 4);
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
@@ -271,7 +270,8 @@ void XrUIManager::Draw()
 			| ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
 			| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
 			| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+			| ImGuiWindowFlags_NoBackground;
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, UIToolBarSize / 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -281,7 +281,7 @@ void XrUIManager::Draw()
 		ImGuiID dockMain = ImGui::GetID("MyDockspace");
 
 		m_MenuBarHeight = ImGui::GetWindowBarHeight();
-		// Save off menu bar height for later.
+		////// Save off menu bar height for later.
 
 		ImGui::DockSpace(dockMain);
 		ImGui::End();
@@ -297,7 +297,7 @@ void XrUIManager::Draw()
 	}
 	
 	OnDrawUI();
-
+	
 	for (IEditorWnd* ui : m_UIArray)
 	{
 		ui->BeginDraw();
