@@ -170,6 +170,9 @@ void CModelPool::Destroy()
 	// Registry
 	while(!Registry.empty()){
 		REGISTRY_IT it	= Registry.begin();
+		if (it == Registry.end())
+			break;
+
 		dxRender_Visual* V=(dxRender_Visual*)it->first;
 #ifdef _DEBUG
 		Msg				("ModelPool: Destroy object: '%s'",*V->dbg_name);

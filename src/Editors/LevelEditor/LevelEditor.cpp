@@ -205,6 +205,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 			if (!UI->ProcessEvent(&Event))
 				break;
 		}
+
 		MainForm->Frame();
 	}
 

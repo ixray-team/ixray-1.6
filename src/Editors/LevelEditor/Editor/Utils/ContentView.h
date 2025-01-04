@@ -130,6 +130,7 @@ private:
 
 	bool IsThmMode = false;
 
+	bool IsWndDestroyed = false;
 	xr_string ISEPath;
 	string32 FindStr = {};
 

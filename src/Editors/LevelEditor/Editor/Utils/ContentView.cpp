@@ -22,6 +22,9 @@ CContentView::CContentView():
 
 void CContentView::Draw()
 {
+	if (IsWndDestroyed)
+		return;
+
 	if (ImGui::Begin("Content Browser"))
 	{
 		DrawHeader();
@@ -564,6 +567,8 @@ void CContentView::Destroy()
 {
 	MenuIcon.destroy();
 	Icons.clear();
+
+	IsWndDestroyed = true;
 }
 
 void CContentView::ResetBegin() {
