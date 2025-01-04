@@ -263,6 +263,12 @@ public:
     size_t ViewID = -1;
     xr_vector<Viewport> Views;
 
+    ref_texture	m_HeaderLogo = nullptr;
+    ref_texture	m_WinMin = nullptr;
+    ref_texture	m_WinRes = nullptr;
+    ref_texture	m_WinMax = nullptr;
+    ref_texture	m_WinClose = nullptr;
+    void InitWindowIcons();
 protected:
     virtual void OnDrawUI();
     void RealResetUI();

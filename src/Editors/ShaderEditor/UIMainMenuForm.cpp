@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "../xrEUI/xrUITheme.h"
-
+#include "../xrEUI/imgui_EditorEx.h"
 UIMainMenuForm::UIMainMenuForm()
 {
 }
@@ -11,7 +11,7 @@ UIMainMenuForm::~UIMainMenuForm()
 
 void UIMainMenuForm::Draw()
 {
-    if (ImGui::BeginMainMenuBar())
+    if (IXBeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
@@ -226,6 +226,6 @@ void UIMainMenuForm::Draw()
             }
             ImGui::EndMenu();
         }
-        ImGui::EndMainMenuBar();
+        IXEndMainMenuBar();
     }
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../../../xrEngine/device.h"
 #include "UI_Camera.h"
@@ -59,6 +59,10 @@ public:
 	u32 dwFillMode;
 	u32 dwShadeMode;
 
+	RECT NormalWinSize;
+	bool NormalWinSizeSaved = false;
+	bool isZoomed = false;
+	//bool isMoving = false;
 public:
 	// camera
 	CRegistrator<pureDrawUI> seqDrawUI;
@@ -87,6 +91,10 @@ public:
 	void Initialize(void);
 	void ShutDown(void);
 	void Reset(IReader* F, BOOL bKeepTextures);
+
+	void MaximizedWindow();
+	void ResoreWindow(bool moving);
+	void InitWindowStyle();
 
 	virtual void DumpResourcesMemoryUsage()
 	{
@@ -170,7 +178,10 @@ private:
 	virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
 	virtual void _BCL RemoveSeqFrame(pureFrame* f);
 
+private:
+	HWND hwnd;
 public:
+	HWND GetHWND() { return hwnd; }
 	void CreateWindow();
 	void DestryWindow();
 	virtual void Reset(bool precache);
