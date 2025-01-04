@@ -35,18 +35,22 @@ CALifeStorageManager::~CALifeStorageManager	()
 
 void CALifeStorageManager::save	(LPCSTR save_name_no_check, bool update_name)
 {
+	pcstr gameSaveExtension = SAVE_EXTENSION;
+	if (EngineExternal().ClearSkyMode())
+		gameSaveExtension = SAVE_EXTENSION_LEGACY;
+
 	LPCSTR game_saves_path		= FS.get_path("$game_saves$")->m_Path;
 
 	string_path					save_name;
-	strncpy_s					(save_name, sizeof(save_name), save_name_no_check, sizeof(save_name)-5-xr_strlen(SAVE_EXTENSION)-xr_strlen(game_saves_path));
+	strncpy_s					(save_name, sizeof(save_name), save_name_no_check, sizeof(save_name)-5-xr_strlen(gameSaveExtension)-xr_strlen(game_saves_path));
 
 	xr_strcpy					(g_last_saved_game, save_name);
 
-	string_path					save;
-	xr_strcpy					(save,m_save_name);
-	if (save_name)
+	string_path					saveBackup;
+	xr_strcpy					(saveBackup,m_save_name);
+	if (save_name[0])
 	{
-		xr_strconcat(m_save_name, save_name, SAVE_EXTENSION);
+		xr_strconcat(m_save_name, save_name, gameSaveExtension);
 	}
 	else {
 		if (!xr_strlen(m_save_name)) {
@@ -94,7 +98,7 @@ void CALifeStorageManager::save	(LPCSTR save_name_no_check, bool update_name)
 #endif // DEBUG
 
 	if (!update_name)
-		xr_strcpy					(m_save_name,save);
+		xr_strcpy					(m_save_name,saveBackup);
 }
 
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
@@ -133,6 +137,10 @@ void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR fi
 
 bool CALifeStorageManager::load	(LPCSTR save_name_no_check)
 {
+	pcstr gameSaveExtension = SAVE_EXTENSION;
+	if (EngineExternal().ClearSkyMode())
+		gameSaveExtension = SAVE_EXTENSION_LEGACY;
+
 	LPCSTR game_saves_path		= FS.get_path("$game_saves$")->m_Path;
 
 	string_path					save_name;
@@ -141,15 +149,18 @@ bool CALifeStorageManager::load	(LPCSTR save_name_no_check)
 	CTimer						timer;
 	timer.Start					();
 
-	string_path					save;
-	xr_strcpy					(save,m_save_name);
-	if (!save_name) {
+	string_path					saveBackup;
+	xr_strcpy					(saveBackup,m_save_name);
+	if (!save_name[0]) {
 		if (!xr_strlen(m_save_name))
-			R_ASSERT2			(false,"There is no file name specified!");
+		{
+			Log("There is no file name specified!");
+			return false;
+		}
 	}
 	else
 	{
-		xr_strconcat(m_save_name, save_name, SAVE_EXTENSION);
+		xr_strconcat(m_save_name, save_name, gameSaveExtension);
 	}
 
 	luabind::functor<void> funct;
@@ -162,18 +173,28 @@ bool CALifeStorageManager::load	(LPCSTR save_name_no_check)
 	xr_strcpy					(g_last_saved_game, save_name);
 	xr_strcpy					(g_bug_report_file, file_name);
 
-	IReader						*stream;
-	stream						= FS.r_open(file_name);
-	if (!stream) {
-		Msg						("* Cannot find saved game %s",file_name);
-		xr_strcpy				(m_save_name,save);
-		return					(false);
+    IReader* stream = FS.r_open(file_name);
+    if (!stream)
+    {
+        Msg("* Cannot open saved game %s", file_name);
+        xr_strcpy(m_save_name, saveBackup);
+        return false;
+    }
+
+	constexpr pcstr mismatch = "Saved game version mismatch or saved game is corrupted";
+	const bool gameSaveIsValid = CSavedGameWrapper::valid_saved_game(*stream);
+	VERIFY2(gameSaveIsValid, mismatch, file_name);
+
+	if (!gameSaveIsValid)
+	{
+		Msg("! %s [%s]", mismatch, file_name);
+
+		xr_strcpy(m_save_name, saveBackup);
+		return false;
 	}
 
-	CHECK_OR_EXIT				(CSavedGameWrapper::valid_saved_game(*stream), make_string<const char*>("%s\nSaved game version mismatch or saved game is corrupted",file_name));
-
 	string512					temp;
-	xr_strconcat(temp, g_pStringTable->translate("st_loading_saved_game").c_str(), " \"", save_name, SAVE_EXTENSION, "\"");
+	xr_strconcat(temp, g_pStringTable->translate("st_loading_saved_game").c_str(), " \"", save_name, gameSaveExtension, "\"");
 	g_pGamePersistent->SetLoadStageTitle(temp);
 	g_pGamePersistent->LoadTitle();
 
