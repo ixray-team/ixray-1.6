@@ -262,9 +262,11 @@ void XrUIManager::Draw()
 	ImGui::PushFont(FontsStorage[ImCurrentFont]);
 	//ImGui::DockSpaceOverViewport();
 	{
+		m_MenuBarHeight = 32;
+		int headerSize = 6;
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + UIToolBarSize / 2));
-		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - (UIToolBarSize / 2)));
+		ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + m_MenuBarHeight - headerSize));
+		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - headerSize));
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGuiWindowFlags window_flags = 0
 			| ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
@@ -280,7 +282,6 @@ void XrUIManager::Draw()
 		ImGui::Begin("MyDockspace", NULL, window_flags);
 		ImGuiID dockMain = ImGui::GetID("MyDockspace");
 
-		m_MenuBarHeight = ImGui::GetWindowBarHeight();
 		////// Save off menu bar height for later.
 
 		ImGui::DockSpace(dockMain);

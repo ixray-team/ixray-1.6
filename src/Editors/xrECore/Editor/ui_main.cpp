@@ -22,6 +22,7 @@
 #include "../xrEngine/gamefont.h"
 #include "../XrEngine/XR_IOConsole.h"
 
+#define TRelease(x) if (x) x->pSurface->Release()
 
 ECORE_API extern bool bIsLevelEditor;
 namespace ImGui
@@ -71,6 +72,12 @@ TUI::~TUI()
 {
 	VERIFY(m_ProgressItems.size()==0);
 	VERIFY(m_EditorState.size()==0);
+
+	TRelease(m_HeaderLogo);
+	TRelease(m_WinMin);
+	TRelease(m_WinRes);
+	TRelease(m_WinMax);
+	TRelease(m_WinClose);
 }
 
 void TUI::OnDeviceCreate()
@@ -801,6 +808,15 @@ void TUI::CreateViewport(int ID)
 
 	MainView.RTSize = { (int)GetRenderWidth(), (int)GetRenderHeight() };
 	MainView.RTFreez.create(("$user$rt_freez" + xr_string::ToString(ID)).c_str(), GetRenderWidth() * EDevice->m_ScreenQuality, GetRenderHeight() * EDevice->m_ScreenQuality, D3DFMT_X8R8G8B8);
+}
+
+void TUI::InitWindowIcons()
+{
+	m_HeaderLogo	= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_logo");
+	m_WinMin		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_min");
+	m_WinMax		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_max");
+	m_WinRes		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_restore");
+	m_WinClose		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_close");
 }
 
 void TUI::OnDrawUI()

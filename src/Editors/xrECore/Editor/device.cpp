@@ -217,7 +217,7 @@ bool CEditorRenderDevice::Create()
 	//HW.CreateDevice		(m_hWnd, true);
 	if (UI)
 	{
-		HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
+		hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
 		string_path 		ini_path;
 		string_path			ini_name;
 		xr_strcpy			(ini_name, UI->EditorName());
@@ -329,7 +329,9 @@ void CEditorRenderDevice::_Create(IReader* F)
 	UIChooseForm::SetNullTexture(texture_null->pSurface);
 
 	// signal another objects
-    UI->OnDeviceCreate			();           
+    UI->OnDeviceCreate			();       
+
+	EDevice->InitWindowStyle();
 }
 
 void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
@@ -394,6 +396,51 @@ void CEditorRenderDevice::Reset(IReader* F, BOOL bKeepTextures)
 	_Destroy(bKeepTextures);
 	_Create(F);
 	Msg("*** RESET [%d ms]", tm.GetElapsed_ms());
+}
+
+void CEditorRenderDevice::MaximizedWindow()
+{
+	if (IsZoomed(hwnd))
+		SendMessageW(hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+
+	//
+	LONG style = GetWindowLong(hwnd, GWL_STYLE);
+	style &= ~WS_THICKFRAME;
+	SetWindowLong(hwnd, GWL_STYLE, style);
+
+	GetWindowRect(hwnd, &EDevice->NormalWinSize);
+	EDevice->NormalWinSizeSaved = true;
+
+	RECT workArea;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+	EDevice->isZoomed = true;
+
+	SDL_SetWindowSize(g_AppInfo.Window, workArea.right, workArea.bottom);
+	SDL_SetWindowPosition(g_AppInfo.Window, 0, 0);
+}
+
+void CEditorRenderDevice::ResoreWindow(bool moving)
+{
+	if (EDevice->NormalWinSizeSaved)
+	{
+		auto& r = EDevice->NormalWinSize;
+		MoveWindow(hwnd, r.left, r.top, r.right - r.left, r.bottom - r.top, TRUE);
+
+		if (moving)
+		{
+			float mouseX, mouseY;
+			SDL_GetMouseState(&mouseX, &mouseY);
+			SDL_SetWindowPosition(g_AppInfo.Window, mouseX / 2, mouseY - 10);
+		}
+	}
+	{
+		LONG style = GetWindowLong(hwnd, GWL_STYLE);
+		style |= WS_THICKFRAME;
+		SetWindowLong(hwnd, GWL_STYLE, style);
+	}
+	EDevice->isZoomed = false;
+
+
 }
 
 bool CEditorRenderDevice::Begin()
@@ -479,6 +526,20 @@ void CEditorRenderDevice::FrameMove()
 
     // process objects
 	seqFrame.Process(rp_Frame);
+}
+
+void CEditorRenderDevice::InitWindowStyle()
+{
+	UI->InitWindowIcons();
+
+#if _WINDOWS
+	LONG style = GetWindowLong(hwnd, GWL_STYLE);
+	style &= ~WS_CAPTION;
+	SetWindowLong(hwnd, GWL_STYLE, style);
+#else
+	SDL_SetWindowResizable(g_AppInfo.Window, SDL_TRUE);
+	SDL_SetWindowHitTest(g_AppInfo.Window, HitTestCallback, 0);
+#endif
 }
 
 void CEditorRenderDevice::DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)

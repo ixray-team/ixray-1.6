@@ -6,6 +6,9 @@
 #include "../../xrEUI/Windows/Help.h"
 #include "../../xrECore/Editor/EThumbnail.h"
 
+#include "../../xrEUI/imgui_EditorEx.h"
+
+
 UIMainMenuForm::UIMainMenuForm()
 {
 }
@@ -14,17 +17,17 @@ UIMainMenuForm::~UIMainMenuForm()
 {
 }
 
+
 void UIMainMenuForm::Draw()
 {
-  
-	if (ImGui::BeginMainMenuBar())
+	if (IXBeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("Clear", "")) { ExecCommand(COMMAND_CLEAR); }
 			if (ImGui::MenuItem("Open...", "")) { ExecCommand(COMMAND_LOAD); }
 			if (ImGui::MenuItem("Save", "")) { ExecCommand(COMMAND_SAVE, xr_string(LTools->m_LastFileName.c_str())); }
-			if (ImGui::MenuItem("Save As ...", "")) { ExecCommand(COMMAND_SAVE, 0,1); }
+			if (ImGui::MenuItem("Save As ...", "")) { ExecCommand(COMMAND_SAVE, 0, 1); }
 			ImGui::Separator();
 			if (ImGui::MenuItem("Open Selection...", "")) { ExecCommand(COMMAND_LOAD_SELECTION); }
 			if (ImGui::MenuItem("Save Selection As...", "")) { ExecCommand(COMMAND_SAVE_SELECTION); }
@@ -41,17 +44,17 @@ void UIMainMenuForm::Draw()
 			if (ImGui::MenuItem("Quit", "")) { ExecCommand(COMMAND_QUIT); }
 			ImGui::EndMenu();
 		}
-
+		
 		if (ImGui::BeginMenu("Scene"))
 		{
 			{
 				bool selected = !MainForm->GetWorldPropertiesFrom()->IsClosed();
-				if (ImGui::MenuItem("World Properties", "", &selected)) 
+				if (ImGui::MenuItem("World Properties", "", &selected))
 				{
 					if (selected)
 						MainForm->GetWorldPropertiesFrom()->Open();
-					else 
-						MainForm->GetWorldPropertiesFrom()->Close(); 
+					else
+						MainForm->GetWorldPropertiesFrom()->Close();
 				}
 
 				if (ImGui::MenuItem("Export as archive"))
@@ -168,7 +171,7 @@ void UIMainMenuForm::Draw()
 					}
 					ImGui::EndMenu();
 				}
-				
+
 				ImGui::EndMenu();
 			}
 			if (bDisable)
@@ -240,7 +243,7 @@ void UIMainMenuForm::Draw()
 			ImGui::EndMenu();
 
 		}
-		
+
 		if (ImGui::BeginMenu("Options"))
 		{
 			if (ImGui::BeginMenu("Render"))
@@ -346,7 +349,7 @@ void UIMainMenuForm::Draw()
 				ImGui::EndMenu();
 			}
 			/*
-			* FX: нахуй - так нахуй 
+			* FX: нахуй - так нахуй
 			ImGui::Separator();
 			{
 				bool selected = psDeviceFlags.test(rsDrawSafeRect);
@@ -420,11 +423,11 @@ void UIMainMenuForm::Draw()
 						if (ImGui::MenuItem(i.first.c_str(), "", &selected))
 						{
 							psDeviceFlags.set(rsEnvironment, true);
-							g_pGamePersistent->Environment().SetWeather(i.first.c_str(),true);
+							g_pGamePersistent->Environment().SetWeather(i.first.c_str(), true);
 							UI->RedrawScene();
 						}
 					}
-				   
+
 					ImGui::EndMenu();
 				}
 			}
@@ -446,7 +449,7 @@ void UIMainMenuForm::Draw()
 			ImGui::Separator();
 			{
 				bool selected = psDeviceFlags.test(rsStatistic);
-				if (ImGui::MenuItem("Stats", "",&selected)) { psDeviceFlags.set(rsStatistic, selected);  UI->RedrawScene(); }
+				if (ImGui::MenuItem("Stats", "", &selected)) { psDeviceFlags.set(rsStatistic, selected);  UI->RedrawScene(); }
 
 			}
 			//ImGui::Separator();
@@ -477,12 +480,12 @@ void UIMainMenuForm::Draw()
 			{
 				bool selected = AllowLogCommands();
 
-				if (ImGui::MenuItem("Log", "",&selected)) { ExecCommand(COMMAND_LOG_COMMANDS); }
+				if (ImGui::MenuItem("Log", "", &selected)) { ExecCommand(COMMAND_LOG_COMMANDS); }
 
 				CUIThemeManager& ThemeInstance = CUIThemeManager::Get();
 				bool selected2 = !ThemeInstance.IsClosed();
 				if (ImGui::MenuItem("Theme", "", &selected2))
-				{ 
+				{
 					if (selected2)
 					{
 						if (!UI->HasWindow<CUIThemeManager>())
@@ -495,8 +498,8 @@ void UIMainMenuForm::Draw()
 						ThemeInstance.Show(false);
 				}
 			}
-		   
-		   ImGui::EndMenu();
+
+			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Help", ""))
@@ -517,12 +520,12 @@ void UIMainMenuForm::Draw()
 
 		ImGui::Separator();
 
-		if (ImGui::MenuItem("Light Anim Editor", "")) 
-		{ 
+		if (ImGui::MenuItem("Light Anim Editor", ""))
+		{
 			ExecCommand(COMMAND_LIGHTANIM_EDITOR);
 		}
 
-		if (ImGui::MenuItem("Macro Editor", "")) 
+		if (ImGui::MenuItem("Macro Editor", ""))
 		{
 			static CUIMacroView* View = nullptr;
 			if (View == nullptr)
@@ -537,21 +540,22 @@ void UIMainMenuForm::Draw()
 		{
 			bool selected = UIObjectList::IsOpen();
 			if (ImGui::MenuItem("Object List", "", &selected))
-			{ 
-				if (selected) 
-					UIObjectList::Show(); 
-				else 
-					UIObjectList::Close(); 
+			{
+				if (selected)
+					UIObjectList::Show();
+				else
+					UIObjectList::Close();
 			}
 		}
-		
-		if (ImGui::MenuItem("Preferences", "")) 
-		{ 
-			ExecCommand(COMMAND_EDITOR_PREF); 
-		}
-		//ImGui::EndMenu();
 
-		ImGui::EndMainMenuBar();
+		if (ImGui::MenuItem("Preferences", ""))
+		{
+			ExecCommand(COMMAND_EDITOR_PREF);
+		}
+
+		IXEndMainMenuBar();
+
+		
 	}
 }
 
