@@ -410,13 +410,18 @@ void CEditorRenderDevice::MaximizedWindow()
 
 	GetWindowRect(hwnd, &EDevice->NormalWinSize);
 	EDevice->NormalWinSizeSaved = true;
-
-	RECT workArea;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
 	EDevice->isZoomed = true;
 
-	SDL_SetWindowSize(g_AppInfo.Window, workArea.right, workArea.bottom);
-	SDL_SetWindowPosition(g_AppInfo.Window, 0, 0);
+	auto CurrentMonitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+	MONITORINFO minfo;
+	minfo.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(CurrentMonitor, &minfo);
+
+	const RECT& workArea = minfo.rcWork;
+
+	SDL_SetWindowSize(g_AppInfo.Window, workArea.right - workArea.left, workArea.bottom - workArea.top);
+	SDL_SetWindowPosition(g_AppInfo.Window, workArea.left, workArea.top);
 }
 
 void CEditorRenderDevice::ResoreWindow(bool moving)
@@ -533,9 +538,9 @@ void CEditorRenderDevice::InitWindowStyle()
 	UI->InitWindowIcons();
 
 #if _WINDOWS
-	LONG style = GetWindowLong(hwnd, GWL_STYLE);
+	LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
 	style &= ~WS_CAPTION;
-	SetWindowLong(hwnd, GWL_STYLE, style);
+	SetWindowLongPtr(hwnd, GWL_STYLE, style);
 #else
 	SDL_SetWindowResizable(g_AppInfo.Window, SDL_TRUE);
 	SDL_SetWindowHitTest(g_AppInfo.Window, HitTestCallback, 0);

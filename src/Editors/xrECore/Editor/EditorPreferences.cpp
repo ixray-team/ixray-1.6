@@ -294,6 +294,10 @@ void CCustomPreferences::Load()
 
 	start_w = JSONData["render"]["w"];
 	start_h = JSONData["render"]["h"];
+
+	if (JSONData["render"].contains("quality"))
+		EDevice->m_ScreenQuality = JSONData["render"]["quality"];
+
 	int x = JSONData["render"]["x"];
 	int y = JSONData["render"]["y"];
 
@@ -389,6 +393,7 @@ void CCustomPreferences::Save()
 
 	JSONData["render"]["w"] = EDevice->dwRealWidth;
 	JSONData["render"]["h"] = EDevice->dwRealHeight;
+	JSONData["render"]["quality"] = EDevice->m_ScreenQuality;
 
 	int X, Y;
 	SDL_GetWindowPosition(g_AppInfo.Window, &X, &Y);

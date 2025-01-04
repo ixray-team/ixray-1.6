@@ -398,7 +398,14 @@ void UIMainForm::DrawRenderToolBar(ImVec2 Pos, ImVec2 Size)
 				{
 					if (ImGui::BeginMenu("Quality"))
 					{
-						static bool selected[4] = { false,false,true,false };
+						static bool selected[4] = 
+						{
+							EDevice->m_ScreenQuality < 0.3f,
+							!selected[0] && EDevice->m_ScreenQuality < 0.6f,
+							!selected[1] && EDevice->m_ScreenQuality < 1.1f,
+							!selected[2] && EDevice->m_ScreenQuality < 2.1f 
+						};
+
 						if (ImGui::MenuItem("25%", "", &selected[0]))
 						{
 							selected[1] = selected[2] = selected[3] = false;
