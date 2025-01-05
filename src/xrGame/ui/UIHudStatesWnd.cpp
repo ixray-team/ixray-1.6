@@ -103,7 +103,6 @@ void CUIHudStatesWnd::InitFromXml( CUIXml& xml, LPCSTR path )
 
 	m_back            = UIHelper::CreateStatic( xml, "back", this );
 	m_ui_health_bar   = UIHelper::CreateProgressBar( xml, "progress_bar_health", this );
-	m_ui_stamina_bar  = UIHelper::CreateProgressBar( xml, "progress_bar_stamina", this );
 
 	if (xml.NavigateToNode("back_v", 0))
 	{
@@ -193,6 +192,7 @@ void CUIHudStatesWnd::InitFromXml( CUIXml& xml, LPCSTR path )
 	{
 		m_back_over_arrow = UIHelper::CreateStatic(xml, "back_over_arrow", this);
 	}
+	m_ui_stamina_bar = UIHelper::CreateProgressBar(xml, "progress_bar_stamina", this);
 
 	if (xml.NavigateToNode("bleeding", 0))
 	{

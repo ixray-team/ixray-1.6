@@ -215,7 +215,8 @@ void CUIMotionIcon::SetLuminosity(float newPos)
 
 void CUIMotionIcon::Draw()
 {
-	inherited::Draw();
+    if (EngineExternal().CallOfPripyatMode())
+	    inherited::Draw();
 }
 
 void CUIMotionIcon::Update()
