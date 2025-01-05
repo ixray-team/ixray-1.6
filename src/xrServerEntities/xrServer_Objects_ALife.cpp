@@ -261,7 +261,9 @@ CSE_ALifeGraphPoint::CSE_ALifeGraphPoint	(LPCSTR caSection) : CSE_Abstract(caSec
 
 #ifdef XRSE_FACTORY_EXPORTS
 	fp_data.inc					();
+	ChangeColorEvent(nullptr);
 #endif // XRSE_FACTORY_EXPORTS
+
 }
 
 CSE_ALifeGraphPoint::~CSE_ALifeGraphPoint	()
@@ -282,6 +284,10 @@ void CSE_ALifeGraphPoint::STATE_Read		(NET_Packet	&tNetPacket, u16 size)
 	tNetPacket.r_u8				(m_tLocations[1]);
 	tNetPacket.r_u8				(m_tLocations[2]);
 	tNetPacket.r_u8				(m_tLocations[3]);
+
+#ifdef XRSE_FACTORY_EXPORTS
+	ChangeColorEvent(nullptr);
+#endif
 };
 
 void CSE_ALifeGraphPoint::STATE_Write		(NET_Packet	&tNetPacket)
@@ -305,53 +311,61 @@ void CSE_ALifeGraphPoint::UPDATE_Write		(NET_Packet	&tNetPacket)
 void CSE_ALifeGraphPoint::FillProps			(LPCSTR pref, PropItemVec& items)
 {
 #	ifdef XRSE_FACTORY_EXPORTS
-	PHelper().CreateRToken8		(items,	PrepareKey(pref,*s_name,"Location\\1"),				&m_tLocations[0],			&*fp_data.locations[0].begin(), (u32)fp_data.locations[0].size());
-	PHelper().CreateRToken8		(items,	PrepareKey(pref,*s_name,"Location\\2"),				&m_tLocations[1],			&*fp_data.locations[1].begin(), (u32)fp_data.locations[1].size());
-	PHelper().CreateRToken8		(items,	PrepareKey(pref,*s_name,"Location\\3"),				&m_tLocations[2],			&*fp_data.locations[2].begin(), (u32)fp_data.locations[2].size());
-	PHelper().CreateRToken8		(items,	PrepareKey(pref,*s_name,"Location\\4"),				&m_tLocations[3],			&*fp_data.locations[3].begin(), (u32)fp_data.locations[3].size());
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\1"), &m_tLocations[0], &*fp_data.locations[0].begin(), (u32)fp_data.locations[0].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\2"), &m_tLocations[1], &*fp_data.locations[1].begin(), (u32)fp_data.locations[1].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\3"), &m_tLocations[2], &*fp_data.locations[2].begin(), (u32)fp_data.locations[2].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\4"), &m_tLocations[3], &*fp_data.locations[3].begin(), (u32)fp_data.locations[3].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+
+
 	PHelper().CreateRList	 	(items,	PrepareKey(pref,*s_name,"Connection\\Level name"),	&m_caConnectionLevelName,	&*fp_data.level_ids.begin(),	(u32)fp_data.level_ids.size());
 	PHelper().CreateRText	 	(items,	PrepareKey(pref,*s_name,"Connection\\Point name"),	&m_caConnectionPointName);
 #	endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
-void CSE_ALifeGraphPoint::on_render(CDUInterface* du, ISE_AbstractLEOwner* owner_, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F)
-{
-#	ifdef XRSE_FACTORY_EXPORTS
-static const u32 IL[16]={0,1, 0,2, 0,3, 0,4, 1,3, 3,2, 2,4, 4,1};
-static const u32 IT[12]={1,3,0, 3,2,0, 2,4,0, 4,1,0};
-static Fvector PT [5] = {
-    {0.0f,	1.0f,	0.0f},
-    {0.0f,	0.0f,	-0.5f},
-    {0.0f,	0.0f,	0.5f},
-    {-0.5f,	0.0f,	0.0f},
-    {0.5f,	0.0f,	0.0f},
-};
 
-	Fcolor C;
+void CSE_ALifeGraphPoint::ChangeColorEvent(PropValue*)
+{
+#ifdef XRSE_FACTORY_EXPORTS
 	u32 cc;
-	string16 buff;
-	xr_sprintf(buff,"%03d_%03d_%03d_%03d",m_tLocations[0],m_tLocations[1],m_tLocations[2],m_tLocations[3]);
+	shared_str buff;
+	buff.printf("%03d_%03d_%03d_%03d", m_tLocations[0], m_tLocations[1], m_tLocations[2], m_tLocations[3]);
 	xr_map<shared_str, u32>::iterator it = fp_data.location_colors.find(buff);
-	if(it==fp_data.location_colors.end())
+	if (it == fp_data.location_colors.end())
 	{
 		it = fp_data.location_colors.find("default");
 	}
-	if(it!=fp_data.location_colors.end())
-		cc=it->second;
+	if (it != fp_data.location_colors.end())
+		cc = it->second;
 	else
-		cc=0x107f7f7f;
+		cc = 0x107f7f7f;
 
-	C.set(cc);
+	RenderColor.set(cc);
+#endif
+}
 
-	if(!bSelected)
-		C.a		*= 0.6f;
+void CSE_ALifeGraphPoint::on_render(CDUInterface* du, ISE_AbstractLEOwner* owner_, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
+{
+#	ifdef XRSE_FACTORY_EXPORTS
+	static const u32 IL[16] = { 0,1, 0,2, 0,3, 0,4, 1,3, 3,2, 2,4, 4,1 };
+	static const u32 IT[12] = { 1,3,0, 3,2,0, 2,4,0, 4,1,0 };
+	static Fvector PT[5] = {
+		{0.0f,	1.0f,	0.0f},
+		{0.0f,	0.0f,	-0.5f},
+		{0.0f,	0.0f,	0.5f},
+		{-0.5f,	0.0f,	0.0f},
+		{0.5f,	0.0f,	0.0f},
+	};
 
-	du->DrawIndexedPrimitive(2/*D3DPT_LINELIST*/, 8, parent.c, PT, 5, IL, 16, C.get());
-	C.mul_rgba(0.75f);
-	du->DrawIndexedPrimitive(4/*D3DPT_TRIANGLELIST*/, 4, parent.c, PT, 5, IT, 12, C.get());
-	
-	if(bSelected)
-		du->DrawSelectionBox(parent.c, Fvector().set(0.5f,1.0f,0.5f),nullptr);
+	Fcolor RenderColorCurrent = RenderColor;
+	if (!bSelected)
+		RenderColorCurrent.a *= 0.6f;
+
+	du->DrawIndexedPrimitive(2/*D3DPT_LINELIST*/, 8, parent.c, PT, 5, IL, 16, RenderColorCurrent.get());
+	RenderColorCurrent.mul_rgba(0.75f);
+	du->DrawIndexedPrimitive(4/*D3DPT_TRIANGLELIST*/, 4, parent.c, PT, 5, IT, 12, RenderColorCurrent.get());
+
+	if (bSelected)
+		du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), nullptr);
 #	endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
