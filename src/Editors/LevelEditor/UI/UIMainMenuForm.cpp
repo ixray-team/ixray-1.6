@@ -459,6 +459,25 @@ void UIMainMenuForm::Draw()
 
 		if (ImGui::BeginMenu("Windows"))
 		{
+			if (ImGui::MenuItem("Light Anim Editor", ""))
+			{
+				ExecCommand(COMMAND_LIGHTANIM_EDITOR);
+			}
+
+			if (ImGui::MenuItem("Macro Editor", ""))
+			{
+				static CUIMacroView* View = nullptr;
+				if (View == nullptr)
+				{
+					View = new CUIMacroView;
+					UI->Push(View);
+				}
+
+				View->Show(true);
+			}
+
+			ImGui::Separator();
+
 			{
 				bool selected = MainForm->GetLeftBarForm()->IsUseSnapList();
 				if (ImGui::MenuItem("Snap List", "", &selected))
@@ -519,23 +538,6 @@ void UIMainMenuForm::Draw()
 		}
 
 		ImGui::Separator();
-
-		if (ImGui::MenuItem("Light Anim Editor", ""))
-		{
-			ExecCommand(COMMAND_LIGHTANIM_EDITOR);
-		}
-
-		if (ImGui::MenuItem("Macro Editor", ""))
-		{
-			static CUIMacroView* View = nullptr;
-			if (View == nullptr)
-			{
-				View = new CUIMacroView;
-				UI->Push(View);
-			}
-
-			View->Show(true);
-		}
 
 		{
 			bool selected = UIObjectList::IsOpen();
