@@ -181,7 +181,6 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render(light*L)
 {
-	if (!UseHW()) return;
 	PROF_EVENT("CDetailManager::hw_Render")
 	RCache.set_CullMode		(CULL_NONE);
 	RCache.set_xform_world	(Fidentity);

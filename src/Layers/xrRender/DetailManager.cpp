@@ -46,7 +46,6 @@ CDetailManager::CDetailManager()
 {
 	dtFS 		= 0;
 	dtSlots		= 0;
-	soft_Geom	= 0;
 	hw_Geom		= 0;
 	hw_BatchSize= 0;
 	hw_VB		= 0;
@@ -138,8 +137,7 @@ void CDetailManager::Load()
 	cache_Initialize	();
 
 	// Hardware specific optimizations
-	if (UseHW())	hw_Load		();
-	else			soft_Load	();
+	hw_Load();
 
 	// swing desc
 	// normal
@@ -155,24 +153,13 @@ void CDetailManager::Load()
 	swing_desc[1].rot2	= pSettings->r_float("details","swing_fast_rot2");
 	swing_desc[1].speed	= pSettings->r_float("details","swing_fast_speed");
 
-	if (UseHW())
-	{
-		render_key = 0;
-		calc_key = 1;
-	}
-	else
-	{
-		render_key = 0;
-		calc_key = 0;
-	}
+	render_key = 0;
+	calc_key = 1;
 }
 #endif
 void CDetailManager::Unload		()
 {
-	if (UseHW())
-		hw_Unload();
-	else
-		soft_Unload();
+	hw_Unload();
 
 	objects.clear();
 
@@ -292,45 +279,45 @@ void CDetailManager::UpdateVisibleM()
 	}
 }
 
-void CDetailManager::Render	()
+void CDetailManager::Render()
 {
 	PROF_EVENT("Render details");
 #ifndef _EDITOR
-	if (0==dtFS)						return;
+	if (0 == dtFS)						return;
 	if (!psDeviceFlags.is(rsDetails))	return;
 #endif
 
-	if (UseHW())
-	{
 #ifndef IXR_WINDOWS
-		if(MT_CALC.valid())
+	if (MT_CALC.valid())
 #endif
-			MT_CALC.wait();
+		MT_CALC.wait();
 
 
-		int idx = calc_key;
-		render_key = idx;
-		calc_key = (idx + 1) % 2;
+	int idx = calc_key;
+	render_key = idx;
+	calc_key = (idx + 1) % 2;
 
-		static DWORD this_thread_id = 0;
-		this_thread_id = GetCurrentThreadId();
+	static DWORD this_thread_id = 0;
+	this_thread_id = GetCurrentThreadId();
 #ifdef IXR_WINDOWS
-		MT_CALC.run(
+	MT_CALC.run
+	(
 #else
-		MT_CALC = std::async(std::launch::async,
+	MT_CALC = std::async(std::launch::async,
 #endif
 		[&]()
 		{
-			if (0==dtFS) return;
-			if (!psDeviceFlags.is(rsDetails)) return;
-			if(this_thread_id!=GetCurrentThreadId()){PROF_THREAD("Details async")}
+#ifndef _EDITOR
+			if (0 == dtFS)						return;
+			if (!psDeviceFlags.is(rsDetails))	return;
+#endif
+			if (this_thread_id != GetCurrentThreadId()) 
+			{
+				PROF_THREAD("Details async")
+			}
 			UpdateVisibleM();
-		});
-	}
-	else
-	{
-		UpdateVisibleM();
-	}
+		}
+	);
 
 #ifndef _EDITOR
 	float _factor = g_pGamePersistent->Environment().wind_strength_factor;
@@ -340,11 +327,11 @@ void CDetailManager::Render	()
 	factor += clampr(_factor - factor, -fTimeDelta, fTimeDelta);
 	lastTime = Device.fTimeDelta;
 #else
-	float factor			= 0.3f;
+	float factor = 0.3f;
 #endif
-	swing_current.lerp		(swing_desc[0],swing_desc[1],factor);
+	swing_current.lerp(swing_desc[0], swing_desc[1], factor);
 
-	float fDelta = Device.fTimeGlobal-m_global_time_old;
+	float fDelta = Device.fTimeGlobal - m_global_time_old;
 
 	if (fDelta < 0.0f || fDelta > 1.0f) {
 		fDelta = Device.fTimeDelta;
@@ -359,10 +346,7 @@ void CDetailManager::Render	()
 	m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
 	m_time_pos += fDelta * swing_current.speed;
 
-	if (UseHW())
-		hw_Render();
-	else
-		soft_Render();
+	hw_Render();
 
 	if (m_frame_render != Device.dwFrame) {
 		m_time_pos_old = m_time_pos;

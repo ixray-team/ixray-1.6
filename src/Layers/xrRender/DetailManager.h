@@ -137,14 +137,6 @@ public:
 	virtual ObjectList* 			GetSnapList		()=0;
 #endif
 
-	IC bool							UseHW			()		{ return !Device.IsEditorMode(); }
-
-	// Software processor
-    ref_geom						soft_Geom;
-	void							soft_Load		();
-	void							soft_Unload		();
-	void							soft_Render		();
-
 	ref_geom						hw_Geom;
 	u32								hw_BatchSize;
 	ID3DVertexBuffer*				hw_VB;
@@ -156,6 +148,7 @@ public:
 	ref_constant					hwc_s_consts;
 	ref_constant					hwc_s_xform;
 	ref_constant					hwc_s_array;
+
 	void							hw_Load			();
 	void							hw_Load_Geom	();
 	void							hw_Load_Shaders	();

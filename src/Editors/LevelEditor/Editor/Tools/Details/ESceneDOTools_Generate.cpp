@@ -86,10 +86,18 @@ bool EDetailManager::Initialize()
 	if (!m_Base.Valid()){
     	ELog.DlgMsg(mtError,"Base texture empty!");
     	return false;
-    }				
+    }
+
+    if (!objects.empty())
+        hw_Unload();
+
     if (!UpdateHeader())                return false;
     m_Base.CreateRMFromObjects			(m_BBox,m_SnapObjects);
     if (!UpdateSlots()) 		   		return false;
+
+    if (!objects.empty())
+        hw_Load();
+
     if (!objects.empty()&&!UpdateObjects(false,false))	return false;
 	return true;
 }
@@ -103,13 +111,21 @@ bool EDetailManager::Reinitialize()
 	if (!m_Base.Valid()){
     	ELog.DlgMsg(mtError,"Base texture empty!");
     	return false;
-    }				
+    }
+
+    if (!objects.empty())
+        hw_Unload();
+
     InvalidateCache();
 
     if (!UpdateHeader())            return false;
     m_Base.CreateRMFromObjects		(m_BBox,m_SnapObjects);
 //.    if (!UpdateBaseTexture(0))		return false;
     if (!UpdateSlots()) 			return false;
+
+    if (!objects.empty())
+        hw_Load();
+
     if (!objects.empty()&&!UpdateObjects(false,false))return false;
 
 	return true;
