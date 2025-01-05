@@ -114,6 +114,7 @@ public:
     void ShowHint(const xr_string& s);
     bool ShowHint(const AStringVec& SS);
     void HideHint();
+    void Invalidate();
 
 public:
     // mouse sensetive

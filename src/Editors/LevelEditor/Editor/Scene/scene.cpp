@@ -718,6 +718,8 @@ void EScene::Play()
 	if (!BuildSpawn())
 		return;
 
+	UI->Invalidate();
+
 	pInput->acquire();
 	UI->IsEnableInput = false;
 
