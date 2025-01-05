@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../../xrEUI/imgui_IconMenuItem.h"
 
 #include "../Nodes/UIMacroView.h"
 
@@ -549,8 +550,8 @@ void UIMainMenuForm::Draw()
 					UIObjectList::Close();
 			}
 		}
-
-		if (ImGui::MenuItem("Preferences", ""))
+		
+		if (IXIconMenuItem("Preferences", UI->m_PreferencesIcon->pSurface))
 		{
 			ExecCommand(COMMAND_EDITOR_PREF);
 		}
