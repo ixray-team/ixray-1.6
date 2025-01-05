@@ -9,7 +9,7 @@
 class "mp_main" (CUIScriptWnd)
 
 function mp_main:__init() super()
-   self:SetFont(GetFontMedium()) --set base font for dialog.
+   --self:SetFont(GetFontMedium()) --set base font for dialog.
    
    self:InitControls()
    self:InitCallBacks()
@@ -331,14 +331,14 @@ function mp_main:GatherServerData()
 		cmdstr = cmdstr .. "/public=1"
 	end
 
-	tmp = self.check_use_battleye:GetCheck()
+--[[	tmp = self.check_use_battleye:GetCheck()
     tmp = tmp and self.check_public_server:GetCheck()
 	if true == tmp then
 		cmdstr = cmdstr .. "/battleye=1"
 	else
 		cmdstr = cmdstr .. "/battleye=0"
 	end
-
+]]
 --   tmp = self.check_battleye_auto_update:GetCheck()
 --	if true == tmp then
 --		cmdstr = cmdstr .. "/battleye_update=1"

@@ -1216,7 +1216,8 @@ void game_cl_Deathmatch::OnGameMenuRespond_ChangeSkin(NET_Packet& P)
 	SetCurrentSkinMenu				();
 	if (pCurSkinMenu)				pCurSkinMenu->SetCurSkin(local_player->skin);
 	SetCurrentBuyMenu				();
-	ReInitRewardGenerator			(local_player);
+	if (EngineExternal().CallOfPripyatMode())
+		ReInitRewardGenerator			(local_player);
 	m_bSpectatorSelected			= FALSE;
 	
 	if (m_bMenuCalledFromReady)

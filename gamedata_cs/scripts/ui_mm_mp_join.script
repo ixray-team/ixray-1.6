@@ -9,9 +9,7 @@
 
 class "mp_join" (CUIWindow)
 
-function mp_join:__init() super()
-   self:SetFont(GetFontMedium()) --set base font for dialog.
-   
+function mp_join:__init() super()   
 end
 
 function mp_join:__finalize()

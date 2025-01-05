@@ -28,7 +28,7 @@ protected:
 
 
 			// string
-			LPCSTR			GetOptStringValue	();
+			LPCSTR			GetOptStringValue	() const;
 			void			SaveOptStringValue	(LPCSTR val);
 			// integer
 			void			GetOptIntegerValue	(int& val, int& min, int& max);
