@@ -6,7 +6,7 @@
 #pragma hdrstop
 
 #include "Blender_detail_still.h"
-
+#include "uber_deffer.h"
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -41,22 +41,28 @@ void	CBlender_Detail_Still::Compile	(CBlender_Compile& C)
 	
 	if (C.bEditor)
 	{
-		C.PassBegin		();
-		{
-			C.PassSET_ZB		(TRUE,TRUE);
-			if (oBlend.value)	C.PassSET_Blend_BLEND	(TRUE, 200);
-			else				C.PassSET_Blend_SET		(TRUE, 200);
-			C.PassSET_LightFog	(TRUE,TRUE);
-			
-			// Stage1 - Base texture
-			C.StageBegin		();
-			C.StageSET_Color	(D3DTA_TEXTURE,	  D3DTOP_MODULATE,	D3DTA_DIFFUSE);
-			C.StageSET_Alpha	(D3DTA_TEXTURE,	  D3DTOP_MODULATE,	D3DTA_DIFFUSE);
-			C.StageSET_TMC		(oT_Name,"$null","$null",0);
-			C.StageEnd			();
-		}
-		C.PassEnd			();
-	} else {
+	//	C.PassBegin		();
+	//	{
+	//		C.PassSET_ZB		(TRUE,TRUE);
+	//		if (oBlend.value)	C.PassSET_Blend_BLEND	(TRUE, 200);
+	//		else				C.PassSET_Blend_SET		(TRUE, 200);
+	//		C.PassSET_LightFog	(TRUE,TRUE);
+	//		
+	//		// Stage1 - Base texture
+	//		C.StageBegin		();
+	//		C.StageSET_Color	(D3DTA_TEXTURE,	  D3DTOP_MODULATE,	D3DTA_DIFFUSE);
+	//		C.StageSET_Alpha	(D3DTA_TEXTURE,	  D3DTOP_MODULATE,	D3DTA_DIFFUSE);
+	//		C.StageSET_TMC		(oT_Name,"$null","$null",0);
+	//		C.StageEnd			();
+	//	}
+	//	C.PassEnd			();
+
+		RImplementation.addShaderOption("USE_TREEWAVE", "1");
+		uber_deffer(C, false, "deffer_detail", "deffer_base", true, 0, true);
+		C.r_End();
+	} 
+	else 
+	{
 		switch (C.iElement)
 		{
 		case SE_R1_NORMAL_HQ:

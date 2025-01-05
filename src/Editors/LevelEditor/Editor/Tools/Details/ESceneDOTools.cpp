@@ -75,7 +75,7 @@ void EDetailManager::InitRender()
 	// Make dither matrix
 	bwdithermap		(2,dither);
 
-	soft_Load	();
+    //hw_Load();
 }
 
 void EDetailManager::OnRender(int priority, bool strictB2F)
@@ -123,12 +123,14 @@ void EDetailManager::OnRender(int priority, bool strictB2F)
 
 void EDetailManager::OnDeviceCreate()
 {
-	// base texture
+    // base texture
     m_Base.CreateShader();
-	// detail objects
-	for (DetailIt it=objects.begin(); it!=objects.end(); it++)
-    	((EDetail*)(*it))->OnDeviceCreate();
-	soft_Load	();
+    // detail objects
+    for (DetailIt it = objects.begin(); it != objects.end(); it++)
+        ((EDetail*)(*it))->OnDeviceCreate();
+
+    if (!objects.empty())
+        hw_Load();
 }
 
 void EDetailManager::OnDeviceDestroy()
@@ -138,7 +140,7 @@ void EDetailManager::OnDeviceDestroy()
 	// detail objects
 	for (DetailIt it=objects.begin(); it!=objects.end(); it++)
     	((EDetail*)(*it))->OnDeviceDestroy();
-	soft_Unload	();
+	hw_Unload	();
 }
 
 
@@ -216,16 +218,17 @@ void EDetailManager::SaveColorIndices(IWriter& F)
 
 bool EDetailManager::LoadColorIndices(IReader& F)
 {
-	VERIFY				(objects.empty());
-    VERIFY  			(m_ColorIndices.empty());
+    VERIFY(objects.empty());
+    VERIFY(m_ColorIndices.empty());
 
-    bool bRes			= true;
+    bool bRes = true;
     // objects
-    IReader* OBJ 		= F.open_chunk(DETMGR_CHUNK_OBJECTS);
-    if (OBJ){
-        IReader* O   	= OBJ->open_chunk(0);
-        for (int count=1; O; count++) {
-            EDetail* DO	= new EDetail();
+    IReader* OBJ = F.open_chunk(DETMGR_CHUNK_OBJECTS);
+    if (OBJ) {
+        IReader* O = OBJ->open_chunk(0);
+        for (int count = 1; O; count++)
+        {
+            EDetail* DO = new EDetail();
             if (DO->Load(*O)) 	objects.push_back(DO);
             else				bRes = false;
             O->close();
@@ -234,25 +237,32 @@ bool EDetailManager::LoadColorIndices(IReader& F)
         OBJ->close();
     }
     // color index map
-    R_ASSERT			(F.find_chunk(DETMGR_CHUNK_COLOR_INDEX));
-    int cnt				= F.r_u8();
-    string256			buf;
+    R_ASSERT(F.find_chunk(DETMGR_CHUNK_COLOR_INDEX));
+    int cnt = F.r_u8();
+    string256 buf;
     u32 index;
     int ref_cnt;
-    for (int k=0; k<cnt; k++){
-		index			= F.r_u32();
-        ref_cnt			= F.r_u8();
-		for (int j=0; j<ref_cnt; j++){
-        	F.r_stringZ	(buf,sizeof(buf));
-            EDetail* DO	= FindDOByName(buf);
-            if (DO) 	m_ColorIndices[index].push_back(DO);    
-            else		bRes=false;
+
+    for (int k = 0; k < cnt; k++) 
+    {
+        index = F.r_u32();
+        ref_cnt = F.r_u8();
+        for (int j = 0; j < ref_cnt; j++) 
+        {
+            F.r_stringZ(buf, sizeof(buf));
+            EDetail* DO = FindDOByName(buf);
+            if (DO) 	m_ColorIndices[index].push_back(DO);
+            else		bRes = false;
         }
     }
-	InvalidateCache		();
+    InvalidateCache();
+
+    if (!objects.empty())
+        hw_Load();
 
     return bRes;
 }
+
 bool EDetailManager::LoadLTX(CInifile& ini)
 {
 	R_ASSERT2			(0, "not_implemented");

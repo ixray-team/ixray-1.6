@@ -319,15 +319,12 @@ RDEVICE.Statistic->TEST0.End		();
 
 			// Vis-sorting
 #ifndef		DBG_SWITCHOFF_RANDOMIZE
-			if (UseHW())
-			{
-				if (Dobj.m_Flags.is(DO_NO_WAVING))
-					Item.vis_ID	= 0;
-				else
-					Item.vis_ID = Random.randI(1,3);
-			}
+
+			if (Dobj.m_Flags.is(DO_NO_WAVING))
+				Item.vis_ID = 0;
 			else
-				Item.vis_ID	= 0;
+				Item.vis_ID = Random.randI(1, 3);
+
 #else
 			Item.vis_ID = 0;
 #endif
