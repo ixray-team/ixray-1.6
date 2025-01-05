@@ -207,6 +207,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		}
 
 		MainForm->Frame();
+
+		if (g_pGamePersistent)
+			g_pGamePersistent->UpdateParticles();
 	}
 
 	xr_delete(g_FontManager);
