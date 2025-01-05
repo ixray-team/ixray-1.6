@@ -43,8 +43,8 @@ void CUIGameAHunt::Init	(int stage)
 
 		CUIXmlInit::InitStatic			(uiXml, "team1_icon", 0,	m_team1_icon);
 		CUIXmlInit::InitStatic			(uiXml, "team2_icon", 0,	m_team2_icon);
-		CUIXmlInit::InitTextWnd			(uiXml, "team1_score", 0,	m_team1_score);
-		CUIXmlInit::InitTextWnd			(uiXml, "team2_score", 0,	m_team2_score);
+		CUIXmlInit::InitStatic			(uiXml, "team1_score", 0,	m_team1_score);
+		CUIXmlInit::InitStatic			(uiXml, "team2_score", 0,	m_team2_score);
 
 		m_pMoneyIndicator->InitFromXML	(uiXml);
 		m_pRankIndicator->InitFromXml	(uiXml);
