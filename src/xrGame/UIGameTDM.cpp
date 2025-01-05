@@ -58,7 +58,7 @@ void CUIGameTDM::Init (int stage)
 		CUIXmlInit::InitStatic			(uiXml, "team2_icon",	0,	m_team2_icon);
 		CUIXmlInit::InitStatic			(uiXml, "team1_score",	0,	m_team1_score);
 		CUIXmlInit::InitStatic			(uiXml, "team2_score",	0,	m_team2_score);
-		CUIXmlInit::InitTextWnd			(uiXml, "fraglimit",	0,	m_pFragLimitIndicator);
+		CUIXmlInit::InitStatic			(uiXml, "fraglimit",	0,	m_pFragLimitIndicator);
 
 		m_pMoneyIndicator->InitFromXML	(uiXml);
 		m_pRankIndicator->InitFromXml	(uiXml);
