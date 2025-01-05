@@ -373,6 +373,12 @@ void TUI::PrepareRedraw()
 	RCache.set_xform_world	(Fidentity);
 }
 
+void TUI::Invalidate()
+{
+	UI->RT.destroy();
+	UI->RT.create("$user$rt_color", UI->GetRenderWidth(), UI->GetRenderHeight(), D3DFMT_X8R8G8B8);
+}
+
 extern ENGINE_API xr_atomic_bool g_bRendering;
 void TUI::Redraw()
 {
