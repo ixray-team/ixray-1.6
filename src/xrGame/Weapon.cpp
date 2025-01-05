@@ -2534,7 +2534,7 @@ bool CWeapon::SwitchAmmoType(u32 flags)
 		else
 			return false;
 
-		if (Actor()->GetDetector() && Actor()->GetDetector()->GetState() != CCustomDetector::eIdle)
+		if (ParentIsActor() && Actor()->GetDetector() && Actor()->GetDetector()->GetState() != CCustomDetector::eIdle)
 			return false;
 	}
 	else if (!Weapon_SetKeyRepeatFlagIfNeeded(kfNEXTAMMO))
