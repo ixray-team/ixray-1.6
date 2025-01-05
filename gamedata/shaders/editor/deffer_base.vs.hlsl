@@ -1,3 +1,7 @@
+#ifndef SKIN_NONE
+#include "deffer_model.vs.hlsl"
+#else
+
 #include "common.hlsli"	
 
 void main(in v_editor I, out p_bumped_new O)
@@ -18,3 +22,4 @@ void main(in v_editor I, out p_bumped_new O)
     O.hpos = mul(m_WVP, I.P);
 }
 
+#endif
