@@ -185,6 +185,15 @@ void UIAIMapTool::SideClick(int tag)
 	UI->RedrawScene();
 }
 
+void UIAIMapTool::UpdateIgnoreMaterial()
+{
+	for (u16 MaterialID : tool->m_ignored_materials)
+	{
+		SGameMtl* mtl = GameMaterialLibraryEditors->GetMaterialByID(MaterialID);
+		m_IgnoreMaterialsList.push_back(*mtl->m_Name);
+	}
+}
+
 void UIAIMapTool::OnDrawUI()
 {
 	if (m_ChooseIgnoreMaterials)
