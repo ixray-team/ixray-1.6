@@ -550,15 +550,8 @@ void UIMainMenuForm::Draw()
 					UIObjectList::Close();
 			}
 		}
-		
-		if (IXIconMenuItem("Preferences", UI->m_PreferencesIcon->pSurface))
-		{
-			ExecCommand(COMMAND_EDITOR_PREF);
-		}
 
 		IXEndMainMenuBar();
-
-		
 	}
 }
 

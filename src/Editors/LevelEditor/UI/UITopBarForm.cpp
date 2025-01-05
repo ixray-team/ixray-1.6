@@ -23,6 +23,8 @@ UITopBarForm::UITopBarForm()
     m_tReloadConfigs         = EDevice->Resources->_CreateTexture("ed\\bar\\reload_configs");
     m_tOpenGameData          = EDevice->Resources->_CreateTexture("ed\\bar\\open_gamedata");
     m_VerifySpaceRestrictors = false;
+
+	m_PreferencesIcon = EDevice->Resources->_CreateTexture("ed\\bar\\win_preferences");
 }
 
 UITopBarForm::~UITopBarForm() {}
@@ -78,7 +80,7 @@ void UITopBarForm::Draw()
 	{
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 6);
 
-		if (ImGui::BeginTable("##ToolbarTable", 8, ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_Hideable))
+		if (ImGui::BeginTable("##ToolbarTable", 9, ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_Hideable))
 		{
 			ImGui::TableSetupColumn("Actions");
 			ImGui::TableSetupColumn("File");
@@ -88,6 +90,7 @@ void UITopBarForm::Draw()
 			ImGui::TableSetupColumn("Engine");
 			ImGui::TableSetupColumn("Directory Actions");
 			ImGui::TableSetupColumn("Sound Preferences");
+			ImGui::TableSetupColumn("Preferences");
 
 			if (ImGui::TableNextColumn())
 			{
@@ -171,6 +174,12 @@ void UITopBarForm::Draw()
 				ImGui::SetNextItemWidth(150);
 				ImGui::SliderFloat("Volume", &psSoundVEffects, 0, 1, "%.2f");
 			}
+			
+			if (ImGui::TableNextColumn())
+			{
+				IMGUI_HINT_BUTTON("Preferences", m_PreferencesIcon, "Preferences", ClickPreferences);
+			}
+
 		}
 		ImGui::EndTable();
 	}
@@ -265,4 +274,9 @@ void UITopBarForm::ClickPlayPC()
 void UITopBarForm::ClickPlayCleanGame()
 {
 	LTools->RunGame("");
+}
+
+void UITopBarForm::ClickPreferences()
+{
+	ExecCommand(COMMAND_EDITOR_PREF);
 }

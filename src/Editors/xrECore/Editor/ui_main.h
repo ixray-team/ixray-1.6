@@ -269,7 +269,7 @@ public:
     ref_texture	m_WinMax = nullptr;
     ref_texture	m_WinClose = nullptr;
 
-    ref_texture	m_PreferencesIcon = nullptr;
+    
     void InitWindowIcons();
 protected:
     virtual void OnDrawUI();
