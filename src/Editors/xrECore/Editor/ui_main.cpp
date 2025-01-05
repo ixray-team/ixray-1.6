@@ -78,8 +78,6 @@ TUI::~TUI()
 	TRelease(m_WinRes);
 	TRelease(m_WinMax);
 	TRelease(m_WinClose);
-
-	TRelease(m_PreferencesIcon);
 }
 
 void TUI::OnDeviceCreate()
@@ -819,8 +817,6 @@ void TUI::InitWindowIcons()
 	m_WinMax		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_max");
 	m_WinRes		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_restore");
 	m_WinClose		= EDevice->Resources->_CreateTexture("ed\\bar\\win_header_close");
-
-	m_PreferencesIcon = EDevice->Resources->_CreateTexture("ed\\bar\\win_preferences");
 }
 
 void TUI::OnDrawUI()

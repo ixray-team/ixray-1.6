@@ -27,4 +27,6 @@ private:
 	void ClickPlayPC();  ref_texture m_tPlayPC;
 	void ClickPlayCleanGame();  ref_texture m_tPlayCleanGame;
 	bool m_VerifySpaceRestrictors;
+
+	void ClickPreferences(); ref_texture	m_PreferencesIcon;
 };
