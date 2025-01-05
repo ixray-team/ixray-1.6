@@ -173,9 +173,9 @@ void CUISkinSelectorWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 			game = smart_cast<game_cl_mp*>(&(Game()));
 			//dm = smart_cast<game_cl_Deathmatch *>(&(Game()));
 
-			if (m_pButtons[0] && pWnd == m_pButtons[0])
+			if (pWnd == m_pButtons[0])
 				OnKeyLeft();
-			else if (m_pButtons[1] && pWnd == m_pButtons[1])
+			else if (pWnd == m_pButtons[1])
 				OnKeyRight();
 			else if (pWnd == m_pBtnAutoSelect)
 			{
@@ -205,7 +205,7 @@ void CUISkinSelectorWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 			}
 		case WINDOW_FOCUS_RECEIVED:
 
-			if (m_pButtons[0] && pWnd == m_pButtons[0])
+			if (pWnd == m_pButtons[0])
 			{
 				if (m_pAnims[0])
 				{
@@ -213,7 +213,7 @@ void CUISkinSelectorWnd::SendMessage(CUIWindow *pWnd, s16 msg, void *pData)
 					m_pAnims[0]->Play();
 				}
 			}
-			else if (m_pButtons[1] && pWnd == m_pButtons[1])
+			else if (pWnd == m_pButtons[1])
 			{
 				if (m_pAnims[1])
 				{
@@ -329,7 +329,8 @@ void CUISkinSelectorWnd::OnKeyLeft()
 
 void CUISkinSelectorWnd::OnKeyRight()
 {
-	if (m_firstSkin + 6 < (int)m_skins.size())
+	int end_count = EngineExternal().ClearSkyMode() ? 4 : 6;
+	if (m_firstSkin + end_count < (int)m_skins.size())
 	{
 		m_firstSkin++;
 		UpdateSkins();
@@ -356,13 +357,14 @@ void CUISkinSelectorWnd::SetVisibleForBtn(ESKINMENU_BTN btn, bool state){
 
 void CUISkinSelectorWnd::SetCurSkin(int skin){
 	R_ASSERT2(skin>= -1 && skin <= (int)m_skins.size(), "invalid skin index");
+	int end_count = EngineExternal().ClearSkyMode() ? 4 : 6;
 
 	m_iActiveIndex = skin;
 
-	if (m_iActiveIndex != -1 && (m_iActiveIndex< m_firstSkin || m_iActiveIndex > m_firstSkin + 5))
+	if (m_iActiveIndex != -1 && (m_iActiveIndex< m_firstSkin || m_iActiveIndex > m_firstSkin + (end_count-1)))
 	{
-		if (m_iActiveIndex > (int)m_skins.size() - 6)
-			m_firstSkin = (int)m_skins.size() - 6;
+		if (m_iActiveIndex > (int)m_skins.size() - end_count)
+			m_firstSkin = (int)m_skins.size() - end_count;
 		else
             m_firstSkin = m_iActiveIndex;
 	}
