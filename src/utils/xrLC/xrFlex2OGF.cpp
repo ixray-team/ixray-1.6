@@ -40,14 +40,15 @@ void Face2OGF_Vertices( const Face &FF, OGF_Vertex	V[3] )
 	}
 }
 
-void OGF_AddFace( OGF &ogf, const Face& FF, bool _tc_ )
+void OGF_AddFace(OGF& ogf, const Face& FF, bool _tc_)
 {
-	OGF_Vertex	V[3];
+	OGF_Vertex* V = new OGF_Vertex[3];
 	// Geometry
-	Face2OGF_Vertices( FF, V );
+	Face2OGF_Vertices(FF, V);
 	// build face
-	TRY				(ogf._BuildFace(V[0],V[1],V[2],_tc_));
-	V[0].UV.clear();V[1].UV.clear();V[2].UV.clear();
+	TRY(ogf._BuildFace(V[0], V[1], V[2], _tc_));
+	V[0].UV.clear(); V[1].UV.clear(); V[2].UV.clear();
+	xr_delete(V);
 }
 
 void BuildOGFGeom( OGF &ogf, const vecFace& faces, bool _tc_ )
