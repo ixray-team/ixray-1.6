@@ -287,11 +287,7 @@ void CDetailManager::Render()
 	if (!psDeviceFlags.is(rsDetails))	return;
 #endif
 
-#ifndef IXR_WINDOWS
-	if (MT_CALC.valid())
-#endif
-		MT_CALC.wait();
-
+	MT_CALC.wait();
 
 	int idx = calc_key;
 	render_key = idx;
@@ -299,12 +295,9 @@ void CDetailManager::Render()
 
 	static DWORD this_thread_id = 0;
 	this_thread_id = GetCurrentThreadId();
-#ifdef IXR_WINDOWS
+
 	MT_CALC.run
 	(
-#else
-	MT_CALC = std::async(std::launch::async,
-#endif
 		[&]()
 		{
 #ifndef _EDITOR

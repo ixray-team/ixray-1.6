@@ -91,25 +91,22 @@ void CCoverManager::compute_static_cover	()
 	const ILevelGraph& Graph = ai().level_graph();
 	const u32 LevelVertexCount = ai().level_graph().header().vertex_count();
 
-	xr_parallel_for(xr_blocked_range<u32>(0, LevelVertexCount), [&](const xr_blocked_range<u32>& range)
+	xr_parallel_for(0u, LevelVertexCount, [&](u32 range)
 	{
-		for (u32 i = range.begin(); i != range.end(); ++i)
+		const ILevelGraph::CVertex& vertex = *Graph.vertex(range);
+		if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
 		{
-			const ILevelGraph::CVertex& vertex = *Graph.vertex(i);
-			if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
-			{
-				m_temp[i] = edge_vertex(i);
-				continue;
-			}
-
-			if (vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3))
-			{
-				m_temp[i] = edge_vertex(i);
-				continue;
-			}
-
-			m_temp[i] = false;
+			m_temp[range] = edge_vertex(range);
+			return;
 		}
+
+		if (vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3))
+		{
+			m_temp[range] = edge_vertex(range);
+			return;
+		}
+
+		m_temp[range] = false;
 	});
 
 	for (u32 i = 0; i < LevelVertexCount; ++i)
