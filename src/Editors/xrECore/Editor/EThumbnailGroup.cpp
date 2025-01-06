@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #pragma hdrstop
 
 #include "EThumbnail.h"
@@ -37,7 +37,7 @@ bool EGroupThumbnail::Load(LPCSTR src_name, LPCSTR path)
     if (path && xr_strlen(path))
         FS.update_path(fn, path, fn);
     else if (path == nullptr)
-        FS.update_path(fn, _objects_, fn);
+        FS.update_path(fn, _groups_, fn);
 
     if (!FS.TryLoad(fn))
         return false;
@@ -96,12 +96,12 @@ void EGroupThumbnail::Save(int age, LPCSTR path)
 
 	string_path fn;
     if (path) 		FS.update_path(fn,path,m_Name.c_str());
-    else			FS.update_path(fn,_objects_,m_Name.c_str());
+    else			FS.update_path(fn, _groups_,m_Name.c_str());
 
     if (path && xr_strlen(path))
         FS.update_path(fn, path, m_Name.c_str());
     else if (path == nullptr)
-        FS.update_path(fn, _objects_, m_Name.c_str());
+        FS.update_path(fn, _groups_, m_Name.c_str());
     else
         xr_strcpy(fn, m_Name.c_str());
 
