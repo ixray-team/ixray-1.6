@@ -311,14 +311,11 @@ void CSE_ALifeGraphPoint::UPDATE_Write		(NET_Packet	&tNetPacket)
 void CSE_ALifeGraphPoint::FillProps			(LPCSTR pref, PropItemVec& items)
 {
 #	ifdef XRSE_FACTORY_EXPORTS
-	RToken8Value* ValueColorR = PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\1"), &m_tLocations[0], &*fp_data.locations[0].begin(), (u32)fp_data.locations[0].size());
-	RToken8Value* ValueColorG = PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\2"), &m_tLocations[1], &*fp_data.locations[1].begin(), (u32)fp_data.locations[1].size());
-	RToken8Value* ValueColorB = PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\3"), &m_tLocations[2], &*fp_data.locations[2].begin(), (u32)fp_data.locations[2].size());
-	RToken8Value* ValueColorA = PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\4"), &m_tLocations[3], &*fp_data.locations[3].begin(), (u32)fp_data.locations[3].size());
-	ValueColorR->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
-	ValueColorG->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
-	ValueColorB->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
-	ValueColorA->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\1"), &m_tLocations[0], &*fp_data.locations[0].begin(), (u32)fp_data.locations[0].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\2"), &m_tLocations[1], &*fp_data.locations[1].begin(), (u32)fp_data.locations[1].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\3"), &m_tLocations[2], &*fp_data.locations[2].begin(), (u32)fp_data.locations[2].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+	PHelper().CreateRToken8(items, PrepareKey(pref,*s_name,"Location\\4"), &m_tLocations[3], &*fp_data.locations[3].begin(), (u32)fp_data.locations[3].size())->OnChangeEvent = xr_make_delegate(this, &CSE_ALifeGraphPoint::ChangeColorEvent);
+
 
 	PHelper().CreateRList	 	(items,	PrepareKey(pref,*s_name,"Connection\\Level name"),	&m_caConnectionLevelName,	&*fp_data.level_ids.begin(),	(u32)fp_data.level_ids.size());
 	PHelper().CreateRText	 	(items,	PrepareKey(pref,*s_name,"Connection\\Point name"),	&m_caConnectionPointName);
