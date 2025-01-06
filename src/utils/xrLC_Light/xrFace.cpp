@@ -32,7 +32,7 @@ void			base_Face::CacheOpacity	()
 	if ( !flags.bOpaque && (!T.THM.HasSurface()) )	////	pSurface was possible deleted
 	{
 		flags.bOpaque	= true;
-	//	clMsg			("Strange face detected... Has alpha without texture...");
+		clMsg			("Strange face detected... Has alpha without texture... [%s]", T.name);
 	}
 }
 static bool do_not_add_to_vector_in_global_data = false;

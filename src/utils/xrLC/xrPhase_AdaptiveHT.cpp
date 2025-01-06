@@ -76,10 +76,7 @@ virtual	void Execute()
  			V->normalFromAdj	();
 
 			u32 flags = LP_dont_rgb + LP_dont_sun;
-			if (lc_global_data()->GetIsIntelUse())
-				LightPoint_Intel ( vC, V->P, V->N, pBuild->L_static(), flags, 0);
-			else 
-				LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(), flags,0);
+			LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(), flags,0);
 			vC.mul				(0.5f);
 			V->C._set			(vC);
 		}

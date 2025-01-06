@@ -1,3 +1,5 @@
+/*
+
 #include "stdafx.h"
 #include "build.h"
 #include "xrPhase_MergeLM_Rect.h"
@@ -245,25 +247,6 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
 			// remainder part
 			for (int _X = 0; _X < x_max;)
 			{
-				// AVX
-				// __m256i block = _mm256_loadu_si256((__m256i*) & temp_surf[_X]);
-				// 
-				// // Сравниваем каждый байт с нулем
-				// __m256i zeros = _mm256_setzero_si256();
-				// __m256i cmp = _mm256_cmpeq_epi8(block, zeros);
-				// 
-				// // Получаем маску ненулевых байтов
-				// int mask = _mm256_movemask_epi8(cmp);
-				// 
-				// // Если есть хотя бы один ненулевой байт
-				// if (mask != 0xFFFFFFFF)
-				// {
-				// 	_X += 32;
-				// 	occuped_parts++;
-				// 	continue;
-				// }
-				// _X++;
-
 				__m128i block = _mm_loadu_si128((__m128i*) & temp_surf[_X]);
 
 				// Сравниваем каждый байт с нулем
@@ -327,26 +310,6 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
 			// remainder part
 			for (int _X = 0; _X < x_max; )
 			{
-				// AVX
-				// __m256i block = _mm256_loadu_si256((__m256i*) & temp_surf[_X]);
-				// 
-				// // Сравниваем каждый байт с нулем
-				// __m256i zeros = _mm256_setzero_si256();
-				// __m256i cmp = _mm256_cmpeq_epi8(block, zeros);
-				// 
-				// // Получаем маску ненулевых байтов
-				// int mask = _mm256_movemask_epi8(cmp);
-				// 
-				// // Если есть хотя бы один ненулевой байт
-				// if (mask != 0xFFFFFFFF)
-				// {
-				// 	_X += 32;
-				// 	continue;
-				// }
-				// 
-				// _X++;
-
-
 				__m128i block = _mm_loadu_si128((__m128i*) & temp_surf[_X]);
 
 				// Сравниваем каждый байт с нулем
@@ -379,3 +342,8 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
 	}
 	return FALSE;
 }
+*/
+
+
+
+

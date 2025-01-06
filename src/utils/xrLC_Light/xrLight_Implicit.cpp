@@ -43,7 +43,7 @@ void	ImplicitThread::Execute()
 }
 
 // 2 : Mainthread + UI thread
-#define	NUM_THREADS	 CPU::ID.n_threads - 1
+#define	NUM_THREADS	 CPU::ID.n_threads
 ImplicitCalcGlobs cl_globs;
 int ThreadTaskID_Implication = 0;
 
@@ -131,11 +131,7 @@ void	ImplicitExecute::	Execute	( )
 								
 
 								u32 flags = (inlc_global_data()->b_nosun() ? LP_dont_sun : 0);
-
-								if (inlc_global_data()->GetIsIntelUse())
-									LightPoint_Intel(C, wP, wN, inlc_global_data()->L_static(), flags, F);
-								else 
-									LightPoint	(&DB, inlc_global_data()->RCAST_Model(), C, wP, wN, inlc_global_data()->L_static(), flags, F);
+ 								LightPoint	(&DB, inlc_global_data()->RCAST_Model(), C, wP, wN, inlc_global_data()->L_static(), flags, F);
 								Fcount		++;
 							}
 						}

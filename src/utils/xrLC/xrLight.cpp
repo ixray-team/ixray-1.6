@@ -91,7 +91,7 @@ for(u32 dit = 0; dit<lc_global_data()->g_deflectors().size(); dit++)
 		// Main process (4 threads)
 		Status			("Lighting...");
 		CThreadManager	threads;
-		const	u32	thNUM	= CPU::ID.n_threads - 2;
+		const	u32	thNUM	= CPU::ID.n_threads;
 
 		CTimer	start_time;	start_time.Start();				
 		for				(int L=0; L<thNUM; L++)	
@@ -110,7 +110,7 @@ void	CBuild::LMaps					()
 void CBuild::Light()
 {
 //	g_params().m_lm_jitter_samples = 1;
-//
+ 
 //	g_params().m_lm_pixels_per_meter = 10;
 //	g_params().m_lm_rms = 4;
 //	g_params().m_lm_rms_zero = 4; 

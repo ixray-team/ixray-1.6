@@ -267,7 +267,6 @@ public:
 				ctxt->result->hit_struct.v = v;
 				ctxt->result->hit_struct.prim = prim;
 				ctxt->result->hit_struct.dist = r;
-
 				ctxt->filterIntersect(ctxt->result);
 				continue_work = ctxt->result->valid;
 				return;
