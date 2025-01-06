@@ -13,8 +13,7 @@
 #include "xrLC_GlobalData.h"
 
 void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip);
-void LightPoint_Intel( base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip);
- 
+  
 union var
 {
 	int		i;
@@ -119,11 +118,7 @@ void xrMU_Model::calc_lighting	(xr_vector<base_color>& dest, const Fmatrix& xfor
 			Fvector				P,N;
 			N.random_dir		(vN,deg2rad(30.f));
 			P.mad				(vP,N,a);
-
-			if (lc_global_data()->GetIsIntelUse() && !use_opcode)
-				LightPoint_Intel( vC, P, N, lights, flags, 0);
-			else 
-				LightPoint			(&DB, MDL, vC, P, N, lights, flags, 0);
+ 			LightPoint			(&DB, MDL, vC, P, N, lights, flags, 0);
 		}
 		vC.scale				(n_samples);
 		vC._tmp_				=	v_trans;

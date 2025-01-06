@@ -16,8 +16,7 @@ xrCriticalSection						g_trans_CS
 #endif // PROFILE_CRITICAL_SECTIONS
 ;
 extern XRLC_LIGHT_API void		LightPoint		(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip);
-extern XRLC_LIGHT_API void		LightPoint_Intel( base_color_c& C, Fvector& P, Fvector& N, base_lighting& lights, u32 flags, Face* skip);
-
+ 
 void	g_trans_register_internal		(Vertex* V)
 {
 	R_ASSERT	(V);
@@ -137,10 +136,8 @@ public:
 				DB.ray_options	(0);
 
 				u32 flags = (lc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_dont_hemi;
-				if (lc_global_data()->GetIsIntelUse())
-					LightPoint_Intel( vC, V->P, V->N, lc_global_data()->L_static(), flags, 0);
-				else 
-					LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, lc_global_data()->L_static(), flags, 0);
+  				LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, lc_global_data()->L_static(), flags, 0);
+
 				vC._tmp_			= v_trans;
 				vC.mul				(.5f);
 				vC.hemi				= old.hemi;			// preserve pre-calculated hemisphere
