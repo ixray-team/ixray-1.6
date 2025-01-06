@@ -204,7 +204,9 @@ void UIKeyForm::DrawMark(int id)
 	ATools->GetStatTime(a, b, c);
 	float motion_length = b - a;
 
-	
+	if (motion_length == 0)
+		return;
+
 	float k_len = m_TempForPlotHistogram.size() / motion_length;
 
 	motion_marks::C_ITERATOR it = M.intervals.begin();
