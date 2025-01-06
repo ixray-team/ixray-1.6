@@ -426,6 +426,8 @@ float RayTraceIntel(R_Light& L, Fvector& P, Fvector& N, float range, Face* skip,
 	// INTEL RAY TRACING
 	if (lc_global_data()->GetIsIntelUse())
 		return RaytraceEmbreeProcess(L, P, N, range, skip);
+
+	return 0;
 }
 
 void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip)
