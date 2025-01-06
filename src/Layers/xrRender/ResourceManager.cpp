@@ -352,7 +352,7 @@ void CResourceManager::DeferredUpload()
 
 #ifndef _EDITOR
 	if (ps_r__common_flags.test(RFLAG_MT_TEX_LOAD)) {
-		xr_parallel_for(m_textures.begin(), m_textures.end(), [](auto& pair)
+		xr_parallel_foreach(m_textures.begin(), m_textures.end(), [](auto& pair)
 		{
 			pair.second->Load();
 		});

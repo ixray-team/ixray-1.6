@@ -141,7 +141,7 @@ void ESceneCustomOTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 
 void ESceneCustomOTool::SelectObjects(bool flag)
 {
-    xr_parallel_for
+    xr_parallel_foreach
     (
         m_Objects.begin(),
         m_Objects.end(),

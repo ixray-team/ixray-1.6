@@ -183,11 +183,7 @@ public:
 	void							Render			();
 
 
-#ifdef IXR_WINDOWS
-    concurrency::task_group	 MT_CALC;
-#else
-	std::future<void> MT_CALC;
-#endif
+	xr_task_group MT_CALC;
 
 	void							cache_Alloc();
 	void							cache_Free();

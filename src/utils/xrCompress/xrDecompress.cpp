@@ -160,7 +160,7 @@ void xrDecompressor::Decompress()
 
 	Msg("%d file(s) to decompress in %d archive(s)\n", (int)files->size(), (int)FS.m_archives.size());
 
-	xr_parallel_for(files->begin(), files->end(), 
+	xr_parallel_foreach(files->begin(), files->end(), 
 	[this](const char* File)
 	{
 		if (int err = ExtractFile(File))
