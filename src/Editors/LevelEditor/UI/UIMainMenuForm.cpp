@@ -578,15 +578,19 @@ void UIMainMenuForm::ExportLevelAsArchive()
 	xr_path RawPath = (FullPath + "\\rawdata").data();
 	xr_path GamePath = (FullPath + "\\gamedata").data();
 	xr_path RawObjectPath = (RawPath.xstring() + "\\objects").data();
+	xr_path RawGroupPath = (RawPath.xstring() + "\\groups").data();
 	xr_path LevelPath = (RawPath.xstring() + "\\levels").data();
 	xr_path TexturesObjectPath = (GamePath.xstring() + "\\textures").data();
+	xr_path TextureLodsObjectPath = (TexturesObjectPath.xstring() + "\\lods").data();
 
 
 	std::filesystem::create_directory(RawPath);
 	std::filesystem::create_directory(RawObjectPath);
+	std::filesystem::create_directory(RawGroupPath);
 	std::filesystem::create_directory(LevelPath);
 	std::filesystem::create_directory(GamePath);
 	std::filesystem::create_directory(TexturesObjectPath);
+	std::filesystem::create_directory(TextureLodsObjectPath);
 
 
 	string_path GameTextures = {};
@@ -596,7 +600,6 @@ void UIMainMenuForm::ExportLevelAsArchive()
 
 	auto ParseBumpFromTexture = [&](const xr_string& InFileThm)
 	{
-
 		ETextureThumbnail* pThmTexture = (ETextureThumbnail*)CreateThumbnail(InFileThm.c_str(), ECustomThumbnail::ETTexture);
 		pThmTexture->Load(InFileThm.c_str(), "");
 
@@ -617,10 +620,8 @@ void UIMainMenuForm::ExportLevelAsArchive()
 		}
 	};
 	
-	auto ParseObject = [&](auto Obj, xr_path FilePath)
+	auto ParseObject = [&](auto Obj, xr_path FilePath, xr_path DirFilePath)
 	{
-		xr_path DirFilePath = RawObjectPath;
-
 		auto Dirs = FilePath.xstring().Split('\\');
 		for (size_t Iter = 0; Iter < Dirs.size() - 1; Iter++)
 		{
@@ -665,12 +666,45 @@ void UIMainMenuForm::ExportLevelAsArchive()
 			ParseBumpFromTexture(InFileThm);
 		}
 	};
+	
+	// LOD's
+	auto CopyLodTexture = [&TextureLodsObjectPath](const xr_string& InputFile)
+	{
+		string_path LodTexturePath = {};
+		FS.update_path(LodTexturePath, _game_textures_, (InputFile + ".dds").data());
+		string_path LodTexturePathThm = {};
+		FS.update_path(LodTexturePathThm, _game_textures_, (InputFile + ".thm").data());
+
+		if (std::filesystem::exists(LodTexturePath))
+		{
+			xr_string OutLodTexture = TextureLodsObjectPath;
+			OutLodTexture += "\\" + xr_path(InputFile).xfilename() + ".dds";
+
+			std::filesystem::copy(LodTexturePath, OutLodTexture.data(), std::filesystem::copy_options::skip_existing);
+		}
+
+		if (!std::filesystem::exists(LodTexturePathThm))
+			return;
+
+		xr_string OutLodTextureThm = TextureLodsObjectPath;
+		OutLodTextureThm += "\\" + xr_path(InputFile).xfilename() + ".thm";
+
+		std::filesystem::copy(LodTexturePathThm, OutLodTextureThm.data(), std::filesystem::copy_options::skip_existing);
+	};
 
 	// Parse objects
 	for (; _F != _E; _F++)
 	{
 		CSceneObject* Obj = (CSceneObject *)*_F;
-		ParseObject(Obj, Obj->GetReference()->GetName());
+		ParseObject(Obj, Obj->GetReference()->GetName(), RawObjectPath);
+		
+		const xr_string& LodTexture = Obj->GetReference()->GetLODTextureName();
+
+		if (LodTexture.empty())
+			continue;
+
+		CopyLodTexture(LodTexture);
+		CopyLodTexture(LodTexture + "_nm");
 	}
 
 	// Parse levels
@@ -682,29 +716,43 @@ void UIMainMenuForm::ExportLevelAsArchive()
 
 	// Parse details 
 	EDetailManager* pDetTool = (EDetailManager*)Scene->GetTool(OBJCLASS_DO);
-	xr_string TexturePath = GameTextures;
-	TexturePath += *pDetTool->m_Base.name;
-	TexturePath += ".dds";
 
-	xr_string TexturePathOut = TexturesObjectPath;
-	TexturePathOut += "\\";
-	TexturePathOut += *pDetTool->m_Base.name;
-	TexturePathOut += ".dds";
-
-	xr_path TextureMask = TexturePathOut;
-	TextureMask = TextureMask.parent_path();
-
-	if (!std::filesystem::exists(TextureMask))
+	if (pDetTool->m_Base.name.size() > 0)
 	{
-		std::filesystem::create_directories(TextureMask);
-	}
 
-	std::filesystem::copy(TexturePath.data(), TexturePathOut.data(), std::filesystem::copy_options::update_existing);
+		xr_string TexturePath = GameTextures;
+		TexturePath += *pDetTool->m_Base.name;
+		TexturePath += ".dds";
+
+		xr_string TexturePathOut = TexturesObjectPath;
+		TexturePathOut += "\\";
+		TexturePathOut += *pDetTool->m_Base.name;
+		TexturePathOut += ".dds";
+
+		xr_path TextureMask = TexturePathOut;
+		TextureMask = TextureMask.parent_path();
+
+		if (!std::filesystem::exists(TextureMask))
+		{
+			std::filesystem::create_directories(TextureMask);
+		}
+
+		std::filesystem::copy(TexturePath.data(), TexturePathOut.data(), std::filesystem::copy_options::update_existing);
+	}
 
 	for (CDetail* DetObjPtr : pDetTool->objects)
 	{
 		EDetail* NormalPtr = (EDetail*)DetObjPtr;
-		ParseObject(NormalPtr->m_pRefs, NormalPtr->m_pRefs->GetName());
+		ParseObject(NormalPtr->m_pRefs, NormalPtr->m_pRefs->GetName(), RawObjectPath);
 	}
+
+	// Parse details 
+	//ESceneGroupTool* pGroupTool = (ESceneGroupTool*)Scene->GetTool(OBJCLASS_GROUP);
+	//
+	//for (auto ObjPtr : pGroupTool->GetObjects())
+	//{
+	//	CGroupObject* NormalPtr = (CGroupObject*)ObjPtr;
+	//	ParseObject(NormalPtr, NormalPtr->RefName(), RawGroupPath);
+	//}
 }
 
