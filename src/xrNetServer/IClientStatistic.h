@@ -1,11 +1,6 @@
 #pragma once
 #include "NET_Shared.h"
 
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <DPlay/dplay8.h>
-#pragma warning(pop)
-
 struct SteamNetConnectionRealTimeStatus_t;
 
 class XRNETSERVER_API IClientStatistic
@@ -31,7 +26,7 @@ class XRNETSERVER_API IClientStatistic
 public:
 	IClientStatistic(CTimer* timer) { ZeroMemory(this, sizeof(*this)); device_timer = timer; dwBaseTime = TimeGlobal(device_timer); }
 
-	void	Update(DPN_CONNECTION_INFO& CI);
+	//void	Update(DPN_CONNECTION_INFO& CI);
 	void	Update(SteamNetConnectionRealTimeStatus_t& status);
 
 	IC u32	getPing() { return dwRoundTripLatencyMS; }
