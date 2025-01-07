@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "../../Editor/Utils/TerrainGarbageGenerator.h"
 
 static std::atomic<bool> RefreshInProgress;
 
@@ -147,6 +148,29 @@ void UIObjectTool::Draw()
 			{
 				m_PropRandom = true;
 				ParentTools->FillAppendRandomPropertiesBegin();
+			}
+
+			if (ImGui::Button("Generate random garbage"))
+			{
+				static EGarbageGenerator Generator;
+				ESceneObjectTool* ObjectToolPtr = static_cast<ESceneObjectTool*>(Scene->GetTool(OBJCLASS_SCENEOBJECT));
+				auto ObjectList = ObjectToolPtr->GetObjects();
+
+				bool Placed = false;
+
+				for (CCustomObject* Object : ObjectList)
+				{
+					if (!Object->Selected())
+						continue;
+
+					Generator.Generate((CSceneObject*)Object);
+					Placed = true;
+				}
+
+				if (!Placed)
+				{
+					ELog.DlgMsg(mtInformation, mbOK, "An object or terrain must be selected!");
+				}
 			}
 		}
 		ImGui::Separator();
