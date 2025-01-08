@@ -21,17 +21,6 @@ void main(in v_detail I, out p_bumped_new O)
     pos.z = dot(m2, I.pos);
     pos.w = 1.0f;
 
-#ifdef USE_TREEWAVE
-    float base = m1.w;
-    float H = I.pos.y * length(m1.xyz);
-    float frac = I.misc.z * consts.x;
-
-    float dp = calc_cyclic(dot(pos, wave));
-    float inten = H * dp;
-
-    pos.xz += calc_xz_wave(dir2D.xz * inten, frac);
-#endif
-
     float3 Pe = mul(m_WV, pos);
     float2 tc = I.misc.xy * consts.xy;
 
