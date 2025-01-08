@@ -57,7 +57,7 @@ void	CBlender_Detail_Still::Compile	(CBlender_Compile& C)
 	//	}
 	//	C.PassEnd			();
 
-		RImplementation.addShaderOption("USE_TREEWAVE", "1");
+		//RImplementation.addShaderOption("USE_TREEWAVE", "1");
 		uber_deffer(C, false, "deffer_detail", "deffer_base", true, 0, true);
 		C.r_End();
 	} 
