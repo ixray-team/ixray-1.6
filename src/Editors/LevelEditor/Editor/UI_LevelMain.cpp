@@ -144,6 +144,12 @@ CCommandVar CLevelTool::CommandReadonlyTarget(CCommandVar p1, CCommandVar p2)
 	return res;
 }
 
+CCommandVar CLevelTool::CommandMultiReplaceObjects(CCommandVar p1, CCommandVar p2)
+{
+
+	return false;
+}
+
 CCommandVar CLevelTool::CommandMultiRenameObjects(CCommandVar p1, CCommandVar p2)
 {
 	if( !Scene->locked() )
@@ -1089,6 +1095,7 @@ void CLevelMain::RegisterCommands()
 	REGISTER_CMD_C	    (COMMAND_SHOW_TARGET,           	LTools,CLevelTool::CommandShowTarget);
 	REGISTER_CMD_C	    (COMMAND_READONLY_TARGET,          	LTools,CLevelTool::CommandReadonlyTarget);
 	REGISTER_CMD_C	    (COMMAND_MULTI_RENAME_OBJECTS,     	LTools,CLevelTool::CommandMultiRenameObjects);
+	REGISTER_CMD_C	    (COMMAND_MULTI_REPLACE_OBJECTS,     LTools,CLevelTool::CommandMultiReplaceObjects);
 
 	REGISTER_CMD_CE	    (COMMAND_SHOW_OBJECTLIST,           "Scene\\Show Object List",		LTools,CLevelTool::CommandShowObjectList, false);
 	// common
