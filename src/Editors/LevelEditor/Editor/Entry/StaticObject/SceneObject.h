@@ -3,6 +3,8 @@
 class CSceneObject : 
 	public CCustomObject
 {
+	friend class UIReferenceReplacer;
+
 	shared_str		m_ReferenceName;
 	CEditableObject*m_pReference;
 	void 			ReferenceChange			(PropValue* sender);

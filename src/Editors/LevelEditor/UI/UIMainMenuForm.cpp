@@ -2,6 +2,7 @@
 #include "../../xrEUI/imgui_IconMenuItem.h"
 
 #include "../Nodes/UIMacroView.h"
+#include "../Editor/Utils/ReferenceReplacer.h"
 
 #include "../../xrEUI/xrUITheme.h"
 #include "../../xrEUI/Windows/Help.h"
@@ -203,6 +204,13 @@ void UIMainMenuForm::Draw()
 			if (ImGui::MenuItem("Library Editor")) { ExecCommand(COMMAND_LIBRARY_EDITOR); }
 			ImGui::Separator();
 			if (ImGui::MenuItem("Multi Rename")) { ExecCommand(COMMAND_MULTI_RENAME_OBJECTS); }
+			if (ImGui::MenuItem("Multi Replace")) 
+			{ 
+				UIReferenceReplacer* RefUI = new UIReferenceReplacer;
+				RefUI->UpdateReferences();
+
+				UI->Push(RefUI);
+			}
 			if (ImGui::MenuItem("Reload")) { ExecCommand(COMMAND_RELOAD_OBJECTS); }
 			ImGui::EndMenu();
 		}
