@@ -54,7 +54,7 @@ void UIObjectList::Draw()
 			for (UITreeItem* Item : m_Root.Items)
 			{
 				UIObjectListItem* RItem = (UIObjectListItem*)Item;
-				if (RItem->bIsSelected)
+				if (RItem->Object->Selected())
 				{
 					RItem->Object->Select(true);
 					Fbox bb;
@@ -186,10 +186,11 @@ void UIObjectList::Refresh()
 				}
 				else
 				{
-					UIObjectListItem* Item = static_cast<UIObjectListItem*>(Form->m_Root.AppendItem(Obj->GetName(), 0)); 
+					UIObjectListItem* Item = static_cast<UIObjectListItem*>(Form->m_Root.AppendItem(Obj->GetName(), 0));
 					VERIFY(Item);
 
-					Item->Object = Obj;
+					Item->bIsSelected = Obj->Selected();
+					Item->Object = Obj; 
 				}
 				
 			}
