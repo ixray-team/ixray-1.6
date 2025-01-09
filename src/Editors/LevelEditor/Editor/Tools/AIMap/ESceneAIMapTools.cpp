@@ -312,15 +312,18 @@ bool ESceneAIMapTool::LoadLTX(CInifile& ini)
     
     // ignored_materials
     m_ignored_materials.clear();
-    u32 ignored_materials_count = ini.r_u32("ignored_materials", "count");
-    m_ignored_materials.reserve(ignored_materials_count);
-
-    for (u32 i = 0; i < ignored_materials_count; i++) 
+    if (ini.section_exist("ignored_materials"))
     {
-        string128 key;
-        sprintf(key, "material_%d", i);
-        SGameMtl* mtl = GameMaterialLibraryEditors->GetMaterial(ini.r_string("ignored_materials", key));
-        if (mtl) m_ignored_materials.push_back(mtl->GetID());
+        u32 ignored_materials_count = ini.r_u32("ignored_materials", "count");
+        m_ignored_materials.reserve(ignored_materials_count);
+
+        for (u32 i = 0; i < ignored_materials_count; i++)
+        {
+            string128 key;
+            sprintf(key, "material_%d", i);
+            SGameMtl* mtl = GameMaterialLibraryEditors->GetMaterial(ini.r_string("ignored_materials", key));
+            if (mtl) m_ignored_materials.push_back(mtl->GetID());
+        }
     }
     
     hash_FillFromNodes();
