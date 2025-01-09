@@ -7,7 +7,7 @@ public:
 
 	bool bIsSelected;
 	CCustomObject* Object;
-	void Draw();
+	float Draw();
 	void DrawRoot();
 	void ClearSelcted(UIObjectListItem*Without=nullptr);
 protected:
