@@ -1,8 +1,10 @@
 #pragma once
 
-template<typename _Object>
-class CStateControlAttack : public CState<_Object> {
-	typedef	CState<_Object> inherited;
+#include "../state.h"
+
+class CStateControlAttack : public CState {
+protected:
+	using	inherited = CState;
 
 	enum {
 		eActionPrepare,
@@ -14,18 +16,20 @@ class CStateControlAttack : public CState<_Object> {
 
 	u32				time_control_started;
 
+	CControllerBase* pControllerBase;
+
 public:
 
-					CStateControlAttack		(_Object *p);
-	virtual			~CStateControlAttack	();
+					CStateControlAttack		(CBaseMonster* object);
+	virtual			~CStateControlAttack	() override;
 
-	virtual void	initialize				();	
-	virtual void	execute					();
-	virtual void	finalize				();
-	virtual void	critical_finalize		();
+	virtual void	initialize				() override;
+	virtual void	execute					() override;
+	virtual void	finalize				() override;
+	virtual void	critical_finalize		() override;
 
-	virtual bool 	check_completion		();
-	virtual bool 	check_start_conditions	();
+	virtual bool 	check_completion		() override;
+	virtual bool 	check_start_conditions	() override;
 
 private:
 
@@ -33,5 +37,3 @@ private:
 			void	execute_hit_continue	();
 			void	execute_hit_prepare		();
 };
-
-#include "controller_state_control_hit_inline.h"

@@ -2,20 +2,30 @@
 
 #include "../state.h"
 
-template<typename _Object>
-class	CStateCustomGroup : public CState<_Object> {
+class CDogBase;
+
+class	CStateCustomGroup : public CState{
 protected:
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+	using inherited = CState		;
+	using state_ptr = CState*;
+
+private:
+	CDogBase* m_pDog;
 
 public:
-	CStateCustomGroup		(_Object *obj);
+	CStateCustomGroup		(CBaseMonster *object);
 	virtual				~CStateCustomGroup		();
 
 	virtual	void		execute					();
 	virtual void		setup_substates			();
-	virtual bool 		check_completion		() {return (this->object->b_state_end);}
-	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
-};
+	virtual bool 		check_completion		() 
+	{
+		bool result {};
 
-#include "group_state_custom_inline.h"
+		if (m_pDog) result = m_pDog->b_state_end;
+
+		return result;
+	}
+
+	virtual void		remove_links			(CObject* object) { inherited::remove_links(object);}
+};

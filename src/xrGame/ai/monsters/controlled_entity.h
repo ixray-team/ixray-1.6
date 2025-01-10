@@ -27,7 +27,7 @@ public:
 	virtual void			set_task_follow		(const CEntity *e)				= 0;
 	virtual void			set_task_attack		(const CEntity *e)				= 0;
 	
-	virtual void			set_under_control	(CController *controller)		= 0;
+	virtual void			set_under_control	(CControllerBase *controller)		= 0;
 	virtual void			free_from_control	()								= 0;
 
 	virtual void			on_reinit			()								= 0;
@@ -35,8 +35,6 @@ public:
 	virtual void			on_destroy			()								= 0;
 };
 
-
-template<typename _Object>
 class CControlledEntity : public CControlledEntityBase {
 	
 	SControlledInfo		m_data;
@@ -47,8 +45,8 @@ class CControlledEntity : public CControlledEntityBase {
 		int group_id;
 	} saved_id;
 
-	_Object				*m_object;
-	CController			*m_controller;
+	CBaseMonster		*m_object;
+	CControllerBase			*m_controller;
 
 public:
 
@@ -60,17 +58,13 @@ public:
 	virtual void			set_task_follow			(const CEntity *e);
 	virtual void			set_task_attack			(const CEntity *e);
 
-	virtual void			set_under_control		(CController *controller); 
+	virtual void			set_under_control		(CControllerBase *controller); 
 	virtual void			free_from_control		();
 
 	virtual void			on_reinit				();
 	virtual void			on_die					();
 	virtual void			on_destroy				();
 
-			void			init_external			(_Object *obj) {m_object = obj;}
-			
-			CController		*get_controller			() {return m_controller;}
+			void			init_external			(CBaseMonster *obj) {m_object = obj;}
 };
-
-#include "controlled_entity_inline.h"
 

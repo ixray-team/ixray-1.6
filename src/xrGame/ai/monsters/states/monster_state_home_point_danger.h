@@ -1,18 +1,18 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateMonsterDangerMoveToHomePoint : public CState<_Object> {
+
+class CStateMonsterDangerMoveToHomePoint : public CState {
 protected:
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+	typedef CState		inherited;
+	typedef CState*	state_ptr;
 
 	u32					m_target_node;
 	bool				m_skip_camp;
 	Fvector				m_danger_pos;
 
 public:
-						CStateMonsterDangerMoveToHomePoint(_Object *obj);
+						CStateMonsterDangerMoveToHomePoint(CBaseMonster *obj);
 	virtual	void		initialize				();
 	virtual void 		finalize				();
 	virtual void 		critical_finalize		();
@@ -26,5 +26,3 @@ public:
 private:
 			Fvector		&get_most_danger_pos	();
 };
-
-#include "monster_state_home_point_danger_inline.h"

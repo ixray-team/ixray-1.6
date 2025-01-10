@@ -3,24 +3,24 @@
 #include "../controlled_entity.h"
 #include "../../../../xrScripts/script_export_space.h"
 
-class CAI_Flesh : public CBaseMonster,
-				  public CControlledEntity<CAI_Flesh> {
-
-	typedef		CBaseMonster					inherited;
-	typedef		CControlledEntity<CAI_Flesh>	CControlled;
+class CFleshBase : public CBaseMonster,
+				  public CControlledEntity {
+protected:
+	using		inherited = CBaseMonster					;
+	using		CControlled = CControlledEntity	;
 
 public:
-							CAI_Flesh		();
-	virtual					~CAI_Flesh		();	
+	CFleshBase();
+	virtual					~CFleshBase() override;
 	
-	virtual	void	Load					(LPCSTR section);
-	virtual	BOOL	net_Spawn				(CSE_Abstract* DC);
+	virtual	void	Load					(LPCSTR section) override;
+	virtual	BOOL	net_Spawn				(CSE_Abstract* DC) override;
 
-	virtual	void	CheckSpecParams			(u32 spec_params);
+	virtual	void	CheckSpecParams			(u32 spec_params) override;
 
-	virtual bool	ability_can_drag		() {return true;}
+	virtual bool	ability_can_drag		() override { return true; }
 
-	virtual	char*	get_monster_class_name () { return (char*)"flesh"; }
+	virtual	char*	get_monster_class_name () override { return (char*)"flesh"; }
 
 
 private:

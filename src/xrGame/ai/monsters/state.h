@@ -8,11 +8,13 @@
 #include "debug_text_tree.h"
 #endif
 
-template<typename _Object>
-class CState {
-	typedef CState<_Object> CSState;
+#include "basemonster/base_monster.h"
+
+class CState 
+{
+	typedef CState CSState;
 public:
-						CState					(_Object *obj, void *data = 0);
+						CState					(CBaseMonster *obj, void *data = 0);
 	virtual 			~CState					(); 
 
 	virtual	void		reinit					();
@@ -58,7 +60,7 @@ protected:
 
 	u32					time_state_started;
 
-	_Object				*object;
+	CBaseMonster		*object;
 	
 	void				*_data;
 
@@ -70,19 +72,16 @@ private:
 	typedef typename xr_map<u32, CSState*>::iterator STATE_MAP_IT;
 };
 
-template<typename _Object>
-class CStateMove : public CState<_Object> {
-	typedef CState<_Object> inherited;
+#include "control_path_builder_base.h"
+
+class CStateMove : public CState 
+{
+	typedef CState inherited;
 public:
-						CStateMove	(_Object *obj, void *data = 0) : inherited(obj,data){}
+						CStateMove	(CBaseMonster *obj, void *data = 0) : inherited(obj,data){}
 	virtual 			~CStateMove	(){}
 	virtual void initialize() {
 		inherited::initialize();
 		this->object->path().prepare_builder();
 	}
 };
-
-
-
-#include "state_inline.h"
-

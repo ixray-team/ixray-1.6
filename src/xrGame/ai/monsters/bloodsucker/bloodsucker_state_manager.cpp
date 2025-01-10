@@ -1,6 +1,14 @@
 #include "stdafx.h"
-#include "bloodsucker_state_manager.h"
+
 #include "bloodsucker.h"
+#include "bloodsucker_state_manager.h"
+
+#include "../ai_monster_squad.h"
+#include "../ai_monster_squad_manager.h"
+
+#include "CharacterPhysicsSupport.h"
+#include "PHMovementControl.h"
+#include "../xrPhysics/IPHCapture.h"
 
 #include "../control_animation_base.h"
 #include "../control_direction_base.h"
@@ -19,26 +27,32 @@
 #include "bloodsucker_predator.h"
 #include "bloodsucker_state_capture_jump.h"
 #include "bloodsucker_attack_state.h"
+#include "bloodsucker_vampire_execute.h"
 
-
-CStateManagerBloodsucker::CStateManagerBloodsucker(CAI_Bloodsucker *monster) : inherited(monster)
+CBloodsuckerBaseStateManager::CBloodsuckerBaseStateManager(CBloodsuckerBase *object) : inherited(object)
 {
-	add_state(eStateRest,				new CStateMonsterRest<CAI_Bloodsucker>					(monster));
-	add_state(eStatePanic,				new CStateMonsterPanic<CAI_Bloodsucker> 				(monster));
-	
-	add_state(eStateAttack,				new CStateMonsterAttack<CAI_Bloodsucker>				(monster));
-	//add_state(eStateAttack,				new CBloodsuckerStateAttack<CAI_Bloodsucker> >		(monster));
+	pBloodsuckerBase = smart_cast<CBloodsuckerBase*>(object);
 
-	add_state(eStateEat,				new CStateMonsterEat<CAI_Bloodsucker>					(monster));
-	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CAI_Bloodsucker>	(monster));
-	add_state(eStateHearDangerousSound,	new CStateMonsterHearDangerousSound<CAI_Bloodsucker> 	(monster));
-	add_state(eStateHitted,				new CStateMonsterHitted<CAI_Bloodsucker> 				(monster));
-	add_state(eStateVampire_Execute,	new CStateBloodsuckerVampireExecute<CAI_Bloodsucker> 	(monster));
+	add_state(eStateRest,					new CStateMonsterRest					(object));
+	add_state(eStatePanic,					new CStateMonsterPanic				(object));
+											    
+	add_state(eStateAttack,					new CStateMonsterAttack						(object));
+											    
+	add_state(eStateEat,					new CStateMonsterEat					(object));
+	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound	(object));
+	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound	(object));
+	add_state(eStateHitted,					new CStateMonsterHitted				(object));
+	add_state(eStateVampire_Execute,		new CustomBloodsuckerStateVampireExecute	(object));
 }
 
-void CStateManagerBloodsucker::drag_object()
+CBloodsuckerBaseStateManager::~CBloodsuckerBaseStateManager()
 {
-	CEntityAlive* const ph_obj = object->m_cob;
+
+}
+
+void CBloodsuckerBaseStateManager::drag_object()
+{
+	CEntityAlive* const ph_obj = pBloodsuckerBase->m_cob;
 	if ( !ph_obj )
 	{
 		return;
@@ -57,24 +71,24 @@ void CStateManagerBloodsucker::drag_object()
 	}
 
 	{
-		const u16 drag_bone = kinematics->LL_BoneID(object->m_str_cel);
+		const u16 drag_bone = kinematics->LL_BoneID(pBloodsuckerBase->m_str_cel);
 		object->character_physics_support()->movement()->PHCaptureObject(ph_obj, drag_bone);
 	}
 
 	IPHCapture* const capture = object->character_physics_support()->movement()->PHCapture();
 
-	if ( capture && !capture->Failed() && object->is_animated() ) 
+	if ( capture && !capture->Failed() && pBloodsuckerBase->is_animated() )
 	{
-		object->start_drag();
+		pBloodsuckerBase->start_drag();
 	}
 }
 
-void CStateManagerBloodsucker::update ()
+void CBloodsuckerBaseStateManager::update ()
 {
 	inherited::update();
 }
 
-bool CStateManagerBloodsucker::check_vampire()
+bool CBloodsuckerBaseStateManager::check_vampire()
 {
 	if ( prev_substate != eStateVampire_Execute )
 	{
@@ -87,7 +101,7 @@ bool CStateManagerBloodsucker::check_vampire()
 	return false;
 }
 
-void CStateManagerBloodsucker::execute ()
+void CBloodsuckerBaseStateManager::execute ()
 {
 	u32 state_id = u32(-1);
 
@@ -126,21 +140,8 @@ void CStateManagerBloodsucker::execute ()
 		else			 state_id = eStateRest;
 	}
 
-	// check if start interesting sound state
-// 	if ( (prev_substate != eStateHearInterestingSound) && (state_id == eStateHearInterestingSound) )
-// 	{
-// 		object->start_invisible_predator();
-// 	} 
-// 	else
-// 	// check if stop interesting sound state
-// 	if ( (prev_substate == eStateHearInterestingSound) && (state_id != eStateHearInterestingSound) ) 
-// 	{
-// 		object->stop_invisible_predator();
-// 	}
-
 	select_state(state_id); 
 
-	// выполнить текущее состояние
 	get_state_current()->execute();
 
 	prev_substate = current_substate;

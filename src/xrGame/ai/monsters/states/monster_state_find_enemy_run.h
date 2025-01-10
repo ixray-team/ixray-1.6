@@ -2,15 +2,14 @@
 
 #include "../state.h"
 
-template<typename _Object>
-class CStateMonsterFindEnemyRun : public CState<_Object> {
-	typedef CState<_Object> inherited;
+class CStateMonsterFindEnemyRun : public CState {
+	typedef CState inherited;
 
 	Fvector				target_point;
 	u32					target_vertex;
 
 public:
-						CStateMonsterFindEnemyRun	(_Object *obj);
+						CStateMonsterFindEnemyRun	(CBaseMonster*obj);
 	virtual				~CStateMonsterFindEnemyRun	();
 
 	virtual void		initialize					();
@@ -18,5 +17,3 @@ public:
 	virtual bool		check_completion			();
 	virtual void		remove_links				(CObject* object_) { inherited::remove_links(object_);}
 };
-
-#include "monster_state_find_enemy_run_inline.h"

@@ -5,18 +5,17 @@
 #include "../control_animation_base.h"
 #include "../control_movement_base.h"
 
-
-CFracture::CFracture()
+CFractureBase::CFractureBase()
 {
-	StateMan = new CStateManagerFracture(this);
+	pStateManagerBase = new CFractureBaseStateManager(this);
 }
 
-CFracture::~CFracture()
+CFractureBase::~CFractureBase()
 {
-	xr_delete(StateMan);
+	xr_delete(pStateManagerBase);
 }
 
-void CFracture::Load(LPCSTR section)
+void CFractureBase::Load(LPCSTR section)
 {
 	inherited::Load	(section);
 
@@ -79,7 +78,7 @@ void CFracture::Load(LPCSTR section)
 	PostLoad					(section);
 }
 
-void CFracture::CheckSpecParams(u32 spec_params)
+void CFractureBase::CheckSpecParams(u32 spec_params)
 {
 	if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
 		com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));

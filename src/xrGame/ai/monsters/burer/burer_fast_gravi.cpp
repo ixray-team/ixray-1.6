@@ -5,6 +5,16 @@
 #include "../control_direction_base.h"
 #include "../control_movement_base.h"
 
+CBurerFastGravi::CBurerFastGravi()
+{
+
+}
+
+CBurerFastGravi::~CBurerFastGravi()
+{
+
+}
+
 bool CBurerFastGravi::check_start_conditions()
 {
 	if (is_active())				return false;	
@@ -16,7 +26,7 @@ bool CBurerFastGravi::check_start_conditions()
 
 void CBurerFastGravi::activate()
 {
-//	CBurer *burer = smart_cast<CBurer *>(m_object);
+//	CBurerBase *burer = smart_cast<CBurerBase *>(m_object);
 	m_man->subscribe	(this, ControlCom::eventTAChange);
 	m_object->dir().face_target(m_object->EnemyMan.get_enemy());
 }

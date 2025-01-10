@@ -6,18 +6,17 @@
 #include "../control_animation_base.h"
 #include "../control_movement_base.h"
 
-
-CCat::CCat()
+CCatBase::CCatBase()
 {
-	StateMan = new CStateManagerCat		(this);
+	pStateManagerBase = new CCatBaseStateManager(this);
 }
 
-CCat::~CCat()
+CCatBase::~CCatBase()
 {
-	xr_delete(StateMan);
+	xr_delete(pStateManagerBase);
 }
 
-void CCat::Load(LPCSTR section)
+void CCatBase::Load(LPCSTR section)
 {
 	inherited::Load			(section);
 
@@ -86,11 +85,11 @@ void CCat::Load(LPCSTR section)
 	PostLoad					(section);
 }
 
-void CCat::reinit()
+void CCatBase::reinit()
 {
 	inherited::reinit();
 
-	MotionID			def1, def2, def3;
+	MotionID			def1{}, def2{}, def3{};
 	IKinematicsAnimated	*pSkel = smart_cast<IKinematicsAnimated*>(Visual());
 
 	def1 = pSkel->ID_Cycle_Safe("jump_attack_0");	VERIFY(def1);
@@ -100,13 +99,13 @@ void CCat::reinit()
 	//CJumpingAbility::reinit(def1, def2, def3);
 }
 
-void CCat::try_to_jump()
+void CCatBase::try_to_jump()
 {
 	CObject *target = const_cast<CEntityAlive *>(EnemyMan.get_enemy());
 	if (!target || !EnemyMan.see_enemy_now()) return;
 }
 
-void CCat::CheckSpecParams(u32 spec_params)
+void CCatBase::CheckSpecParams(u32 spec_params)
 {
 	if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
 		com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
@@ -140,16 +139,14 @@ void CCat::CheckSpecParams(u32 spec_params)
 
 		//return;
 	}
-
-
 }
 
-void CCat::UpdateCL()
+void CCatBase::UpdateCL()
 {
 	inherited::UpdateCL				();
 }
 
-void CCat::HitEntityInJump(const CEntity *pEntity)
+void CCatBase::HitEntityInJump(const CEntity *pEntity)
 {
 	SAAParam &params	= anim().AA_GetParams("jump_attack_2");
 	HitEntity			(pEntity, params.hit_power, params.impulse, params.impulse_dir);

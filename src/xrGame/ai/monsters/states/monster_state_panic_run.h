@@ -1,11 +1,12 @@
 #pragma once
 
-template<typename _Object>
-class CStateMonsterPanicRun : public CState<_Object> {
-	typedef CState<_Object> inherited;
+#include "../state.h"
+
+class CStateMonsterPanicRun : public CState {
+	typedef CState inherited;
 
 public:
-						CStateMonsterPanicRun	(_Object *obj) : inherited(obj) {}
+						CStateMonsterPanicRun	(CBaseMonster *obj) : inherited(obj) {}
 	virtual				~CStateMonsterPanicRun	() {}
 
 	virtual void		initialize				();
@@ -14,5 +15,3 @@ public:
 
 	virtual bool		check_completion		();
 };
-
-#include "monster_state_panic_run_inline.h"

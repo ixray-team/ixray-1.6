@@ -2,12 +2,11 @@
 
 #include "../state.h"
 
-template<typename _Object>
-class CStateMonsterAttackMelee : public CState<_Object> {
-	typedef CState<_Object> inherited;
+class CStateMonsterAttackMelee : public CState {
+	typedef CState inherited;
 
 public:
-						CStateMonsterAttackMelee	(_Object *obj);
+						CStateMonsterAttackMelee	(CBaseMonster *obj);
 	virtual				~CStateMonsterAttackMelee	();
 
 	virtual	void		execute						();
@@ -16,5 +15,3 @@ public:
 	virtual bool 		check_start_conditions		();
 	virtual void		remove_links				(CObject* object_) { inherited::remove_links(object_);}
 };
-
-#include "monster_state_attack_melee_inline.h"

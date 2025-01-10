@@ -6,22 +6,21 @@
 #include "../control_animation_base.h"
 #include "../control_movement_base.h"
 
-
-CAI_Flesh::CAI_Flesh()
+CFleshBase::CFleshBase()
 {
-	StateMan = new CStateManagerFlesh(this);
+	pStateManagerBase = new CFleshBaseStateManager(this);
 	
 	m_fEyeShiftYaw		= PI_DIV_6;
 
 	CControlled::init_external(this);
 }
 
-CAI_Flesh::~CAI_Flesh()
+CFleshBase::~CFleshBase()
 {
-	xr_delete(StateMan);
+	xr_delete(pStateManagerBase);
 }
 
-BOOL CAI_Flesh::net_Spawn (CSE_Abstract* DC) 
+BOOL CFleshBase::net_Spawn (CSE_Abstract* DC)
 {
 	if (!inherited::net_Spawn(DC))
 		return(FALSE);
@@ -29,7 +28,7 @@ BOOL CAI_Flesh::net_Spawn (CSE_Abstract* DC)
 	return TRUE;
 }
 
-void CAI_Flesh::Load(LPCSTR section)
+void CFleshBase::Load(LPCSTR section)
 {
 	inherited::Load(section);
 
@@ -108,7 +107,7 @@ void CAI_Flesh::Load(LPCSTR section)
 
 // возвращает true, если после выполнения этой функции необходимо прервать обработку
 // т.е. если активирована последовательность
-void CAI_Flesh::CheckSpecParams(u32 spec_params)
+void CFleshBase::CheckSpecParams(u32 spec_params)
 {
 	if ((spec_params & ASP_DRAG_CORPSE) == 	ASP_DRAG_CORPSE) anim().SetCurAnim(eAnimDragCorpse);
 
@@ -129,13 +128,13 @@ void CAI_Flesh::CheckSpecParams(u32 spec_params)
 // Необходима для определения пересечения копыта плоти с баунд-сферой крысы
 // Параметры: ConeVertex - вершина конуса, ConeAngle - угол конуса (между поверхностью и высотой)
 // ConeDir - направление конуса, SphereCenter - центр сферы, SphereRadius - радиус сферы
-bool CAI_Flesh::ConeSphereIntersection(Fvector ConeVertex, float ConeAngle, Fvector ConeDir, Fvector SphereCenter, float SphereRadius)
+bool CFleshBase::ConeSphereIntersection(Fvector ConeVertex, float ConeAngle, Fvector ConeDir, Fvector SphereCenter, float SphereRadius)
 {
 	float fInvSin = 1.0f/_sin(ConeAngle);
 	float fCosSqr = _cos(ConeAngle)*_cos(ConeAngle);
 
 	
-	Fvector kCmV;	kCmV.sub(SphereCenter,ConeVertex);
+	Fvector kCmV{};	kCmV.sub(SphereCenter, ConeVertex);
 	Fvector kD		= kCmV;
 	Fvector tempV	= ConeDir;
 	tempV.mul		(SphereRadius* fInvSin);

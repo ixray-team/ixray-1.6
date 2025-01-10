@@ -1,11 +1,11 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateGroupAttackMoveToHomePoint : public CState<_Object> {
+
+class CStateGroupAttackMoveToHomePoint : public CState {
 protected:
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+	using inherited = CState	;
+	using state_ptr = CState*	;
 
 	u32					m_target_node;
 	bool				m_skip_camp;
@@ -15,7 +15,9 @@ protected:
 	TTime				m_state_started;
 
 public:
-						CStateGroupAttackMoveToHomePoint(_Object *obj);
+						CStateGroupAttackMoveToHomePoint(CBaseMonster * object);
+						virtual ~CStateGroupAttackMoveToHomePoint();
+
 	virtual	void		initialize				();
 	virtual void 		finalize				();
 	virtual void 		critical_finalize		();
@@ -29,5 +31,3 @@ public:
 
 			bool		enemy_inaccessible		();
 };
-
-#include "group_state_home_point_attack_inline.h"

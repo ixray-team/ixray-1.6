@@ -1,39 +1,35 @@
 #pragma once
 
+#include "../state.h"
+
 // Hiding until enemy get out from its sight
-template<typename _Object>
-class CStateControlHideLite : public CState<_Object> {
-	typedef	CState<_Object>		inherited;
-	typedef	CState<_Object>*	state_ptr;
+class CStateControlHideLite : public CState {
+protected:
+	using	inherited = CState	;
+	using	state_ptr = CState*;
 
 	struct {
 		Fvector position;
 		u32		node;
 	} target;
-
+	CControllerBase* pControllerBase;
 	u32				m_time_finished;
 
 public:
+	CStateControlHideLite(CBaseMonster* object);
+	virtual			~CStateControlHideLite() override;
+	
+	virtual void	reinit					() override;
 
-					CStateControlHideLite	(_Object *obj) : inherited(obj) {}
-	virtual			~CStateControlHideLite	() {}
+	virtual void	initialize				() override;
+	virtual void	execute					() override;
 
-	virtual void	reinit					();
+	virtual void	finalize				() override;
 
-	virtual void	initialize				();
-	virtual void	execute					();
-
-	virtual void	finalize				();
-
-	virtual bool 	check_completion		();
-	virtual bool 	check_start_conditions	();
-	virtual void	remove_links			(CObject* object) {}
-
+	virtual bool 	check_completion		() override;
+	virtual bool 	check_start_conditions	() override;
+	virtual void	remove_links(CObject* object) override { inherited::remove_links(object); }
 
 private:
 	void	select_target_point		();
 };
-
-
-#include "controller_state_attack_hide_lite_inline.h"
-

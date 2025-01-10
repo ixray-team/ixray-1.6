@@ -1,16 +1,17 @@
 #pragma once
 #include "../state.h"
 
-template<typename _Object>
-class CStateGroupEating : public CState<_Object> {
+class CStateGroupEating : public CState {
 protected:
-	typedef CState<_Object>		inherited;
+	using inherited = CState	;
 
 	CEntityAlive	*corpse;
 	u32				time_last_eat;
 
+	CDogBase* m_pDog;
+
 public:
-	CStateGroupEating		(_Object *obj);
+	CStateGroupEating		(CBaseMonster * object);
 	virtual				~CStateGroupEating	();
 
 	virtual void		initialize				();
@@ -20,5 +21,3 @@ public:
 	virtual bool		check_completion		();
 	virtual void		remove_links			(CObject* object);
 };
-
-#include "group_state_eat_eat_inline.h"

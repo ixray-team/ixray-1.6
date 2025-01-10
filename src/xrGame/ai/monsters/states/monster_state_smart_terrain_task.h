@@ -3,14 +3,13 @@
 
 #include "../../../alife_smart_terrain_task.h"
 
-template<typename _Object>
-class CStateMonsterSmartTerrainTask : public CState<_Object> {
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+class CStateMonsterSmartTerrainTask : public CState{
+	typedef CState		inherited;
+	typedef CState*	state_ptr;
 
 	CALifeSmartTerrainTask *m_current_task;
 public:
-						CStateMonsterSmartTerrainTask	(_Object *obj);
+						CStateMonsterSmartTerrainTask	(CBaseMonster*obj);
 	virtual				~CStateMonsterSmartTerrainTask	();
 
 	virtual void		initialize				();
@@ -21,5 +20,3 @@ public:
 	virtual void		check_force_state		();
 	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
 };
-
-#include "monster_state_smart_terrain_task_inline.h"

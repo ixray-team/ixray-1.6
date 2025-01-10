@@ -3,21 +3,18 @@
 #include "../controlled_entity.h"
 #include "../../../../xrScripts/script_export_space.h"
 
-class CTushkano :	public CBaseMonster,
-					public CControlledEntity<CTushkano> {
-
-
-	typedef		CBaseMonster					inherited;
-	typedef		CControlledEntity<CTushkano>	CControlled;
+class CTushkanoBase : public CBaseMonster, public CControlledEntity 
+{
+protected:
+	using		inherited = CBaseMonster;
+	using		CControlled = CControlledEntity;
 
 public:
-					CTushkano 			();
-	virtual			~CTushkano 			();	
+					CTushkanoBase 			();
+	virtual			~CTushkanoBase 			() override;
 
-	virtual void	Load				(LPCSTR section);
-	virtual void	CheckSpecParams		(u32 spec_params);
-	virtual	char*	get_monster_class_name () { return (char*) "tushkano"; }
-
+	virtual void	Load				(LPCSTR section) override;
+	virtual	char*	get_monster_class_name () override { return (char*) "tushkano"; }
 
 	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

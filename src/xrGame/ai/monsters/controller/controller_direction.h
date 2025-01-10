@@ -5,12 +5,13 @@
 #include "../../../ai_monster_space.h"
 
 
-class CController;
+class CControllerBase;
 
 class CControllerDirection : public CControlDirectionBase {
-	typedef CControlDirectionBase inherited;
+protected:
+	using inherited = CControlDirectionBase;
 
-	CController						*m_controller;
+	CControllerBase						*pControllerBase;
 	
 	bonesManipulation				m_bones;
 	CBoneInstance					*m_bone_spine;
@@ -21,8 +22,11 @@ class CControllerDirection : public CControlDirectionBase {
 	Fvector							m_head_look_point;
 
 public:	
-	virtual void		reinit				();
-	virtual	void		update_schedule		();	
+	CControllerDirection();
+	virtual ~CControllerDirection() override;
+
+	virtual void		reinit				() override;
+	virtual	void		update_schedule		() override;
 
 			void		head_look_point		(const Fvector &look_point);
 			Fvector		&get_head_look_point() {return m_head_look_point;}

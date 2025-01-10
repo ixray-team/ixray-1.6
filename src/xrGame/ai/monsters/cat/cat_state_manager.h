@@ -1,18 +1,18 @@
 #pragma once
 #include "../monster_state_manager.h"
 
-class CCat;
+class CCatBase;
 
-class CStateManagerCat : public CMonsterStateManager<CCat> {
-
-	typedef CMonsterStateManager<CCat> inherited;
+class CCatBaseStateManager : public CMonsterStateManager {
+protected:
+	using inherited = CMonsterStateManager;
 
 	u32					m_rot_jump_last_time;
 
 public:
-						CStateManagerCat	(CCat *obj);	
-	virtual				~CStateManagerCat	();
+	CCatBaseStateManager(CCatBase* object);
+	virtual				~CCatBaseStateManager() override;
 
-	virtual	void		execute				();
-	virtual void		remove_links		(CObject* object_) { inherited::remove_links(object_);}
+	virtual	void		execute				() override;
+	virtual void		remove_links		(CObject* object) override { inherited::remove_links(object);}
 };

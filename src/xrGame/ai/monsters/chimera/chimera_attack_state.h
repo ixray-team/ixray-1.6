@@ -1,18 +1,27 @@
-#ifndef CHIMERA_ATTACK_STATE_H_INCLUDED
-#define CHIMERA_ATTACK_STATE_H_INCLUDED
+#pragma once
 
-template<typename Object>
-class ChimeraAttackState : public CState<Object> 
+#include "../state.h"
+
+class ChimeraAttackState : public CState
 {
+protected:
+	CChimeraBase* pChimeraBase;
+
+	float num_scan_points;
+	float scan_angle;
+
 public:
-							ChimeraAttackState				(Object* obj);
-	virtual void			initialize						();
-	virtual	void			execute							();
-	virtual void 			finalize						();
-	virtual void 			critical_finalize				();
+							ChimeraAttackState				(CBaseMonster* object);
+
+							virtual ~ChimeraAttackState() override;
+
+	virtual void			initialize						() override;
+	virtual	void			execute							() override;
+	virtual void 			finalize						() override;
+	virtual void 			critical_finalize				() override;
 
 private:
-	virtual bool			check_control_start_conditions	(ControlCom::EControlType type);
+	virtual bool			check_control_start_conditions	(ControlCom::EControlType type) override;
 	bool					select_target_for_move			();
 
 	Fvector					correct_jump_pos				(Fvector const&		pos);
@@ -28,8 +37,8 @@ private:
 	float					get_attack_radius				() const;
 	float					calculate_min_run_distance		() const;
 
-	typedef CState<Object>	inherited;
-	virtual void			remove_links	(CObject* object_) { inherited::remove_links(object_); }
+	using inherited = CState			;
+	virtual void			remove_links	(CObject* object) override { inherited::remove_links(object); }
 
 	CControl_Com*			m_capturer;
 
@@ -59,9 +68,4 @@ private:
 	bool					m_attack_jump;
 
 	float					m_min_run_distance;
-
-}; // ChimeraAttackState
-
-#include "chimera_attack_state_inline.h"
-
-#endif // #ifdef CHIMERA_ATTACK_STATE_H_INCLUDED
+};

@@ -1,13 +1,11 @@
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <malloc.h>
-#pragma warning(pop)
+#include "../state.h"
 
-template<typename _Object>
-class CStateGroupDrag : public CState<_Object> {
-	typedef CState<_Object>		inherited;
+class CDogBase;
+
+class CStateGroupDrag : public CState {
+	using inherited = CState	;
 
 	Fvector				m_cover_position;
 	u32					m_cover_vertex_id;
@@ -15,18 +13,17 @@ class CStateGroupDrag : public CState<_Object> {
 	bool				m_failed;
 	Fvector				m_corpse_start_position;
 
+	CDogBase*			m_pDog;
+
 public:
-						CStateGroupDrag		(_Object *obj);
+						CStateGroupDrag		(CBaseMonster* object);
 	virtual				~CStateGroupDrag		();
 
 	virtual void		initialize				();
 	virtual	void		execute					();
 	virtual void		finalize				();
 	virtual void		critical_finalize		();
-	virtual void		remove_links			(CObject* object_) { inherited::remove_links(object_);}
+	virtual void		remove_links			(CObject* object) { inherited::remove_links(object);}
 
 	virtual bool		check_completion		();
 };
-
-
-#include "group_state_eat_drag_inline.h"

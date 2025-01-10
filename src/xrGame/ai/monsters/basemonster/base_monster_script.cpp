@@ -380,27 +380,27 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction *tpEntityAction)
 
 	switch(l_tAction.m_tAction) {
 		case eGA_Rest:		
-			StateMan->force_script_state(eStateRest);	
+			pStateManagerBase->force_script_state(eStateRest);
 			break;
 		case eGA_Eat:		
 			if (pE && !pE->getDestroy() && !pE->g_Alive()){
 				CorpseMan.force_corpse(pE);
-				StateMan->force_script_state(eStateEat);	
-			} else StateMan->force_script_state(eStateRest);	
+				pStateManagerBase->force_script_state(eStateEat);
+			} else pStateManagerBase->force_script_state(eStateRest);
 
 			break;
 		case eGA_Attack:
 			if (pE && !pE->getDestroy() && pE->g_Alive()){
 				EnemyMan.force_enemy(pE);
-				StateMan->force_script_state(eStateAttack);
-			} else StateMan->force_script_state(eStateRest);
+				pStateManagerBase->force_script_state(eStateAttack);
+			} else pStateManagerBase->force_script_state(eStateRest);
 
 			break;
 		case eGA_Panic:		
 			if (pE && !pE->getDestroy() && pE->g_Alive()){
 				EnemyMan.force_enemy			(pE);
-				StateMan->force_script_state	(eStatePanic);
-			} else StateMan->force_script_state	(eStateRest);	
+				pStateManagerBase->force_script_state	(eStatePanic);
+			} else pStateManagerBase->force_script_state	(eStateRest);
 			break;
 	}
 
@@ -435,7 +435,7 @@ void CBaseMonster::ProcessScripts()
 
 	// если из скрипта выбрано действие по универсальной схеме, выполнить его
 	if (m_script_state_must_execute) 	
-		StateMan->execute_script_state			();		
+		pStateManagerBase->execute_script_state			();
 	
 	TranslateActionToPathParams					();
 
@@ -505,7 +505,7 @@ void CBaseMonster::SetEnemy(const CEntityAlive *sent)
 
 void CBaseMonster::SetScriptControl(const bool bScriptControl, shared_str caScriptName)
 {
-	if (StateMan) StateMan->critical_finalize();
+	if (pStateManagerBase) pStateManagerBase->critical_finalize();
 
 	if ( !m_bScriptControl && bScriptControl )
 	{

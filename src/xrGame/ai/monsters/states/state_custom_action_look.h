@@ -2,19 +2,16 @@
 #include "../state.h"
 #include "state_data.h"
 
-template<typename _Object>
-class CStateMonsterCustomActionLook : public CState<_Object> {
-	typedef CState<_Object> inherited;
+class CStateMonsterCustomActionLook : public CState {
+	typedef CState inherited;
 
 	SStateDataActionLook	data;
 
 public:
-						CStateMonsterCustomActionLook	(_Object *obj);
+						CStateMonsterCustomActionLook	(CBaseMonster*obj);
 	virtual				~CStateMonsterCustomActionLook	();
 
 	virtual	void		execute						();
 	virtual bool		check_completion			();
 	virtual void		remove_links				(CObject* object_) { inherited::remove_links(object_);}
 };
-
-#include "state_custom_action_look_inline.h"

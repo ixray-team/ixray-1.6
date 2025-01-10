@@ -1,14 +1,20 @@
 #pragma once
 #include "../monster_state_manager.h"
 
-class CBurer;
+class CBurerBase;
 
-class CStateManagerBurer : public CMonsterStateManager<CBurer> {
-	typedef CMonsterStateManager<CBurer> inherited;
+class CBurerBaseBaseStateManager : public CMonsterStateManager {
+protected:
+	using inherited = CMonsterStateManager;
+
+	CBurerBase* pBurerBase;
+
 public:
-					CStateManagerBurer		(CBurer *monster); 
-	virtual void	execute					();
-	virtual void	setup_substates			();
-	virtual void	remove_links			(CObject* object_) { inherited::remove_links(object_);}
+	CBurerBaseBaseStateManager(CBaseMonster* object);
+					virtual ~CBurerBaseBaseStateManager() override;
+
+	virtual void	execute					() override;
+	virtual void	setup_substates			() override;
+	virtual void	remove_links			(CObject* object) override { inherited::remove_links(object);}
 };
 
