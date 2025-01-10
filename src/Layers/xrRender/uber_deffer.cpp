@@ -94,13 +94,13 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 	}
 
 	if(bump) {
-		R_ASSERT2(fnameB[0] && xr_strlen(fnameB), C.L_textures[0].c_str());
-		R_ASSERT2(fnameA[0] && xr_strlen(fnameA), C.L_textures[0].c_str());
+		VERIFY2(fnameB[0] && xr_strlen(fnameB), C.L_textures[0].c_str());
+		VERIFY2(fnameA[0] && xr_strlen(fnameA), C.L_textures[0].c_str());
 	}
 
 	if(bHasDetailBump) {
-		R_ASSERT2(texDetailBump[0] && xr_strlen(texDetailBump), C.L_textures[0].c_str());
-		R_ASSERT2(texDetailBumpX[0] && xr_strlen(texDetailBumpX), C.L_textures[0].c_str());
+		VERIFY2(texDetailBump[0] && xr_strlen(texDetailBump), C.L_textures[0].c_str());
+		VERIFY2(texDetailBumpX[0] && xr_strlen(texDetailBumpX), C.L_textures[0].c_str());
 	}
 
 #ifdef USE_DX11
