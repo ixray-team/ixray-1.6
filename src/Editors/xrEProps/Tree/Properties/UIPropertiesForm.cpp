@@ -212,7 +212,7 @@ void UIPropertiesForm::DrawEditText()
 				RTextValue* V2 = dynamic_cast<RTextValue*>(m_EditTextValue->GetFrontValue());
 				if (V2)
 				{
-					shared_str out = m_EditTextValueData;
+					shared_str out = !IsUTF8(m_EditTextValueData) ? m_EditTextValueData : Platform::UTF8_to_CP1251(m_EditTextValueData).data();
 					if (m_EditTextValue->AfterEdit<RTextValue, shared_str>(out))
 					{
 						if (m_EditTextValue->ApplyValue<RTextValue, shared_str>(out))
