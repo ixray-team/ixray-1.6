@@ -20,11 +20,6 @@ xr_string CEngineExternal::GetTitle() const
 	return READ_IF_EXISTS(pOptions, r_string_wb, "general", "title", "IX-Ray Platform").c_str();
 }
 
-xr_string CEngineExternal::GetEngineMode() const
-{
-	return READ_IF_EXISTS(pOptions, r_string_wb, "general", "engine_mode", "cop").c_str();
-}
-
 const char* CEngineExternal::GetPlayerHudOmfAdditional() const
 {
 	return READ_IF_EXISTS(pOptions, r_string_wb, "player_hud", "PlayerHudOmfAdditional", "").c_str();
@@ -103,12 +98,15 @@ const char* CEngineExternal::PlatformMode() const
 
 bool CEngineExternal::ClearSkyMode() const
 {
-	//return PlatformMode() == "cs";
 	return !xr_strcmp(PlatformMode(), "cs");
 }
 
 bool CEngineExternal::CallOfPripyatMode() const
 {
-	//return PlatformMode() == "cop";
 	return !xr_strcmp(PlatformMode(), "cop");
+}
+
+bool CEngineExternal::LostAlphaMode() const
+{
+	return !xr_strcmp(PlatformMode(), "la");
 }
