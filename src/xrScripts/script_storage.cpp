@@ -393,9 +393,9 @@ bool CScriptStorage::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 
 	if (l_iErrorCode) 
 	{
-#ifdef DEBUG
+//#ifdef DEBUG
 		print_output(lua(), caScriptName, l_iErrorCode);
-#endif
+//#endif
 		on_error(lua());
 		lua_settop(lua(), start);
 		return (false);
