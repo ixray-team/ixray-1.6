@@ -392,15 +392,15 @@ void TUI::Redraw()
 
 		if
 		(
-			u32(View.RTSize.x * EDevice->m_ScreenQuality) != RT->dwWidth  || 
-			u32(View.RTSize.y * EDevice->m_ScreenQuality) != RT->dwHeight || 
+			u32(View.RTSize.x * EDevice->m_ScreenQuality) != EDevice->TargetWidth || 
+			u32(View.RTSize.y * EDevice->m_ScreenQuality) != EDevice->TargetHeight ||
 			!RT->pSurface
 		)
 		{
 			if(!ImGui::IsMouseDown(ImGuiMouseButton_Left)) 
 			{
-				GetRenderWidth() = View.RTSize.x * EDevice->m_ScreenQuality;
-				GetRenderHeight() = View.RTSize.y * EDevice->m_ScreenQuality;
+				EDevice->TargetWidth = View.RTSize.x * EDevice->m_ScreenQuality;
+				EDevice->TargetHeight = View.RTSize.y * EDevice->m_ScreenQuality;
 
 				RT.destroy();
 				RTCopy.destroy();
