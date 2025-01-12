@@ -208,8 +208,8 @@ void UIObjectList::DrawObjects()
 
 	if (ImGui::BeginTable("objects", 1, flags, ImVec2(0, -ImGui::GetFrameHeight() - 4)))
 	{
-		IsDocked = ImGui::IsWindowDocked();
-		IsFocused = ImGui::IsWindowFocused();
+		//IsDocked = ImGui::IsWindowDocked();
+		IsFocused = IsDocked || ImGui::IsWindowFocused();
 
 		ImGui::TableSetupScrollFreeze(1, 1);
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
