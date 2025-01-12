@@ -41,7 +41,7 @@ float4 main(v2p_volume I) : SV_Target
 #endif
 
     O.Normal = lerp(O.Normal, -Ldynamic_dir.xyz, O.SSS);
-    float3 Light = DirectLight(Ldynamic_color, Ldynamic_dir.xyz, O.Normal, O.View.xyz, O.Color, O.Metalness, O.Roughness);
+    float3 Light = DirectLight(Ldynamic_color, Ldynamic_dir.xyz, O.Normal, O.View.xyz, O.Color, O.Metalness, O.Roughness, O.F0);
 
 #if SUN_QUALITY == 2
     float Shadow = shadow_high(PS);

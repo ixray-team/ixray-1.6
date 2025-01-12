@@ -65,7 +65,7 @@ float4 main(PSInput I) : SV_Target
 	float3 env = lerp(env0, env1, L_ambient.w) * L_sky_color.xyz;
 
 #ifdef USE_SSLR_ON_WATER
-	env = lerp(env, sslr.xyz, sslr.w);
+	env = lerp(env, PopGamma(sslr.xyz), sslr.w);
 #endif
 
     float power = pow(fresnel, 5.0f);
@@ -88,8 +88,7 @@ float4 main(PSInput I) : SV_Target
 	Light *= 1.0f - base.w;
 
 	final += SpecularPhong(v2point, Nw, L_sun_dir_w.xyz) * Light.w;
-
-#endif //USE_SOFT_WATER
+#endif
 	
-	return lerp(float4(final, alpha), fog_color, calc_fogging(I.world_position));
+	return PushGamma(lerp(float4(final, alpha), fog_color, calc_fogging(I.world_position)));
 }
