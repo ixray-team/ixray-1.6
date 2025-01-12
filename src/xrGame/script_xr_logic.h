@@ -28,23 +28,12 @@ public:
 	bool isSymbolEvent(char nSymbol) const;
 
 	// on stack implementation, no allocations
-	const char* lua_pickSectionFromCondlist(CScriptGameObject* pClientPlayer,
-		CScriptGameObject* pClientObject, const char* pSectionName,
-		const char* pFieldName, const char* pSourceName);
-	const char* lua_pickSectionFromCondlist(CScriptGameObject* pClientPlayer,
-		CSE_ALifeDynamicObject* pServerObject, const char* pSectionName,
-		const char* pFieldName, const char* pSourceName);
-	const char* lua_pickSectionFromCondlist(
-		CSE_ALifeDynamicObject* pServerPlayer,
-		CSE_ALifeDynamicObject* pServerObject, const char* pSectionName,
-		const char* pFieldName, const char* pSourceName);
+	const char* lua_pickSectionFromCondlist(luabind::object pServerPlayer, luabind::object pServerObject, const char* pSectionName, const char* pFieldName, const char* pSourceName);
 
 	static void script_register(lua_State* L);
 
 private:
-	const char* pickSectionFromCondlist(CCondlistEmbedded& condlist,
-		void* pClientActor, void* pClientObject, int nCallingVersion,
-		bool& bNeedToBreak);
+	const char* pickSectionFromCondlist(CCondlistEmbedded& condlist, luabind::object pClientActor, luabind::object pClientObject, bool& bNeedToBreak);
 
 	size_t parseParams(const char* pParamsBuffer, xr_embedded_params_t& result);
 
