@@ -608,7 +608,7 @@ void UIMainMenuForm::ExportLevelAsArchive()
 
 	auto ParseBumpFromTexture = [&](const xr_string& InFileThm)
 	{
-		ETextureThumbnail* pThmTexture = (ETextureThumbnail*)CreateThumbnail(InFileThm.c_str(), ECustomThumbnail::ETTexture);
+		ETextureThumbnail* pThmTexture = (ETextureThumbnail*)CreateThumbnail(InFileThm.c_str(), ECustomThumbnail::ETTexture, false);
 		pThmTexture->Load(InFileThm.c_str(), "");
 
 		if (pThmTexture != nullptr)
