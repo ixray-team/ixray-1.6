@@ -143,3 +143,24 @@ DXTUtils::ImageInfo DXT_API DXTUtils::GitPixels(const char* FileName)
 
 	return { Img.GetWidth(), Img.GetHeight(), Pixels };
 }
+
+void DXTUtils::Filter::Resize(u32* dst, u32 dstW, u32 dstH, u32* out, u32 outW, u32 outH)
+{
+	RedImageTool::RedImage Surface;
+	Surface.Create(dstW, dstH);
+
+	for (u32 y = 0; y < dstH; y++)
+	{
+		for (u32 x = 0; x < dstW; x++)
+		{
+			Surface.SetPixel(dst[y * dstW + x], x, y);
+		}
+	}
+
+	Surface.Convert(RedImageTool::RedTexturePixelFormat::R8G8B8A8);
+	//Surface.SwapRB();
+	Surface.Scale(outW, outH, RedImageTool::RedResizeFilter::Default);
+
+	size_t PixelCount = Surface.GetWidth() * Surface.GetHeight() * 4;
+	memcpy(out, *Surface, PixelCount);
+}

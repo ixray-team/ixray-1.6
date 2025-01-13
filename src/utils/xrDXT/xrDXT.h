@@ -40,6 +40,7 @@ namespace DXTUtils
 		};
 
 		static void Process(u32* dst, u32 dstW, u32 dstH, u32* src, u32 srcW, u32 srcH, EIMF_Type FILTER);
+		static void Resize(u32* dst, u32 dstW, u32 dstH, u32* out, u32 outW, u32 outH);
 	};
 
 	int DXT_API Compress(const char* out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
