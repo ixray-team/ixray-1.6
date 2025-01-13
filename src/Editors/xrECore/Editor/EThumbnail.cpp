@@ -44,7 +44,7 @@ void EImageThumbnail::CreatePixels(u32* p, u32 w, u32 h)
 {
     R_ASSERT(p && (w > 0) && (h > 0));
     m_Pixels.resize(THUMB_SIZE);
-    DXTUtils::Filter::Process(m_Pixels.data(), THUMB_WIDTH, THUMB_HEIGHT, p, w, h, DXTUtils::Filter::imf_box);
+    DXTUtils::Filter::Process(m_Pixels.data(), THUMB_WIDTH, THUMB_HEIGHT, p, w, h, DXTUtils::Filter::imf_mitchell);
 }
 
 void EImageThumbnail::Update(ImTextureID& Texture)
@@ -66,7 +66,7 @@ void EImageThumbnail::Update(ImTextureID& Texture)
     }
     else
     {
-        R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+        R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
         Texture = pTexture;
     }
 
