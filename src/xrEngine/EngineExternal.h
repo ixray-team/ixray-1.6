@@ -29,8 +29,10 @@ enum class EEngineExternalGame
 	DisableSprintWhileOverweight
 };
 
-enum class EEngineExternalRender {
+enum class EEngineExternalRender 
+{
 	DisableLoadScreenTips,
+	LargeFontAtlas,
 	None
 };
 
