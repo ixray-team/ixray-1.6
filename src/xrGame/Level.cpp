@@ -55,6 +55,8 @@
 #include "../xrPhysics/IPHWorld.h"
 #include "../xrPhysics/console_vars.h"
 
+#include "Logic/CondlistGC.h"
+
 // lua to cpp
 #include "script_xr_conditions.h"
 #include "script_xr_effects.h"
@@ -197,6 +199,8 @@ CLevel::CLevel() :
 	m_chunk = 0;
 	spawn = 0;
 
+	GCondlistGC = new CCondlistGarbageCollector;
+
 #if defined(IXRAY_USE_LUA_AND_CPP_IMPLEMENTATION) || \
 	defined(IXRAY_USE_CPP_ONLY_IMPLEMENTATION)
 	m_pScriptXRCondition = new CScriptXRConditionsStorage();
@@ -334,6 +338,7 @@ CLevel::~CLevel()
 	}
 	deinit_compression();
 
+	xr_delete(GCondlistGC);
 	xr_delete(m_game_graph);
 	m_chunk->close();
 	FS.r_close(spawn);

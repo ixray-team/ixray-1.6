@@ -148,12 +148,12 @@ class CScriptGameObject;
 namespace ixray
 {
 	// the length of string of check condition e.g. {...} <= between brackets string must be equal or less 128 or section_name or %...% <= between percents string must be equal or less 128 symbols 
-	constexpr size_t kCondlistInfoStringSize = 128;
+	constexpr size_t kCondlistInfoStringSize = 2048;
 	// the length of function name or section name or infoportion
 	// for example we have a such condlist "{-infoportion_name} section_name %=function_name%" so
 	// this field applies for infoportion_name length and section_name and function_name thus 
 	// length of all three are equal to each other (there's no point to separate lengths for section_name, function_name and infoportion)
-	constexpr size_t kCondlistDataStringSize = 128;
+	constexpr size_t kCondlistDataStringSize = 2048;
 	// length of number that represents in game uses from 1 to 100, but for future considerations was chosen a such size
 	constexpr size_t kCondlistProbabilityStringSize = 6;
 	// amount of ',' symbol that represent alternative condlist in one condlist field

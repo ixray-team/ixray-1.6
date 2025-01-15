@@ -33,11 +33,11 @@ public:
 	static void script_register(lua_State* L);
 
 private:
-	const char* pickSectionFromCondlist(CCondlistEmbedded& condlist, luabind::object pClientActor, luabind::object pClientObject, bool& bNeedToBreak);
+	const char* pickSectionFromCondlist(xr_shared_ptr<CCondlistEmbedded> condlist, luabind::object pClientActor, luabind::object pClientObject, bool& bNeedToBreak);
 
 	size_t parseParams(const char* pParamsBuffer, xr_embedded_params_t& result);
 
-	void parseCondlistInfo(CCondlistInfo& info, CCondlistEmbedded& result);
+	void parseCondlistInfo(CCondlistInfo& info, xr_shared_ptr<CCondlistEmbedded> result);
 	// returns size of array
 	u32 parseInfoportions(
 		const char* pBuffer, CCondlistEmbedded::xr_condlistdata& result);
