@@ -818,11 +818,16 @@ void dInternalStepIsland_x2 (dxWorld *world, dxBody * const *body, int nb,
     //dSetZero (rhs,m);
     for (i=0; i<nj; i++) {
       dReal *JJ = J + 2*8*ofs[i];
-      Multiply0_p81 (rhs+ofs[i],JJ,
-		     tmp1 + 8*joint[i]->node[0].body->tag, info[i].m);
-      if (joint[i]->node[1].body) {
-	MultiplyAdd0_p81 (rhs+ofs[i],JJ + 8*info[i].m,
-			  tmp1 + 8*joint[i]->node[1].body->tag, info[i].m);
+
+      if (joint[i]->node[0].body)
+      {
+          Multiply0_p81(rhs + ofs[i], JJ,
+              tmp1 + 8 * joint[i]->node[0].body->tag, info[i].m);
+      }
+      if (joint[i]->node[1].body)
+      {
+          MultiplyAdd0_p81(rhs + ofs[i], JJ + 8 * info[i].m,
+              tmp1 + 8 * joint[i]->node[1].body->tag, info[i].m);
       }
     }
     // complete rhs
