@@ -42,7 +42,7 @@ public:
 	inline pointer c_str(void) const { return m_buffer; }
 	inline constexpr number_type max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
 	inline bool empty(void) const { return m_buffer[0] != char_t(0); }
-	inline constexpr value_type at(number_type index) const
+	inline value_type at(number_type index) const
 	{
 		assert(index >= 0 && index <= this->max_size() && "out of bounds");
 		assert(index != number_type(-1) && "invalid value");
