@@ -59,12 +59,12 @@ public:
 	inline pointer data(void) { return &m_buffer[0]; }
 	inline number_type size(void)
 	{
-		if constexpr (typeid(char) == typeid(char_t))
+		if constexpr (std::is_same<char,char_t>::value)
 		{
 			return strlen(m_buffer);
 		}
 
-		if constexpr (typeid(wchar_t) == typeid(char_t))
+		if constexpr (std::is_same<wchar_t, char_t>::value)
 		{
 			return wcslen(m_buffer);
 		}
