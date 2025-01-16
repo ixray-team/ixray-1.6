@@ -1,5 +1,13 @@
 #pragma once
 
+/*
+* 
+* Author: wh1t3lord
+* Description: fast-stack char/wchar string in one class with std::string API reference implementation
+* Date: 16.01.2025
+* 
+*/
+
 #include <string.h>
 #include <iterator>
 
@@ -17,7 +25,7 @@ public:
 	stack_string()
 	{
 		static_assert(decltype(char) == decltype(char_t) || decltype(wchar_t) == decltype(char_t), "unsupported char format, report to developers (maybe you need it, but at least write your problem)");
-		static_assert(_kStringLength != unsigned int(-1), "you can't pass a negative value for instatiation!");
+		static_assert(_kStringLength != decltype(_kStringLegnth)(-1), "you can't pass a negative value for instatiation!");
 		static_assert(_kStringLength > 0, "you can't make a arr as zero lol");
 
 		// if you do {} <= initializes like memset(buf,0,sizeof(buf)) not fast, this is faster initialization!
