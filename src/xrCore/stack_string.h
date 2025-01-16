@@ -20,13 +20,13 @@ public:
 	using reference = char_t&;
 	using const_pointer = const pointer;
 
-	using size_type = decltype(_kStringLength);
+	using number_type = decltype(_kStringLength);
 
 public:
 	stack_string()
 	{
-		static_assert(decltype(char) == decltype(char_t) || decltype(wchar_t) == decltype(char_t), "unsupported char format, report to developers (maybe you need it, but at least write your problem)");
-		static_assert(_kStringLength != decltype(_kStringLegnth)(-1), "you can't pass a negative value for instatiation!");
+		static_assert(std::is_same<char,char_t>::value || std::is_same<wchar_t, char_t>::value, "unsupported char format, report to developers (maybe you need it, but at least write your problem)");
+		static_assert(_kStringLength != decltype(_kStringLength)(-1), "you can't pass a negative value for instatiation!");
 		static_assert(_kStringLength > 0, "you can't make a arr as zero lol");
 
 		// if you do {} <= initializes like memset(buf,0,sizeof(buf)) not fast, this is faster initialization!
@@ -37,23 +37,36 @@ public:
 	~stack_string() {}
 
 
+	// const
 	inline pointer c_str(void) const { return m_buffer; }
-	inline constexpr size_type max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
-	inline size_type size(void)
+	inline constexpr number_type max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
+	inline bool empty(void) const { return m_buffer[0] != char_t(0); }
+	inline constexpr value_type at(number_type index) const 
 	{
-		if constexpr (decltype(char) == decltype(char_t))
+		assert(index >= 0 && index <= this->max_size() && "out of bounds");
+		assert(index != number_type(-1) && "invalid value");
+
+		if (index > this->max_size())
+			return char_t(0);
+		else 
+			return m_buffer[index];
+	}
+
+	// non-const
+	inline void clear(void) { m_buffer[0] = char_t(0); }
+	inline pointer data(void) { return &m_buffer[0]; }
+	inline number_type size(void)
+	{
+		if constexpr (typeid(char) == typeid(char_t))
 		{
 			return strlen(m_buffer);
 		}
 
-		if constexpr (decltype(wchar_t) == decltype(char_t))
+		if constexpr (typeid(wchar_t) == typeid(char_t))
 		{
 			return wcslen(m_buffer);
 		}
 	}
-
-	inline bool empty(void) const { return m_buffer[0] != char_t(0); }
-	inline void clear(void) { m_buffer[0] = char_t(0); }
 
 private:
 	char_t m_buffer[_kStringLength];
