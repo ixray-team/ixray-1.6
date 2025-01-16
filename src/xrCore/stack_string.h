@@ -22,13 +22,14 @@ public:
 
 	using number_type = decltype(_kStringLength);
 
+	static_assert(std::is_same<char, char_t>::value || std::is_same<wchar_t, char_t>::value, "unsupported char format, report to developers (maybe you need it, but at least write your problem)");
+	static_assert(_kStringLength != number_type(-1), "you can't pass a negative value for instatiation!");
+	static_assert(_kStringLength > 0, "you can't make a arr as zero lol");
+	static_assert(std::is_signed<number_type>::value == false, "must be unsigned type of length variable");
+
 public:
 	stack_string()
 	{
-		static_assert(std::is_same<char,char_t>::value || std::is_same<wchar_t, char_t>::value, "unsupported char format, report to developers (maybe you need it, but at least write your problem)");
-		static_assert(_kStringLength != decltype(_kStringLength)(-1), "you can't pass a negative value for instatiation!");
-		static_assert(_kStringLength > 0, "you can't make a arr as zero lol");
-
 		// if you do {} <= initializes like memset(buf,0,sizeof(buf)) not fast, this is faster initialization!
 		// https://godbolt.org/z/9cc833e1W
 		m_buffer[0] = char_t(0);
@@ -41,14 +42,14 @@ public:
 	inline pointer c_str(void) const { return m_buffer; }
 	inline constexpr number_type max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
 	inline bool empty(void) const { return m_buffer[0] != char_t(0); }
-	inline constexpr value_type at(number_type index) const 
+	inline constexpr value_type at(number_type index) const
 	{
 		assert(index >= 0 && index <= this->max_size() && "out of bounds");
 		assert(index != number_type(-1) && "invalid value");
 
 		if (index > this->max_size())
 			return char_t(0);
-		else 
+		else
 			return m_buffer[index];
 	}
 
