@@ -53,8 +53,9 @@ void unit_test_stack_string()
 {
 	stack_string<char, 10> str;
 	assert(str.empty() == true);
-
-	static_assert(str.max_size() == sizeof(str));
+	static_assert(str.max_size() == sizeof(char[10])); // real compile-time assert ^^
+	assert(str.max_size() == sizeof(char[10]));
+	assert(str.size() == 0);
 }
 #endif
 
