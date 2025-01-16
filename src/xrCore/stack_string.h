@@ -47,6 +47,7 @@ public:
 		assert(index >= 0 && index <= this->max_size() && "out of bounds");
 		assert(index != number_type(-1) && "invalid value");
 
+		// instead of throwing (aka traditional std::string design) we just make it safe...
 		if (index > this->max_size())
 			return char_t(0);
 		else
@@ -67,6 +68,17 @@ public:
 		{
 			return wcslen(m_buffer);
 		}
+	}
+
+	inline reference at(number_type index) 
+	{
+		assert(index >= 0 && index <= this->max_size() && "out of bounds");
+		assert(index != number_type(-1) && "invalid value");
+
+		if (index > this->max_size())
+			index = 0;
+
+		return m_buffer[index];
 	}
 
 private:
