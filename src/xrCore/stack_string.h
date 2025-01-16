@@ -1,11 +1,11 @@
 #pragma once
 
 /*
-* 
+*
 * Author: wh1t3lord
 * Description: fast-stack char/wchar string in one class with std::string API reference implementation
 * Date: 16.01.2025
-* 
+*
 */
 
 #include <string.h>
@@ -15,11 +15,12 @@ template<typename char_t, unsigned int _kStringLength>
 class stack_string
 {
 public:
-
-	using iterator_category = std::random_access_iterator_tag;
 	using value_type = char_t;
 	using pointer = char_t*;
 	using reference = char_t&;
+	using const_pointer = const pointer;
+
+	using size_type = decltype(_kStringLength);
 
 public:
 	stack_string()
@@ -37,19 +38,22 @@ public:
 
 
 	inline pointer c_str(void) const { return m_buffer; }
-	inline constexpr unsigned int max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
-	inline unsigned int size(void)
+	inline constexpr size_type max_size(void) const { return sizeof(m_buffer) / sizeof(char_t); }
+	inline size_type size(void)
 	{
 		if constexpr (decltype(char) == decltype(char_t))
 		{
 			return strlen(m_buffer);
 		}
-		
+
 		if constexpr (decltype(wchar_t) == decltype(char_t))
 		{
 			return wcslen(m_buffer);
 		}
 	}
+
+	inline bool empty(void) const { return m_buffer[0] != char_t(0); }
+	inline void clear(void) { m_buffer[0] = char_t(0); }
 
 private:
 	char_t m_buffer[_kStringLength];
