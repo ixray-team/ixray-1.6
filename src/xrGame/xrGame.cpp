@@ -48,6 +48,7 @@ void setup_luabind_allocator		()
 	}
 }
 
+#ifdef DEBUG
 void unit_test_stack_string()
 {
 	stack_string<char, 10> str;
@@ -62,6 +63,7 @@ void unit_test_stack_string()
 
 	assert(_try_);
 }
+#endif
 
 extern "C" 
 {
@@ -77,7 +79,9 @@ extern "C"
 		RegisterImGuiInGame();
 #endif
 
+#ifdef DEBUG
 		unit_test_stack_string();
+#endif
 
 		string_path GameGlobals = {};
 		FS.update_path(GameGlobals, "$game_config$", "game_global.ltx");
