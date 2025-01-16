@@ -238,7 +238,7 @@ IC void CBackend::ApplyPrimitieTopology( D3D_PRIMITIVE_TOPOLOGY Topology )
 	if ( m_PrimitiveTopology != Topology )
 	{
 		m_PrimitiveTopology = Topology;
-		RContext->IASetPrimitiveTopology(m_PrimitiveTopology);
+		g_RenderRHI->IASetPrimitiveTopology(m_PrimitiveTopology);
 	}
 }
 
@@ -342,8 +342,8 @@ IC void CBackend::Render_noIA(u32 iVertexCount)
 	ApplyRTandZB();
 
 	//Unbind IA (VB, IB)
-	RContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	RContext->IASetInputLayout(nullptr);
+	g_RenderRHI->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	g_RenderRHI->IASetInputLayout(nullptr);
 
 	StateManager.Apply();
 

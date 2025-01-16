@@ -442,6 +442,9 @@ public:
 	virtual void CopyTexture2D(IRHIResource* pDstResource, IRHIResource* pSrcResource) = 0;
 	virtual void CopyTexture3D(IRHIResource* pDstResource, IRHIResource* pSrcResource) = 0;
 
+	virtual void IASetPrimitiveTopology(u32 Topology) = 0;
+	virtual void IASetInputLayout(void* Layout) = 0;
+
 	virtual void Draw(u32 VertexCount, u32 StartVertexLocation) = 0;
 	virtual void DrawIndexed(u32 IndexCount, u32 StartIndexLocation, s32 BaseVertexLocation) = 0;
 

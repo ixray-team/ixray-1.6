@@ -375,6 +375,16 @@ void CRenderRHI_DX11::DrawIndexed(u32 IndexCount, u32 StartIndexLocation, s32 Ba
 	m_pHWRenderContext->DrawIndexed(IndexCount, StartIndexLocation, BaseVertexLocation);
 }
 
+void CRenderRHI_DX11::IASetPrimitiveTopology(u32 Topology)
+{
+	m_pHWRenderContext->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)Topology);
+}
+
+void CRenderRHI_DX11::IASetInputLayout(void* Layout)
+{
+	m_pHWRenderContext->IASetInputLayout((ID3D11InputLayout*)Layout);
+}
+
 ID3D11Device* CRenderRHI_DX11::GetDevice()
 {
 	return (ID3D11Device*)m_pHWRenderDevice;

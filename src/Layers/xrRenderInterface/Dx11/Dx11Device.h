@@ -44,6 +44,9 @@ public:
 	void Draw(u32 VertexCount, u32 StartVertexLocation) override;
 	void DrawIndexed(u32 IndexCount, u32 StartIndexLocation, s32 BaseVertexLocation) override;
 
+	void IASetPrimitiveTopology(u32 Topology) override;
+	void IASetInputLayout(void* Layout) override;
+
 	// DX11 Stuff
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
@@ -57,9 +60,8 @@ public:
 	virtual void CreateRDoc() override;
 
 private:
-	D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL m_FeatureLevel = D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_1;
 	IDXGISwapChain* m_pHWSwapchain = nullptr;
-
 
 	ID3D11Device* m_pHWRenderDevice = nullptr;
 	ID3D11DeviceContext* m_pHWRenderContext = nullptr;
@@ -71,7 +73,6 @@ private:
 
 	ID3D11DepthStencilView* m_pRenderDSV = nullptr;
 	ID3D11RenderTargetView* m_pSwapChainRTV = nullptr;
-
 };
 
 // D3D11 Stuff
