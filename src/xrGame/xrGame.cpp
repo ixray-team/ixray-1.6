@@ -48,6 +48,21 @@ void setup_luabind_allocator		()
 	}
 }
 
+void unit_test_stack_string()
+{
+	stack_string<char, 10> str;
+	assert(str.empty() == true);
+
+	int _try_ = 0;
+	try { str.at(100); }
+	catch (...) 
+	{
+		_try_ = 1;
+	}
+
+	assert(_try_);
+}
+
 extern "C" 
 {
 	DLL_API void __cdecl xrGameInitialize()
@@ -61,6 +76,8 @@ extern "C"
 #ifdef DEBUG_DRAW
 		RegisterImGuiInGame();
 #endif
+
+		unit_test_stack_string();
 
 		string_path GameGlobals = {};
 		FS.update_path(GameGlobals, "$game_config$", "game_global.ltx");

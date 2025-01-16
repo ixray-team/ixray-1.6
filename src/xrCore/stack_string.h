@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <iterator>
+#include <cassert>
 
 template<typename char_t, unsigned int _kStringLength>
 class stack_string
