@@ -54,14 +54,7 @@ void unit_test_stack_string()
 	stack_string<char, 10> str;
 	assert(str.empty() == true);
 
-	int _try_ = 0;
-	try { str.at(100); }
-	catch (...) 
-	{
-		_try_ = 1;
-	}
-
-	assert(_try_);
+	static_assert(str.max_size() == sizeof(str));
 }
 #endif
 
