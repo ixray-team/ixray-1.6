@@ -385,7 +385,10 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 void CUITalkWnd::PlaySnd(LPCSTR text)
 {
 	u32 text_len = xr_strlen(text);
-	if ( text_len == 0 )
+	
+	// Very crude hack with check for maximum path size
+	// Script result passes here not the text ID, but the fully localized variant
+	if ( text_len == 0 || text_len >= _MAX_PATH)
 	{
 		return;
 	}
