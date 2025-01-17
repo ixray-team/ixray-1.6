@@ -166,25 +166,23 @@ bool UpdateBuffersD3D9();
 void ResizeBuffersD3D9(u16 Width, u16 Height);
 void DestroyD3D9();
 
-#ifndef _EDITOR
 bool CreateD3D11();
 bool UpdateBuffersD3D11();
 void ResizeBuffersD3D11(u16 Width, u16 Height);
 void DestroyD3D11();
-#endif
 
 bool CRenderDevice::InitRenderDeviceEditor()
 {
 	fill_vid_mode_list();
 
-	if (!CreateD3D9())
+	if (!CreateD3D11())
 	{
 		return false;
 	}
 
 	Device.TargetWidth = psCurrentVidMode[0];
 	Device.TargetHeight = psCurrentVidMode[1];
-	CurrentAPILevel = APILevel::DX9;
+	CurrentAPILevel = APILevel::DX11;
 
 	return true;
 }

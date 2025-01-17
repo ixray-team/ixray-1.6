@@ -4,32 +4,33 @@
 namespace dx10BufferUtils
 {
 
-HRESULT	IC CreateBuffer( ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer)
+HRESULT	IC CreateBuffer( ID3DBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bIndexBuffer, bool bDynamic)
 {
 	D3D_BUFFER_DESC desc;
 	desc.ByteWidth = DataSize;
 	//desc.Usage = bImmutable ? D3D_USAGE_IMMUTABLE : D3D_USAGE_DEFAULT;
-	desc.Usage = D3D_USAGE_DEFAULT;
+	desc.Usage = bDynamic ? D3D_USAGE_DYNAMIC : D3D_USAGE_DEFAULT;
 	desc.BindFlags = bIndexBuffer ? D3D_BIND_INDEX_BUFFER : D3D_BIND_VERTEX_BUFFER;
-	desc.CPUAccessFlags = 0;
+	//desc.CPUAccessFlags = 0;
+	desc.CPUAccessFlags = (bDynamic) ? D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ : 0;
 	desc.MiscFlags = 0;
 
 	D3D_SUBRESOURCE_DATA subData;
 	subData.pSysMem = pData;
 
-	HRESULT res = RDevice->CreateBuffer( &desc, &subData, ppBuffer);
+	HRESULT res = RDevice->CreateBuffer( &desc, pData ? &subData : NULL, ppBuffer);
 	//R_CHK(res);
 	return res;
 }
 
-HRESULT	CreateVertexBuffer( ID3DVertexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT	CreateVertexBuffer( ID3DVertexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bDynamic)
 {
-	return CreateBuffer( ppBuffer, pData, DataSize, bImmutable, false);
+	return CreateBuffer( ppBuffer, pData, DataSize, bImmutable, false, bDynamic);
 }
 
-HRESULT	CreateIndexBuffer( ID3DIndexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable)
+HRESULT	CreateIndexBuffer( ID3DIndexBuffer** ppBuffer, const void* pData, UINT DataSize, bool bImmutable, bool bDynamic )
 {
-	return CreateBuffer( ppBuffer, pData, DataSize, bImmutable, true);
+	return CreateBuffer( ppBuffer, pData, DataSize, bImmutable, true, bDynamic);
 }
 
 HRESULT	CreateConstantBuffer( ID3DBuffer** ppBuffer, UINT DataSize)

@@ -1,4 +1,4 @@
-project(xrECore)
+ project(xrECore)
 
 # Files import
 file(GLOB_RECURSE ECORE_SOURCE_ALL_FILES CONFIGURE_DEPENDS
@@ -33,7 +33,7 @@ file(GLOB_RECURSE ECORE_SOURCE_RES_FILES
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
-    "../../Layers/xrRenderDX9/dx9r_constants_cache.*"
+    "../../Layers/xrRenderDX10/dx10r_constants_cache.*"
     "../../Layers/xrRender/Animation.*"
     "../../Layers/xrRender/blenders/Blender.*"
     "../../Layers/xrRender/blenders/Blender_Palette.*"
@@ -75,8 +75,8 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/FProgressive.*"
     "../../Layers/xrRender/FSkinned.*"
     "../../Layers/xrRender/FVisual.*"
-    "../../Layers/xrRenderDX9/dx9HW.*"
-    "../../Layers/xrRenderDX9/dx9HWCaps.*"
+    "../../Layers/xrRenderDX10/dx11HW.*"
+    "../../Layers/xrRenderDX10/dx11HWCaps.*"
     "../../Layers/xrRender/ModelPool.*"
     "../../Layers/xrRender/ParticleEffect.*"
     "../../Layers/xrRender/ParticleEffectDef.*"
@@ -85,8 +85,8 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/ResourceManager.*"
     "../../Layers/xrRender/ResourceManager_Loader.*"
     "../../Layers/xrRender/ResourceManager_Reset.*"
-    "../../Layers/xrRenderDX9/dx9ResourceManager_Resources.*"
-    "../../Layers/xrRenderDX9/dx9ResourceManager_Scripting.*"
+    "../../Layers/xrRenderDX10/dx10ResourceManager_Resources.*"
+    "../../Layers/xrRenderDX10/dx10ResourceManager_Scripting.*"
     "../../Layers/xrRender/R_Backend.*"
     "../../Layers/xrRender/R_Backend_DBG.*"
     "../../Layers/xrRender/R_Backend_hemi.*"
@@ -99,15 +99,14 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/SH_Atomic.*"
     "../../Layers/xrRender/SH_Constant.*"
     "../../Layers/xrRender/SH_Matrix.*"
-    "../../Layers/xrRenderDX9/dx9SH_RT.*"
-    "../../Layers/xrRenderDX9/dx9SH_Texture.*"
-    "../../Layers/xrRenderDX9/DDSTextureLoader9.*"
+    "../../Layers/xrRenderDX10/dx11SH_RT.*"
+    "../../Layers/xrRenderDX10/dx11SH_Texture.*"
     "../../Layers/xrRender/SkeletonAnimated.*"
     "../../Layers/xrRender/SkeletonCustom.*"
     "../../Layers/xrRender/SkeletonRigid.*"
     "../../Layers/xrRender/SkeletonX.*"
     "../../Layers/xrRender/stats_manager.*"
-    "../../Layers/xrRenderDX9/dx9Texture.*"
+    "../../Layers/xrRenderDX10/dx11Texture.*"
     "../../Layers/xrRender/TextureDescrManager.*"
     "../../Layers/xrRender/tga.*"
     "../../Layers/xrRender/tss_def.*"
@@ -165,6 +164,7 @@ target_compile_definitions(xrECore PRIVATE _WINDOWS)
 target_compile_definitions(xrECore PRIVATE _USRDLL)
 target_compile_definitions(xrECore PUBLIC XR_EDITOR_NEW)
 target_compile_definitions(xrECore PUBLIC _EDITOR)
+target_compile_definitions(xrECore PUBLIC USE_DX11)
 
 target_compile_options(xrECore PRIVATE /W0)
 target_compile_definitions(xrECore PRIVATE "$<$<CONFIG:Debug>:DEBUG>")
@@ -183,7 +183,7 @@ target_link_libraries(xrECore PUBLIC xrPhysics)
 target_link_libraries(xrECore PUBLIC xrDXT)
 target_link_libraries(xrECore PUBLIC MagicFM)
 target_link_libraries(xrECore PUBLIC NvMender2003)
-target_link_libraries(xrECore PUBLIC "d3d9.lib")
+target_link_libraries(xrECore PUBLIC "d3d11.lib")
 target_link_libraries(xrECore PUBLIC "d3dcompiler.lib")
 
 # UnityBuild Preferences
@@ -200,16 +200,7 @@ target_link_libraries(xrECore PUBLIC "d3dcompiler.lib")
 
 
 ## DirectX SDK
-if(NOT "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
-    target_link_libraries(xrECore PUBLIC ${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/release/lib/x86/d3dx9.lib)
-else()
-    target_link_libraries(xrECore PUBLIC ${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/release/lib/x64/d3dx9.lib)
-endif()
-
-target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/include/")
-target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/directxmesh_desktop_win10.2023.4.28.1/include/")
-
-## DirectX SDK
+target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/directxmesh_desktop_2019.2024.6.5.1/include/")
 target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/directxtex_desktop_2019.2024.6.5.1/include/")
 target_link_libraries(xrECore PUBLIC ${CMAKE_BINARY_DIR}/packages/directxtex_desktop_2019.2024.6.5.1/native/lib/${NUGET_PACKAGE_PLATFORM}/release/DirectXTex.lib)
 

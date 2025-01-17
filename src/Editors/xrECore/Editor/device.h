@@ -21,12 +21,14 @@ class CResourceManager;
 class ECORE_API CEditorRenderDevice;
 extern ECORE_API CEditorRenderDevice* EDevice;
 
-#define REContext ((IDirect3DDevice9*)EDevice->GetRenderContext())
-#define REDevice ((IDirect3DDevice9*)EDevice->GetRenderDevice())
-#define RESwapchainTarget ((IDirect3DSurface9*)EDevice->GetSwapchainTexture())
-#define RETarget ((IDirect3DSurface9*)EDevice->GetRenderTexture())
-#define REDepth ((IDirect3DSurface9*)EDevice->GetDepthTexture())
-#define RESwapchain ((IDirect3DDevice9*)EDevice->GetSwapchain())
+#define REContext ((ID3D11DeviceContext*)Device.GetRenderContext())
+#define REDevice ((ID3D11Device*)Device.GetRenderDevice())
+#define RESwapchainTarget ((ID3D11RenderTargetView*)Device.GetSwapchainTexture())
+#define RETarget ((ID3D11RenderTargetView*)Device.GetRenderTexture())
+#define REDepth ((ID3D11DepthStencilView*)Device.GetDepthTexture())
+#define RESwapchain ((IDXGISwapChain*)Device.GetSwapchain())
+
+#define MAX_EDITOR_LIGHT 16
 
 class ECORE_API CEditorRenderDevice :
 	public CRenderDevice
@@ -48,7 +50,14 @@ public:
 	ref_shader m_SelectionShader;
 
 	ref_texture texture_null;
+	Fmaterial m_CurrentMat;
 	Fmaterial m_DefaultMat;
+
+	Flight m_Lights[MAX_EDITOR_LIGHT];
+	BOOL m_EnableLights[MAX_EDITOR_LIGHT];
+
+	ID3D11Buffer* m_MaterialBuffer;
+	ID3D11Buffer* m_LightBuffer;
 
 public:
 	float RadiusRender;
@@ -121,35 +130,43 @@ public:
 	IC void SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 	{
 		VERIFY(b_is_Ready);
-		CHK_DX(REDevice->SetRenderState(p1,p2));
+
+		R_ASSERT2(0, "Implement");
+	//	CHK_DX(REDevice->SetRenderState(p1,p2));
 	}
 
 	IC void SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 	{
 		VERIFY(b_is_Ready);
-		CHK_DX(REDevice->SetSamplerState(sampler,type,value));
+
+		R_ASSERT2(0, "Implement");
+
+		//CHK_DX(REDevice->SetSamplerState(sampler,type,value));
 	}
 
 	// light&material
 	IC void LightEnable(u32 dwLightIndex, BOOL bEnable)
 	{
-		CHK_DX(REDevice->LightEnable(dwLightIndex, bEnable));
+		m_EnableLights[dwLightIndex] = bEnable;
 	}
 
 	IC void SetLight(u32 dwLightIndex, Flight& lpLight)
 	{
-		CHK_DX(REDevice->SetLight(dwLightIndex, (D3DLIGHT9*)&lpLight));
+		m_Lights[dwLightIndex] = lpLight;
 	}
 
 	IC void SetMaterial(Fmaterial& mat)
 	{
-		CHK_DX(REDevice->SetMaterial((D3DMATERIAL9*)&mat));
+		m_CurrentMat = mat;
 	}
 
 	IC void ResetMaterial()
 	{
-		CHK_DX(REDevice->SetMaterial((D3DMATERIAL9*)&m_DefaultMat));
+		m_CurrentMat = m_DefaultMat;
 	}
+
+	void UpdateMaterial();
+	void UpdateLight();
 
 	// update
 	void UpdateView();

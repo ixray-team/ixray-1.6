@@ -238,8 +238,8 @@ void CRenderTarget::accum_spot(light* L)
 	increment_light_marker();
 }
 
-#include "../../../Layers/xrRenderPC_R2/r2_rendertarget_accum_spot_geom.cpp"
-#include "../../../Layers/xrRenderPC_R2/r2_rendertarget_accum_point_geom.cpp"
+#include "../../../Layers/xrRenderPC_R4/r4_rendertarget_accum_spot_geom.cpp"
+#include "../../../Layers/xrRenderPC_R4/r4_rendertarget_accum_point_geom.cpp"
 #include "../../../Layers/xrRender/light.cpp"
 
 //---------------------

@@ -9,6 +9,7 @@
 #include "../Engine/XrGameMaterialLibraryEditors.h"
 #include "../Layers/xrRender/ResourceManager.h"
 #include "../Layers/xrRender/dxRenderDeviceRender.h"
+#include "../Layers/xrRenderDX10/dx10BufferUtils.h"
 #include "UI_ToolsCustom.h"
 
 CEditorRenderDevice 	*	EDevice;
@@ -86,6 +87,9 @@ CEditorRenderDevice::CEditorRenderDevice()
 
     m_CurrentShader	= 0;
     //pSystemFont		= 0;
+
+	m_MaterialBuffer	= 0;
+	m_LightBuffer		= 0;
 
 	fASPECT 		= 1.f;
 	fFOV 			= 60.f;
@@ -179,7 +183,7 @@ void CEditorRenderDevice::InitTimer()
 
 void CEditorRenderDevice::Clear()
 {
-	u32 ClearColor = 0x0;
+	Fcolor ClearColor = Fcolor(0.0f, 0.0f, 0.0f);
 
 	if (EPrefs)
 	{
@@ -190,10 +194,11 @@ void CEditorRenderDevice::Clear()
 			color_get_B(EPrefs->scene_clear_color) / 255.f, 
 			color_get_A(EPrefs->scene_clear_color) / 255.f
 		};
-		ClearColor = color_rgba_f(color[0], color[1], color[2], color[3]);
+		ClearColor = Fcolor(color[0], color[1], color[2], color[3]);
 	}
 
-	CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL | D3DCLEAR_TARGET, ClearColor, 1, 0));
+	RContext->ClearRenderTargetView( RSwapchainTarget, (float*)&ClearColor );
+	RContext->ClearDepthStencilView( RDepth, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0 );
 }
 
 //---------------------------------------------------------------------------
@@ -228,7 +233,7 @@ bool CEditorRenderDevice::Create()
 			UI->ResetUI();
 		
 		InitRenderDeviceEditor();
-		UI->Initialize(hwnd, RDevice, ini_path);
+		UI->Initialize(hwnd, RDevice, RContext, ini_path);
 	}
 	
 	// after creation
@@ -290,8 +295,9 @@ void CEditorRenderDevice::_SetupStates()
 	//Caps.Update();
 	for (u32 i=0; i<Caps.raster.dwStages; i++){
 		float fBias = -1.f;
-		CHK_DX(REDevice->SetSamplerState( i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD) (&fBias))));
+		SetSS( i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD) (&fBias)));
 	}
+
 	EDevice->SetRS(D3DRS_DITHERENABLE,	TRUE				);
     EDevice->SetRS(D3DRS_COLORVERTEX,		TRUE				);
     EDevice->SetRS(D3DRS_STENCILENABLE,	FALSE				);
@@ -324,6 +330,9 @@ void CEditorRenderDevice::_Create(IReader* F)
     m_WireShader.create			("editor\\wire");
     m_SelectionShader.create	("editor\\selection");
 
+	dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
+	dx10BufferUtils::CreateConstantBuffer( &m_LightBuffer, sizeof( Flight ) * MAX_EDITOR_LIGHT );
+
 	texture_null.create("ed\\ed_nodata");
 	texture_null->Load();
 	UIChooseForm::SetNullTexture(texture_null->pSurface);
@@ -338,6 +347,12 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 {
 	b_is_Ready 						= FALSE;
     m_CurrentShader				= 0;
+
+	m_LightBuffer->Release		();
+	m_LightBuffer				= 0;
+
+	m_MaterialBuffer->Release	();
+	m_MaterialBuffer			= 0;
 
     UI->OnDeviceDestroy			();
 
@@ -380,7 +395,7 @@ void CEditorRenderDevice::Reset(bool)
 	Resources->reset_end();
 	Resources->DeferredUpload();
 
-	UI->ResetEnd(RDevice);
+	UI->ResetEnd(RDevice, RContext);
 	_SetupStates();
 
 	UIChooseForm::SetNullTexture(texture_null->pSurface);
@@ -456,24 +471,8 @@ bool CEditorRenderDevice::Begin()
 	mView_saved = mView;
 	vCameraPosition_saved = vCameraPosition;
 	//HW.Validate		();
-	HRESULT	_hr = REDevice->TestCooperativeLevel();
-	if (FAILED(_hr))
-	{
-		// If the device was lost, do not render until we get it back
-		if (D3DERR_DEVICELOST == _hr) {
-			Sleep(33);
-			return	FALSE;
-		}
-
-		// Check if the device is ready to be reset
-		if (D3DERR_DEVICENOTRESET == _hr)
-		{
-			Reset(false);
-		}
-	}
 
 	VERIFY(FALSE == g_bRendering);
-	(REDevice->BeginScene());
 
 	Clear();
 
@@ -490,10 +489,19 @@ void CEditorRenderDevice::End()
 	// end scene
 	RCache.OnFrameEnd();
 
-    (REDevice->EndScene());
+	RSwapchain->Present(0, 0);
+}
 
-	CHK_DX(REDevice->Present( NULL, NULL, NULL, NULL ));
+void CEditorRenderDevice::UpdateMaterial()
+{
+	R_ASSERT( m_MaterialBuffer );
+	RContext->UpdateSubresource( m_MaterialBuffer, 0, NULL, &m_CurrentMat, 0, 0 );
+}
 
+void CEditorRenderDevice::UpdateLight()
+{
+	R_ASSERT( m_LightBuffer );
+	RContext->UpdateSubresource( m_LightBuffer, 0, NULL, m_Lights, 0, 0 );
 }
 
 void CEditorRenderDevice::UpdateView()

@@ -1,6 +1,6 @@
 #pragma once
-#include <d3d9.h>
-using ImTextureID = IDirect3DBaseTexture9*;
+#include <d3d11.h>
+using ImTextureID = ID3D11Resource*;
 #define ImTextureID ImTextureID 
 
 #ifdef XREUI_EXPORTS

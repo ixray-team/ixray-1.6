@@ -3,7 +3,8 @@
 //----------------------------------------------------
 #pragma once
 // DirectX headers
-#include <d3d9.h>
+#include <d3d11.h>
+#include <d3d11shader.h>
 #include "../xrEUI/stdafx.h"
 #include "../../Layers/xrRenderDX9/xrD3DDefs.h"
 
@@ -24,6 +25,7 @@
 
 #include "../../xrEngine/Fmesh.h"
 #include "../../xrEngine/_d3d_extensions.h"
+#include "..\Layers\xrRenderDX10\DxgiFormat.h"
 #define smart_cast dynamic_cast
 
 #ifndef O_SEQUENTIAL
@@ -169,6 +171,56 @@ inline u32 TColor(u32 r)
 {
 	return r;
 }
+
+inline HRESULT DX11CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usage, DxgiFormat Format, UINT Pool, ID3D11Texture2D** ppTexture, HANDLE* pSharedHandle)
+{
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = Width;
+	desc.Height = Height;
+	desc.MipLevels = Levels;
+	desc.Format = (DXGI_FORMAT)Format;
+	desc.Usage = (D3D11_USAGE)Usage;
+	desc.CPUAccessFlags = (Usage & D3D11_USAGE_DYNAMIC) ? D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ : 0;
+	return RDevice->CreateTexture2D(&desc, NULL, ppTexture);
+}
+
+inline HRESULT DX11LockRect(
+	ID3D11Texture2D*		pTexture,
+	UINT					Level,
+	D3DLOCKED_RECT*			pLockedRect,
+	const RECT*				pRect,
+	DWORD					Flags
+)
+{
+	D3D11_MAPPED_SUBRESOURCE sb;
+	HRESULT hr = RContext->Map(pTexture, Level, D3D11_MAP_READ_WRITE, 0, &sb);
+
+	R_ASSERT(pLockedRect);
+	pLockedRect->pBits = sb.pData;
+	pLockedRect->Pitch = sb.RowPitch;
+	
+	return hr;
+}
+
+inline HRESULT DX11UnlockRect(
+	ID3D11Texture2D* pTexture,
+	UINT Level
+)
+{
+	RContext->Unmap(pTexture, Level);
+	return S_OK;
+}
+
+//inline HRESULT DX11Lock(
+//	UINT  OffsetToLock,
+//	UINT  SizeToLock,
+//	void** ppbData,
+//	DWORD Flags
+//)
+//{
+//	D3D11_MAPPED_SUBRESOURCE sb;
+//	HRESULT hr = RContext->Map(pTexture, Level, D3D11_MAP_READ_WRITE, 0, &sb);
+//}
 
 #ifdef XRECORE_EXPORTS
 inline void not_implemented()

@@ -15,6 +15,7 @@
 #include "Library.h"
 #include "EditObject.h"
 #include "ui_main.h"
+#include "../Layers/xrRenderDX10/dx10BufferUtils.h"
 
 ECORE_API CDrawUtilities DU_impl;
 
@@ -98,6 +99,7 @@ u32 m_ColorSafeRect = 0xffB040B0;
 //void 			 SPrimitiveBuffer::RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices, u32 _i_cnt)
 {
+#if 0
 	IDirect3DVertexBuffer9*	pVB=0;
 	IDirect3DIndexBuffer9*	pIB=0;
 	p_cnt				= _p_cnt;
@@ -123,6 +125,15 @@ void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF,
 		OnRender.bind	(this,&SPrimitiveBuffer::RenderDP);
 	}
 	pGeom.create		(FVF,pVB,pIB);
+#endif
+    ID3D11Buffer*	pVB = 0;
+    ID3D11Buffer*	pIB = 0;
+    p_cnt			    = _p_cnt;
+	p_type			    = _pt;
+	v_cnt			    = _v_cnt;
+	i_cnt			    = _i_cnt;
+	u32 stride = FVF::ComputeVertexSize(FVF);
+    dx10BufferUtils::CreateVertexBuffer(&pVB, NULL, v_cnt * stride, false, true);
 }
 void SPrimitiveBuffer::Destroy()
 {                       

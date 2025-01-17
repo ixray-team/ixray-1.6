@@ -29,6 +29,7 @@ target_compile_definitions(xrEUI PRIVATE XREUI_EXPORTS)
 target_compile_definitions(xrEUI PRIVATE _WINDOWS)
 target_compile_definitions(xrEUI PRIVATE _USRDLL)
 target_compile_definitions(xrEUI PUBLIC XR_EDITOR_NEW)
+target_compile_definitions(xrEUI PUBLIC USE_DX11)
 
 add_compile_options(/fp:fast)
 target_compile_definitions(xrEUI PRIVATE "$<$<CONFIG:Debug>:DEBUG>")

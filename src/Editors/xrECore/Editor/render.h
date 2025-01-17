@@ -17,6 +17,7 @@
 #include <d3dcompiler.h>
 #include "../../../Layers/xrRender/light.h"
 #include "../Render/LightSpot.h"
+#include "../Editor/device.h"
 
 class ISpatial;
 
@@ -71,7 +72,7 @@ public:
 		dwLightMarkerID = 5;
 
 		if(bResetStencil) {
-			CHK_DX(RDevice->Clear(0L, nullptr, D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
+			RContext->ClearDepthStencilView( RDepth, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0 );
 		}
 	}
 
@@ -99,11 +100,11 @@ public:
 	ref_geom g_accum_point;
 	ref_geom g_accum_spot;
 
-	IDirect3DVertexBuffer9* g_accum_point_vb;
-	IDirect3DIndexBuffer9* g_accum_point_ib;
+	ID3D11Buffer* g_accum_point_vb;
+	ID3D11Buffer* g_accum_point_ib;
 
-	IDirect3DVertexBuffer9* g_accum_spot_vb;
-	IDirect3DIndexBuffer9* g_accum_spot_ib;
+	ID3D11Buffer* g_accum_spot_vb;
+	ID3D11Buffer* g_accum_spot_ib;
 
 	virtual	void					set_blur(float	f) {}
 	virtual	void					set_gray(float	f) {}
@@ -236,7 +237,7 @@ public:
 	}
 
 
-	virtual IDirect3DBaseTexture9* texture_load(LPCSTR	fname, u32& mem_size);
+	virtual ID3DBaseTexture* texture_load(LPCSTR	fname, u32& msize, bool bStaging = false);
 
 	virtual DWORD					get_dx_level();
 
