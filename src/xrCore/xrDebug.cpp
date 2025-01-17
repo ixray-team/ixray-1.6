@@ -178,12 +178,14 @@ void xrDebug::show_dialog(const std::string& message, bool& ignore_always)
 		{ 0, 2, "Continue" },
 	};
 
+	auto utf8_message = Platform::ANSI_TO_UTF8(Platform::UTF8_to_CP1251(message.c_str()));
+
 	const SDL_MessageBoxData messageboxdata = 
 	{
 		SDL_MESSAGEBOX_ERROR | SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT,		/* .flags */
 		nullptr,					/* .window */
 		"Fatal Error",				/* .title */
-		Platform::ANSI_TO_UTF8(message.c_str()).c_str(),			/* .message */
+		utf8_message.c_str(),			/* .message */
 		std::size(buttons),			/* .numbuttons */
 		buttons,					/* .buttons */
 		nullptr						/* .colorScheme */
