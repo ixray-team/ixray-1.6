@@ -72,5 +72,17 @@ float3 DirectLight(float4 Radiance, float3 Light, float3 Normal, float3 View, fl
 #endif
 }
 
+float3 SimpleTranslucency(float3 Radiance, float3 Light, float3 Normal)
+{
+	float NdotL = dot(Light, Normal);
+	float Scale = 0.36f * NdotL;
+
+	float Attention = Scale + 0.0769f; Attention *= Attention * 1.171f;	
+	float Factor = 1.0f - saturate(abs(Scale) * 13.0f - 1.0f);
+
+	float SSS = lerp(saturate(NdotL), Attention, Factor * Factor);
+	return PushGamma(Radiance) * saturate(0.271f * SSS + 0.0972f);
+}
+
 #endif
 
