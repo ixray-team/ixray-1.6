@@ -66,19 +66,19 @@ void EImageThumbnail::Update(ImTextureID& Texture)
     }
     else
     {
-        R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+        R_CHK(DX11CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, 0, &pTexture, 0));
         Texture = pTexture;
     }
 
     D3DLOCKED_RECT rect;
-    R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
+    R_CHK(DX11LockRect(pTexture, 0, &rect, 0, D3DLOCK_DISCARD));
     for (int i = 0; i < THUMB_HEIGHT; i++)
     {
 
         unsigned char* dest = static_cast<unsigned char*>(rect.pBits) + (rect.Pitch * i);
         memcpy(dest, Pixels() + (THUMB_WIDTH * (THUMB_HEIGHT - i - 1)), sizeof(unsigned char) * THUMB_WIDTH * 4);
     }
-    R_CHK(pTexture->UnlockRect(0));
+    R_CHK(DX11UnlockRect(pTexture, 0));
 }
 
 ECORE_API EImageThumbnail* CreateThumbnail(LPCSTR src_name, ECustomThumbnail::THMType type, bool bLoad)

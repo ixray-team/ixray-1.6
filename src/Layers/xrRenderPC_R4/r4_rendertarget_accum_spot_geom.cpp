@@ -116,6 +116,7 @@ struct Slice
 	Fvector	m_Vert[4];
 };
 
+#ifndef _EDITOR
 void CRenderTarget::accum_volumetric_geom_create()
 {
 	//u32	dwUsage				= D3DUSAGE_WRITEONLY;
@@ -213,3 +214,5 @@ void CRenderTarget::accum_volumetric_geom_destroy()
 #endif // DEBUG
 	_RELEASE	(g_accum_volumetric_vb);
 }
+
+#endif

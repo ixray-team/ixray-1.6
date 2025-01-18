@@ -112,8 +112,8 @@ void	CBlender_Particle::Compile	(CBlender_Compile& C)
 		break;
 	};
 }
-#else
 
+#else
 void	CBlender_Particle::Compile	(CBlender_Compile& C)
 {
 	IBlender::Compile		(C);

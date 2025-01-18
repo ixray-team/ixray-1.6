@@ -111,15 +111,7 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/tga.*"
     "../../Layers/xrRender/tss_def.*"
     "../../Layers/xrRender/xrRender_console.*"
-    "../../Layers/xrRenderPC_R1/Blender_Blur.*"
-    "../../Layers/xrRenderPC_R1/BlenderDefault.*"
-    "../../Layers/xrRenderPC_R1/Blender_default_aref.*"
-    "../../Layers/xrRenderPC_R1/Blender_LaEmB.*"
-    "../../Layers/xrRenderPC_R1/Blender_Model.*"
-    "../../Layers/xrRenderPC_R1/Blender_Screen_GRAY.*"
-    "../../Layers/xrRenderPC_R1/Blender_Shadow_World.*"
-    "../../Layers/xrRenderPC_R1/Blender_Vertex_aref.*"
-    "../../Layers/xrRenderPC_R1/Blender_Vertex.*"
+    "../../Layers/xrRenderPC_R4/EditorBlenders/*.*"
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_EXT_FILES CONFIGURE_DEPENDS

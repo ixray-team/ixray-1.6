@@ -95,7 +95,9 @@ void	CBlender_Model::Compile	(CBlender_Compile& C)
 		}
 
 		C.r_End();
-	} else {
+	}
+	else 
+	{
 		LPCSTR	vsname		= 0;
 		LPCSTR	psname		= 0;
 		switch (C.iElement)

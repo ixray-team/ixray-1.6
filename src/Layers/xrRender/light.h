@@ -2,13 +2,14 @@
 #define LAYERS_XRRENDER_LIGHT_H_INCLUDED
 
 #include "../../xrCDB/ISpatial.h"
-//#include "../../xrEngine/xr_object.h"
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1
 #	include "light_package.h"
 #	include "light_smapvis.h"
-#endif //(RENDER==R_R2) || (RENDER==R_R4)
+#endif
 
-class	light		:	public IRender_Light, public ISpatial
+class light :	
+	public IRender_Light,
+	public ISpatial
 {
 public:
 	struct {
@@ -39,7 +40,7 @@ public:
 	float			m_volumetric_intensity;
 	float			m_volumetric_distance;
 	bool			b_spatial_move;
-#if (RENDER==R_R2) || (RENDER==R_R4) || defined(_EDITOR)
+#if RENDER!=R_R1
 	float			falloff;			// precalc to make light equal to zero at light range
 	float	        attenuation0;		// Constant attenuation		
 	float	        attenuation1;		// Linear attenuation		
@@ -57,29 +58,34 @@ public:
 	u32				m_xform_frame;
 	Fmatrix			m_xform;
 
-	struct _vis		{
+	struct _vis
+	{
 		u32			frame2test;		// frame the test is sheduled to
 		u32			query_id;		// ID of occlusion query
 		u32			query_order;	// order of occlusion query
 		bool		visible;		// visible/invisible
 		bool		pending;		// test is still pending
 		u16			smap_ID;
-	}				vis;
+	} vis;
 
-	union			_xform	{
-		struct		_D		{
+	union _xform
+	{
+		struct _D	
+		{
 			Fmatrix						combine	;
 			s32							minX,maxX	;
 			s32							minY,maxY	;
 			BOOL						transluent	;
 		}	D;
-		struct		_P		{
+		struct _P	
+		{
 			Fmatrix						world		;
 			Fmatrix						view		;
 			Fmatrix						project		;
 			Fmatrix						combine		;
 		}	P;
-		struct		_S		{
+		struct _S	
+		{
 			Fmatrix						view		;
 			Fmatrix						project		;
 			Fmatrix						combine		;
@@ -88,8 +94,8 @@ public:
 			u32							posY		;
 			BOOL						transluent	;
 		}	S;
-	}	X;
-#endif	//	(RENDER==R_R2) || (RENDER==R_R4)
+	} X;
+#endif	//	RENDER!=R_R1
 
 public:
 #if RENDER!=R_R1
@@ -135,7 +141,7 @@ public:
 	virtual IRender_Light*	dcast_Light		()	{ return this; }
 
 	virtual vis_data&		get_homdata		();
-#if (RENDER==R_R2) || (RENDER==R_R4) || defined(_EDITOR)
+#if RENDER!=R_R1 || defined(_EDITOR)
 	void			xform_calc				();
 #ifndef _EDITOR
 	void			optimize_smap_size		();
@@ -144,7 +150,7 @@ public:
 	void			export_ 					(light_Package& dest);
 	void			set_attenuation_params	(float a0, float a1, float a2, float fo);
 #endif // _EDITOR
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 
 	float			get_LOD					();
 

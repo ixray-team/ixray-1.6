@@ -103,7 +103,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 		R_ASSERT2(texDetailBumpX[0] && xr_strlen(texDetailBumpX), C.L_textures[0].c_str());
 	}
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 	if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0) {
 		string256 hs = "tess", ds = "tess";
 

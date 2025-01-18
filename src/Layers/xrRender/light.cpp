@@ -33,7 +33,7 @@ light::light		(void)	: ISpatial(g_SpatialSpace)
 	ignore_object	= nullptr;
 	for (int f=0; f<6; f++)decor_object[f] = nullptr;
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1 && !defined(_EDITOR)
 	ZeroMemory		(omnipart,sizeof(omnipart));
 	s_spot			= nullptr;
 	s_point			= nullptr;
@@ -46,26 +46,26 @@ light::light		(void)	: ISpatial(g_SpatialSpace)
 	X.S.posX	= 0;
 	X.S.posY	= 0;
 	X.S.size	= SMAP_adapt_max;
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 	b_spatial_move = true;
 	RImplementation.v_all_lights.push_back(this);
 }
 
-light::~light	()
+light::~light()
 {
-#if (RENDER==R_R2) || (RENDER==R_R4)
-	for (int f=0; f<6; f++)	xr_delete(omnipart[f]);
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
-	set_active		(false);
+#if RENDER!=R_R1 && !defined(_EDITOR)
+	for (int f = 0; f < 6; f++)	xr_delete(omnipart[f]);
+#endif // RENDER!=R_R1
+	set_active(false);
 
 	// remove from Lights_LastFrame
-#if (RENDER==R_R2) || (RENDER==R_R4)
-	for (u32 it=0; it<RImplementation.Lights_LastFrame.size(); it++)
-		if (this==RImplementation.Lights_LastFrame[it])	RImplementation.Lights_LastFrame[it]=0;
+#if RENDER!=R_R1 && !defined(_EDITOR)
+	for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
+		if (this == RImplementation.Lights_LastFrame[it])	RImplementation.Lights_LastFrame[it] = 0;
 	m_sectors.clear();
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
-	ignore_object	= nullptr;
-	for (int f=0; f<6; f++)decor_object[f] = nullptr;
+#endif // RENDER!=R_R1
+	ignore_object = nullptr;
+	for (int f = 0; f < 6; f++)decor_object[f] = nullptr;
 
 	RImplementation.v_all_lights.remove(this);
 }
@@ -86,7 +86,7 @@ void light::destroy(bool deffered)
 }
 
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1 && !defined(_EDITOR)
 void light::set_texture		(LPCSTR name)
 {
 	if ((0==name) || (0==name[0]))
@@ -117,7 +117,7 @@ void light::set_texture		(LPCSTR name)
 void light::set_shadow				(bool b)						
 { 
 	flags.bShadow=b;
-#if RENDER!=R_R1
+#if RENDER!=R_R1 && !defined(_EDITOR)
 	if (flags.type==IRender_Light::POINT)
 	{
 		if(flags.bShadow)
@@ -198,6 +198,7 @@ void	light::set_rotation		(const Fvector& D, const Fvector& R)	{
 #if RENDER!=R_R1
 void light::get_sectors()
 {
+#ifndef _EDITOR
 	if(0==spatial.sector)
 		spatial_updatesector();
 
@@ -215,6 +216,8 @@ void light::get_sectors()
 	{
 		m_sectors = std::move(RImplementation.detectSectors_sphere(sector, position, Fvector().set(range, range, range)));
 	}
+#endif
+
 }
 #endif
 
@@ -261,11 +264,11 @@ void	light::spatial_move			()
 	// update spatial DB
 	ISpatial::spatial_move			();
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1 && !defined(_EDITOR)
 	svis.invalidate();
 	xform_calc();
 	get_sectors();
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 }
 
 void light::spatial_updatesector_internal()
@@ -288,7 +291,7 @@ Fvector	light::spatial_sector_point	()
 }
 
 //////////////////////////////////////////////////////////////////////////
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1 && !defined(_EDITOR)
 // Xforms
 void	light::xform_calc			()
 {
@@ -368,7 +371,7 @@ void	light::xform_calc			()
 	}
 }
 
-void	light::optimize_smap_size()
+void light::optimize_smap_size()
 {
 	int _cached_size = X.S.size;
 	X.S.posX	= 0;
@@ -477,7 +480,7 @@ void	light::set_attenuation_params	(float a0, float a1, float a2, float fo)
 	falloff      = fo;
 }
 
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif
 
 float	light::get_LOD					()
 {

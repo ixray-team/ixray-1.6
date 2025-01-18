@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "Blender_Blur.h"
+#include "../../xrRenderPC_R1/Blender_Blur.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

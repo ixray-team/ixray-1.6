@@ -274,7 +274,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
 	//PROF_EVENT("CSkeletonX::_Render");
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 	if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
 		Parent->StoreVisualMatrix(RCache.xforms.m_w);
 
@@ -298,7 +298,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 
 			RCache.set_xform_world	(W);
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 			if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
 				Fmatrix	O; O.mul_43(Parent->mOldWorldMartrix, Parent->LL_GetTransform_R_old(u16(RMS_boneid)));
 				RCache.set_xform_world_old(O);
@@ -319,7 +319,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 			// transfer matrices
 			ref_constant array = RCache.get_c(s_bones_array_const);
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 			ref_constant array_old = RImplementation.phase == RImplementation.PHASE_NORMAL ? RCache.get_c(s_bones_array_const_old) : array;
 #endif // USE_DX11
 			{
@@ -334,7 +334,7 @@ void CSkeletonX::_Render	(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 					RCache.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
 					RCache.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 					if(RImplementation.phase == RImplementation.PHASE_NORMAL) {
 						Fmatrix& O = Parent->LL_GetTransform_R_old(mid);
 						RCache.set_ca(&*array_old, id + 0, O._11, O._21, O._31, O._41);

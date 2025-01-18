@@ -1264,18 +1264,18 @@ int UIMinimapEditorForm::LoadTexture(Element& el, const xr_string texture)
 
 	ID3DTexture2D* pTexture = nullptr;
 	{
-		R_CHK(REDevice->CreateTexture(W, H, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+		R_CHK(DX11CreateTexture(W, H, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, D3DPOOL_MANAGED, &pTexture, 0));
 		el.Texture = pTexture;
 		{
 			D3DLOCKED_RECT rect;
-			R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
+			R_CHK(DX11LockRect(pTexture, 0, &rect, 0, D3DLOCK_DISCARD));
 			for (int i = 0; i < H; i++)
 			{
 
 				unsigned char* dest = static_cast<unsigned char*>(rect.pBits) + (rect.Pitch * i);
 				memcpy(dest, m_ImageData.data() + (W * i), sizeof(unsigned char) * W * 4);
 			}
-			R_CHK(pTexture->UnlockRect(0));
+			R_CHK(DX11UnlockRect(pTexture, 0));
 		}
 	}
 
@@ -1322,19 +1322,19 @@ void UIMinimapEditorForm::LoadBGClick(const xr_string texture)
 		m_TextureRemove = m_BackgroundTexture;
 		ID3DTexture2D* pTexture = nullptr;
 		{
-			R_CHK(REDevice->CreateTexture(m_ImageW, m_ImageH, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+			R_CHK(DX11CreateTexture(m_ImageW, m_ImageH, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, D3DPOOL_MANAGED, &pTexture, 0));
 			m_BackgroundTexture = pTexture;
 
 			{
 				D3DLOCKED_RECT rect;
-				R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
+				R_CHK(DX11LockRect(pTexture, 0, &rect, 0, D3DLOCK_DISCARD));
 				for (int i = 0; i < m_ImageH; i++)
 				{
 
 					unsigned char* dest = static_cast<unsigned char*>(rect.pBits) + (rect.Pitch * i);
 					memcpy(dest, m_ImageData.data() + (m_ImageW * i), sizeof(unsigned char) * m_ImageW * 4);
 				}
-				R_CHK(pTexture->UnlockRect(0));
+				R_CHK(DX11UnlockRect(pTexture, 0));
 			}
 		}
 	}

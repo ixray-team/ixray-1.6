@@ -1,6 +1,8 @@
 #pragma	once
+#include "r__dsgraph_structure.h"
 
-class	smapvis		: public	R_feedback
+class smapvis: 
+	public R_feedback
 {
 public:
 	enum			{

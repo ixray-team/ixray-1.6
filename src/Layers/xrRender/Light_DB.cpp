@@ -181,7 +181,7 @@ void			CLight_DB::add_light		(light* L)
 }
 #endif
 
-#if (RENDER==R_R2) || (RENDER==R_R4)
+#if RENDER!=R_R1
 void			CLight_DB::add_light		(light* L)
 {
 	if (Device.dwFrame==L->frame_render)	return;
@@ -192,7 +192,7 @@ void			CLight_DB::add_light		(light* L)
 
 	L->export_(package);
 }
-#endif // (RENDER==R_R2) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 
 void			CLight_DB::Update			()
 {

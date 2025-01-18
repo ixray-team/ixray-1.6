@@ -194,12 +194,12 @@ namespace ChoseEvents
             }
             else
             {
-                R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, 0));
+                R_CHK(DX11CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, D3DUSAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, D3DPOOL_DEFAULT, &pTexture, 0));
                 Texture = pTexture;
             }
             {
                 D3DLOCKED_RECT rect;
-                R_CHK(pTexture->LockRect(0, &rect, 0, 0));
+                R_CHK(DX11LockRect(pTexture, 0, &rect, 0, 0));
                 u32* dest = nullptr;
                 
                 for (u32 y = 0; y < THUMB_HEIGHT; y++)
@@ -211,7 +211,7 @@ namespace ChoseEvents
                         dest[i] = subst_alpha(dest[i], 0xFF);
                     }
                 }
-                R_CHK(pTexture->UnlockRect(0));
+                R_CHK(DX11UnlockRect(pTexture, 0));
             }
 
         }

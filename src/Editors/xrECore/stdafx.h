@@ -7,6 +7,7 @@
 #include <d3d11shader.h>
 #include "../xrEUI/stdafx.h"
 #include "../../Layers/xrRenderDX9/xrD3DDefs.h"
+#include "../../Layers/xrRender/r__types.h"
 
 #include "../../utils/xrDXT/xrDXT.h"
 
@@ -36,7 +37,8 @@
 
 #define         R_R1    1
 #define         R_R2    2
-#define         RENDER  R_R1
+#define         R_R4    4
+#define         RENDER  R_R4
 #define			REDITOR 1
 
 

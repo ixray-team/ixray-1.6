@@ -134,6 +134,9 @@ void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF,
 	i_cnt			    = _i_cnt;
 	u32 stride = FVF::ComputeVertexSize(FVF);
     dx10BufferUtils::CreateVertexBuffer(&pVB, NULL, v_cnt * stride, false, true);
+    VERIFY(pIB);
+
+    pGeom.create(FVF, pVB, pIB);
 }
 void SPrimitiveBuffer::Destroy()
 {                       

@@ -133,7 +133,7 @@ public:
 	CTexture* t_envmap_1;	// env-1
 };
 
-class	ECORE_API CRender : public IRender_interface
+class ECORE_API CRender : public IRender_interface
 {
 	CRenderTarget* Target;
 	Fmatrix					current_matrix;

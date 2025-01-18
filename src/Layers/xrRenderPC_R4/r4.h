@@ -6,7 +6,10 @@
 #include "../xrRender/PSLibrary.h"
 
 #include "../xrRender/r__types.h"
+
+#ifndef _EDITOR
 #include "r4_rendertarget.h"
+#endif
 
 #include "../xrRender/HOM.h"
 #include "../xrRender/DetailManager.h"
@@ -23,6 +26,9 @@
 
 class dxRender_Visual;
 
+#ifdef _EDITOR
+#include "../../Editors/xrECore/Editor/render.h"
+#else
 // definition
 class CRender	:	public R_dsgraph_structure
 {
@@ -341,5 +347,7 @@ protected:
 private:
 	FS_FileSet						m_file_set;
 };
+
+#endif
 
 extern CRender						RImplementation;
