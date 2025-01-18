@@ -213,16 +213,27 @@ inline HRESULT DX11UnlockRect(
 	return S_OK;
 }
 
-//inline HRESULT DX11Lock(
-//	UINT  OffsetToLock,
-//	UINT  SizeToLock,
-//	void** ppbData,
-//	DWORD Flags
-//)
-//{
-//	D3D11_MAPPED_SUBRESOURCE sb;
-//	HRESULT hr = RContext->Map(pTexture, Level, D3D11_MAP_READ_WRITE, 0, &sb);
-//}
+inline HRESULT DX11Lock(
+	ID3D11Resource* pResource,
+	UINT  OffsetToLock,
+	UINT  SizeToLock,
+	void** ppbData,
+	DWORD Flags
+)
+{
+	D3D11_MAPPED_SUBRESOURCE sb;
+	HRESULT hr = RContext->Map(pResource, 0, D3D11_MAP_READ_WRITE, 0, &sb);
+
+	R_ASSERT(ppbData);
+	*ppbData = sb.pData;
+	return hr;
+}
+
+inline HRESULT DX11Unlock(ID3D11Resource* pResource)
+{
+	RContext->Unmap(pResource, 0);
+	return S_OK;
+}
 
 #ifdef XRECORE_EXPORTS
 inline void not_implemented()

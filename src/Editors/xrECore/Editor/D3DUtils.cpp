@@ -99,6 +99,7 @@ u32 m_ColorSafeRect = 0xffB040B0;
 //void 			 SPrimitiveBuffer::RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices, u32 _i_cnt)
 {
+    // #TODO: MORE ACCURATE BUFFER CREATION
 #if 0
 	IDirect3DVertexBuffer9*	pVB=0;
 	IDirect3DIndexBuffer9*	pIB=0;
@@ -126,16 +127,31 @@ void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF,
 	}
 	pGeom.create		(FVF,pVB,pIB);
 #endif
-    ID3D11Buffer*	pVB = 0;
-    ID3D11Buffer*	pIB = 0;
-    p_cnt			    = _p_cnt;
-	p_type			    = _pt;
-	v_cnt			    = _v_cnt;
-	i_cnt			    = _i_cnt;
-	u32 stride = FVF::ComputeVertexSize(FVF);
-    dx10BufferUtils::CreateVertexBuffer(&pVB, NULL, v_cnt * stride, false, true);
-    VERIFY(pIB);
-
+    ID3DBuffer* pVB = 0;
+    ID3DBuffer* pIB = 0;
+    p_cnt = _p_cnt;
+    p_type = _pt;
+    v_cnt = _v_cnt;
+    i_cnt = _i_cnt;
+    u32 stride = FVF::ComputeVertexSize(FVF);
+    R_CHK(dx10BufferUtils::CreateVertexBuffer(&pVB, NULL, v_cnt * stride, false, true));
+    u8* bytes;
+    R_CHK(DX11Lock(pVB, 0, 0, (LPVOID*)&bytes, 0));
+    FLvertexVec	verts(v_cnt);
+    for (u32 k = 0; k < v_cnt; ++k)
+        verts[k].set(((Fvector*)vertices)[k], 0xFFFFFFFF);
+    Memory.mem_copy(bytes, &*verts.begin(), v_cnt * stride);
+    R_CHK(DX11Unlock(pVB));
+    if (i_cnt) {
+        R_CHK(dx10BufferUtils::CreateIndexBuffer(&pIB, NULL, i_cnt * sizeof(u16), false, true));
+        R_CHK(DX11Lock(pIB, 0, 0, (LPVOID*)&bytes, 0));
+        Memory.mem_copy(bytes, indices, i_cnt * sizeof(u16));
+        R_CHK(DX11Unlock(pIB));
+        OnRender.bind(this, &SPrimitiveBuffer::RenderDIP);
+    }
+    else {
+        OnRender.bind(this, &SPrimitiveBuffer::RenderDP);
+    }
     pGeom.create(FVF, pVB, pIB);
 }
 void SPrimitiveBuffer::Destroy()

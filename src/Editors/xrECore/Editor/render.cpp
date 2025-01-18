@@ -18,6 +18,7 @@
 #include "../../../Layers/xrRender/du_sphere_part.h"
 #include "../../../Layers/xrRender/du_cone.h"
 #include "../../../Layers/xrRender/du_sphere.h"
+#include "../../../Layers/xrRender/ShaderResourceTraits.h"
 
 //---------------------------------------------------------------------------
 float ssaDISCARD = 4.f;

@@ -312,6 +312,36 @@ void	CBlender_Compile::Stage_Texture	(LPCSTR name, u32 ,	u32	 fmin, u32 fmip, u3
 //	i_Address				(Stage(),address);
 	i_Filter				(Stage(),fmin,fmip,fmag);
 }
+#else
+void	CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
+{
+	Stage_Texture(T);
+	Stage_Matrix(M, UVW_channel);
+	Stage_Constant(C);
+}
+
+void	CBlender_Compile::StageTemplate_LMAP0()
+{
+	StageSET_Address(D3DTADDRESS_CLAMP);
+	StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+	StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+	StageSET_TMC("$base1", "$null", "$null", 1);
+}
+
+void	CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32	 fmin, u32 fmip, u32 fmag)
+{
+	sh_list& lst = L_textures;
+	int id = ParseName(name);
+	LPCSTR N = name;
+	if (id >= 0) {
+		if (id >= int(lst.size()))	Debug.fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
+		N = *lst[id];
+	}
+	passTextures.push_back(std::make_pair(Stage(), ref_texture(DEV->_CreateTexture(N))));
+	//	i_Address				(Stage(),address);
+	//i_Filter(Stage(), fmin, fmip, fmag);
+	// TODO DX11 EDITOR
+}
 #endif	//	USE_DX11
 void	CBlender_Compile::Stage_Matrix		(LPCSTR name, int iChannel)
 {

@@ -11,6 +11,10 @@ bool CEditorRenderDevice::MakeScreenshot(U32Vec& pixels, u32 width, u32 height)
 {
 	if (!b_is_Ready) return false;
 
+    R_ASSERT2(0, "Please implement this");
+
+#if 0
+
     // free managed resource
     Resources->Evict();
 
@@ -63,6 +67,8 @@ bool CEditorRenderDevice::MakeScreenshot(U32Vec& pixels, u32 width, u32 height)
     _RELEASE(pFB);
     _RELEASE(pRT);
     _RELEASE(poldRT);
+
+#endif
 
     return true;
 }

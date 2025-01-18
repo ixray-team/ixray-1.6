@@ -166,6 +166,25 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 	C.r_dx10Sampler("smp_base");
 	C.r_dx10Sampler("smp_rtlinear");
 #else //USE_DX11
+
+#ifdef _EDITOR
+	C.r_Pass(vs, ps, FALSE);
+
+	C.r_dx10Texture("s_base", C.L_textures[0].c_str());
+	C.r_dx10Texture("s_bumpX", fnameB);
+	C.r_dx10Texture("s_bump", fnameA);
+	C.r_dx10Texture("s_bumpD", dt);
+	C.r_dx10Texture("s_detail", dt);
+
+	if (bHasDetailBump) {
+		C.r_dx10Texture("s_detailBump", texDetailBump);
+		C.r_dx10Texture("s_detailBumpX", texDetailBumpX);
+	}
+
+	if (lmap) {
+		C.r_dx10Texture("s_hemi", C.L_textures[2].c_str());
+	}
+#else
 	C.r_Pass(vs, ps, FALSE);
 
 	C.r_Sampler_waf("s_base", C.L_textures[0].c_str(), false);
@@ -174,22 +193,24 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 	C.r_Sampler_waf("s_bumpD", dt, false);
 	C.r_Sampler_waf("s_detail", dt, false);
 
-	if(bHasDetailBump) {
+	if (bHasDetailBump) {
 		C.r_Sampler_waf("s_detailBump", texDetailBump, false);
 		C.r_Sampler_waf("s_detailBumpX", texDetailBumpX, false);
 	}
 
-	if(lmap) {
+	if (lmap) {
 		C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str(), false);
 	}
+#endif // _EDITOR
+
 #endif
 
 #ifdef _EDITOR
-	C.r_Sampler_clw("s_material", "shaders\\r2_material");
-	C.r_Sampler("env_s0", "$user$env_s0");
-	C.r_Sampler("env_s1", "$user$env_s1");
-	C.r_Sampler("sky_s0", "$user$sky0");
-	C.r_Sampler("sky_s1", "$user$sky1");
+	C.r_dx10Texture("s_material", "shaders\\r2_material");
+	C.r_dx10Texture("env_s0", "$user$env_s0");
+	C.r_dx10Texture("env_s1", "$user$env_s1");
+	C.r_dx10Texture("sky_s0", "$user$sky0");
+	C.r_dx10Texture("sky_s1", "$user$sky1");
 #endif
 
 	if (!DO_NOT_FINISH) {

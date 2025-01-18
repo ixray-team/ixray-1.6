@@ -11,6 +11,7 @@
 #include "ui_main.h"
 #include "D3DUtils.h"
 #include "render.h"
+#include "../Layers/xrRenderDX10/dx10BufferUtils.h"
 
 #include <FlexibleVertexFormat.h>
 
@@ -46,12 +47,12 @@ void CEditableMesh::GenerateRenderBuffers()
 		int buf_size = FVF::ComputeVertexSize(_S->_FVF()) * rb.dwNumVertex;
 		R_ASSERT2(buf_size, "Empty buffer size or bad FVF.");
 		u8* bytes = 0;
-		IDirect3DVertexBuffer9* pVB = 0;
-		R_CHK(REDevice->CreateVertexBuffer(buf_size, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &pVB, 0));
+		ID3D11Buffer* pVB = 0;
+		R_CHK(dx10BufferUtils::CreateVertexBuffer(&pVB, NULL, buf_size, false, true));
 		rb.pGeom.create(_S->_FVF(), pVB, 0);
-		R_CHK(pVB->Lock(0, 0, (LPVOID*)&bytes, 0));
+		R_CHK(DX11Lock(pVB, 0, 0, (LPVOID*)&bytes, 0));
 		FillRenderBuffer(face_lst, start_face, num_face, _S, bytes);
-		pVB->Unlock();
+		DX11Unlock(pVB);
 
 		start_face += (_S->m_Flags.is(CSurface::sf2Sided)) ? rb.dwNumVertex / 6 : rb.dwNumVertex / 3;
 

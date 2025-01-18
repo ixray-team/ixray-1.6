@@ -70,7 +70,7 @@ void FProgressive::Load		(const char* N, IReader *data, u32 dwFlags)
 void FProgressive::Render	(float LOD)
 {
 	//PROF_EVENT("FProgressive::Render");
-#if RENDER!=R_R1
+#if RENDER!=R_R1 && !_EDITOR
 	if (m_fast && RImplementation.phase==CRender::PHASE_SMAP)
 	{
 		int lod_id			= iFloor((1.f-clampr(LOD,0.f,1.f))*float(xSWI->count-1)+0.5f);
