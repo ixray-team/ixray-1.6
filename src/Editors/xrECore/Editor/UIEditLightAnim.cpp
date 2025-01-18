@@ -19,10 +19,12 @@ UIEditLightAnim::UIEditLightAnim()
 	m_Texture = nullptr;
 	m_PointerWeight = -1;
 	m_PointerResize = true;
-	m_PointerTexture = nullptr;
+	m_PointerTexture = new CTexture;
 	m_PointerValue = 0;
 	m_RenderAlpha = false;
-	R_CHK(DX11CreateTexture(32, 32, 1, D3D11_USAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM, 0, &m_ItemTexture, 0));
+	ID3D11Texture2D* surf = nullptr;
+	R_CHK(DX11CreateTexture(32, 32, 1, D3D11_USAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM, 0, &surf, 0));
+	m_ItemTexture->surface_set(surf);
 
 	m_Items->SetOnItemCreaetEvent(xr_make_delegate(this, &UIEditLightAnim::OnCreateItem));
 	m_Items->SetOnItemRemoveEvent(xr_make_delegate(this, &UIEditLightAnim::OnRemoveItem));
@@ -46,9 +48,9 @@ UIEditLightAnim::~UIEditLightAnim()
 			LALib.Reload();
 		}
 	}
-	m_ItemTexture->Release();
-	if (m_PointerTexture) { m_PointerTexture->Release(); xr_delete(m_PointerRawImage); }
-	if (m_Texture) { m_Texture->Release(); }
+	m_ItemTexture->Unload();
+	if (m_PointerTexture) { m_PointerTexture->Unload(); xr_delete(m_PointerRawImage); }
+	if (m_Texture) { m_Texture->Unload(); }
 	m_TextureNull.destroy();
 	xr_delete(m_Props);
 	xr_delete(m_Items);
@@ -123,7 +125,7 @@ void UIEditLightAnim::Draw()
 
 				}
 				RenderPointer();
-				ImGui::Image(m_PointerTexture, ImVec2(m_PointerWeight,POINTER_HEIGHT));
+				ImGui::Image(m_PointerTexture->get_SRView(), ImVec2(m_PointerWeight, POINTER_HEIGHT));
 			}
 			m_Props->Draw();
 		}
@@ -249,7 +251,7 @@ void UIEditLightAnim::Draw()
 	   
 			RenderItem();
 		}
-		ImGui::Image(m_CurrentItem?m_ItemTexture:m_TextureNull->pSurface, ImGui::CalcItemSize(ImVec2(-1,-1), 32, 32));
+		ImGui::Image(m_CurrentItem?m_ItemTexture->get_SRView() : m_TextureNull->get_SRView(), ImGui::CalcItemSize(ImVec2(-1, -1), 32, 32));
 		if (!IsDocked)
 			IsDocked = ImGui::IsWindowDocked();
 		if (!IsFocused)
@@ -333,7 +335,7 @@ void UIEditLightAnim::RenderItem()
 	}
 	{
 		D3DLOCKED_RECT rect;
-		R_CHK(DX11LockRect(m_ItemTexture, 0, &rect, 0, 0));
+		R_CHK(DX11LockRect(m_ItemTexture->pSurface, 0, &rect, 0, 0));
 		u32* dest = nullptr;
 
 		for (u32 y = 0; y < 32; y++)
@@ -344,7 +346,7 @@ void UIEditLightAnim::RenderItem()
 				dest[i] = Color;
 			}
 		}
-		R_CHK(DX11UnlockRect(m_ItemTexture, 0));
+		R_CHK(DX11UnlockRect(m_ItemTexture->pSurface, 0));
 	}
 }
 
@@ -430,9 +432,9 @@ void UIEditLightAnim::RenderPointer()
 	if (m_PointerResize)
 	{
 		if (m_PointerTexture) {
-			m_PointerTexture->Release(); xr_delete(m_PointerRawImage);
+			m_PointerTexture->Unload(); xr_delete(m_PointerRawImage);
 		}
-		R_CHK(DX11CreateTexture(m_PointerWeight, POINTER_HEIGHT, 1, D3D11_USAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM, 0, &m_PointerTexture, 0));
+		R_CHK(DX11CreateTexture(m_PointerWeight, POINTER_HEIGHT, 1, D3D11_USAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM, 0, (ID3D11Texture2D**)&m_PointerTexture->pSurface, 0));
 		m_PointerRawImage = xr_alloc<u32>(POINTER_HEIGHT* m_PointerWeight);
 	}
 	for (int x = 0; x < m_PointerWeight; x++)
@@ -529,7 +531,7 @@ void UIEditLightAnim::RenderPointer()
 	}
 	{
 		D3DLOCKED_RECT rect;
-		R_CHK(DX11LockRect(m_PointerTexture, 0, &rect, 0, 0));
+		R_CHK(DX11LockRect(m_PointerTexture->pSurface, 0, &rect, 0, 0));
 		u32* dest = nullptr;
 
 		for (u32 y = 0; y < POINTER_HEIGHT; y++)
@@ -540,7 +542,7 @@ void UIEditLightAnim::RenderPointer()
 				dest[i] = m_PointerRawImage[y * int(m_PointerWeight) + i];
 			}
 		}
-		R_CHK(DX11UnlockRect(m_PointerTexture, 0));
+		R_CHK(DX11UnlockRect(m_PointerTexture->pSurface, 0));
 	}
 	
 }

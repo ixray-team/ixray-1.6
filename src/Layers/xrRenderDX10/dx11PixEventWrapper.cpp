@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <d3d11_1.h>
 
 #include "../xrRender/Debug/dxPixEventWrapper.h"
 

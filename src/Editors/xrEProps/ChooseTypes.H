@@ -21,7 +21,8 @@ typedef xr_delegate<void(SChooseItem*, PropItemVec&)>	TOnChooseSelectItem;
 typedef xr_delegate<void(LPCSTR, HDC, const Irect&)> 	TOnDrawThumbnail;
 typedef xr_delegate<void()>						   	TOnChooseClose;
 
-using TGetTexture = xr_delegate<void(LPCSTR, ImTextureID&)>;
+class ID3D11Texture2D;
+using TGetTexture = xr_delegate<void(LPCSTR, ID3D11Texture2D*&)>;
 
 typedef void (*TOnChooseFillEvents)();
 

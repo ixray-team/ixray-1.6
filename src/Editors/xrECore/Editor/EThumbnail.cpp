@@ -47,7 +47,7 @@ void EImageThumbnail::CreatePixels(u32* p, u32 w, u32 h)
     DXTUtils::Filter::Process(m_Pixels.data(), THUMB_WIDTH, THUMB_HEIGHT, p, w, h, DXTUtils::Filter::imf_mitchell);
 }
 
-void EImageThumbnail::Update(ImTextureID& Texture)
+void EImageThumbnail::Update(ID3DTexture2D*& Texture)
 {
     if (m_Pixels.size() == 0)
     {

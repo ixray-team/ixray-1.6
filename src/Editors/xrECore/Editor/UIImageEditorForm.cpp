@@ -9,7 +9,7 @@ UIImageEditorForm::UIImageEditorForm()
 	m_ItemList = new UIItemListForm();
 	m_ItemList->SetOnItemFocusedEvent(TOnILItemFocused(this,&UIImageEditorForm::OnItemsFocused));
 	m_ItemList->SetOnItemRemoveEvent(TOnItemRemove(&ImageLib, &CImageManager::RemoveTexture));
-	m_Texture = nullptr;
+	m_Texture = new CTexture;
 	m_bFilterImage = true;
 	m_bFilterCube = true;
 	m_bFilterBump = true;
@@ -21,7 +21,9 @@ UIImageEditorForm::UIImageEditorForm()
 
 UIImageEditorForm::~UIImageEditorForm()
 {
-	if (m_Texture)m_Texture->Release();
+	if (m_Texture)
+		m_Texture->Unload();
+
 	xr_delete(m_ItemList);
 	xr_delete(m_ItemProps);
 }
@@ -39,7 +41,7 @@ void UIImageEditorForm::Draw()
 
 	if (m_TextureRemove)
 	{
-		m_TextureRemove->Release();
+		m_TextureRemove->Unload();
 		m_TextureRemove = nullptr;
 	}
 
@@ -106,9 +108,9 @@ void UIImageEditorForm::Draw()
 			if (m_Texture == nullptr)
 			{
 				u32 mem = 0;
-				m_Texture = RImplementation.texture_load("ed\\ed_nodata", mem);
+				m_Texture->surface_set(RImplementation.texture_load("ed\\ed_nodata", mem));
 			}
-			ImGui::Image(m_Texture, ImVec2(128, 128));
+			ImGui::Image(m_Texture->get_SRView(), ImVec2(128, 128));
 			m_ItemProps->Draw();
 
 			if (!IsDocked)
@@ -398,8 +400,9 @@ void UIImageEditorForm::OnItemsFocused(ListItem* item)
 			ButtonValue* B = PHelper().CreateButton(props, "CubeMap\\Edit", "Make Small", 0);
 			B->OnBtnClickEvent.bind(this, &UIImageEditorForm::OnCubeMapBtnClick);
 		}
-
-		thm->Update(m_Texture);
+		ID3D11Texture2D* Tex = nullptr;
+		thm->Update(Tex);
+		m_Texture->surface_set(Tex);
 	}
 
 	m_ItemProps->AssignItems(props);

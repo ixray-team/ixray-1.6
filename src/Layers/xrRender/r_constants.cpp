@@ -16,12 +16,12 @@
 // pool
 //.static	poolSS<R_constant,512>			g_constant_allocator;
 
-//R_constant_table::~R_constant_table	()	{	dxRenderDeviceRender::Instance().Resources->_DeleteConstantTable(this);	}
+//R_constant_table::~R_constant_table	()	{	DEV->_DeleteConstantTable(this);	}
 
 
 R_constant_table::~R_constant_table	()	
 {	
-	//dxRenderDeviceRender::Instance().Resources->_DeleteConstantTable(this);	
+	//DEV->_DeleteConstantTable(this);	
 	DEV->_DeleteConstantTable(this);
 }
 

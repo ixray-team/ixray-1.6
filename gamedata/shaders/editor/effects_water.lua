@@ -16,17 +16,17 @@ function normal(shader, t_base, t_second, t_detail)
         :zb(true, false)
         :fog(true)
 
-    shader:sampler("s_base"):texture(tex_base)
-    shader:sampler("s_nmap"):texture(tex_nmap)
+    shader:dx10sampler("s_base",tex_base)
+    shader:dx10sampler("s_nmap",tex_nmap)
 
-    shader:sampler("s_env0"):texture(tex_env0)
-    shader:sampler("s_env1"):texture(tex_env1)
+    shader:dx10sampler("s_env0",tex_env0)
+    shader:dx10sampler("s_env1",tex_env1)
 
-    shader:sampler("env_s0"):texture("$user$env_s0")
-    shader:sampler("env_s1"):texture("$user$env_s1")
+    shader:dx10sampler("env_s0","$user$env_s0")
+    shader:dx10sampler("env_s1","$user$env_s1")
 
-    shader:sampler("s_image"):texture("$user$rt_color")
-    shader:sampler("s_caustic"):texture(tex_caustic)
+    shader:dx10sampler("s_image","$user$rt_color")
+    shader:dx10sampler("s_caustic",tex_caustic)
 	
-    shader:sampler("s_env"):texture(tex_env)
+    shader:dx10sampler("s_env",tex_env)
 end

@@ -49,9 +49,9 @@ Shader* CXMLBlend::Compile(const char* Texture)
 
 		if (pElement)
 		{
-			dxRenderDeviceRender::Instance().Resources->_ParseList(pCompiler->L_textures, Texture);
+			DEV->_ParseList(pCompiler->L_textures, Texture);
 			pCompiler->iElement = Iter;
-			pCompiler->bDetail = bUseDetail ? dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(pCompiler->L_textures[0], pCompiler->detail_texture, pCompiler->detail_scaler) : false;
+			pCompiler->bDetail = bUseDetail ? DEV->m_textures_description.GetDetailTexture(pCompiler->L_textures[0], pCompiler->detail_texture, pCompiler->detail_scaler) : false;
 
 			pShader->E[Iter] = MakeShader(Texture, pElement);
 		}

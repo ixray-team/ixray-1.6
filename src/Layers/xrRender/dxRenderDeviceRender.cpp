@@ -344,14 +344,14 @@ void dxRenderDeviceRender::ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32
 void dxRenderDeviceRender::ResourcesStoreNecessaryTextures()
 {
 #ifndef _EDITOR
-	dxRenderDeviceRender::Instance().Resources->StoreNecessaryTextures();
+	DEV->StoreNecessaryTextures();
 #endif
 }
 
 void dxRenderDeviceRender::ResourcesDumpMemoryUsage()
 {
 #ifndef _EDITOR
-	dxRenderDeviceRender::Instance().Resources->_DumpMemoryUsage();
+	DEV->_DumpMemoryUsage();
 #endif
 }
 

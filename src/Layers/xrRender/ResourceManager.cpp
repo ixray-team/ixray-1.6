@@ -12,7 +12,7 @@
 #include <execution>
 #include "../xrRenderDX10/dx11XMLBlendCompiler.h"
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 #include "../xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #endif
 //	Already defined in Texture.cpp
@@ -365,7 +365,7 @@ void CResourceManager::DeferredUpload()
 		}
 	}
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 	FluidManager.Initialize(70, 70, 70);
 	FluidManager.SetScreenSize((u32)RCache.get_width(), (u32)RCache.get_height());
 #endif
@@ -376,7 +376,7 @@ void CResourceManager::DeferredUnload()
 	if (!RDEVICE.b_is_Ready)
 		return;
 
-#ifdef USE_DX11
+#if defined(USE_DX11) && !defined(_EDITOR)
 	FluidManager.Destroy();
 #endif
 

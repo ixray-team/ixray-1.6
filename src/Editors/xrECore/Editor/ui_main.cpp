@@ -335,6 +335,7 @@ void TUI::PrepareRedraw()
 	VERIFY(m_bReady);
 	if (m_Flags.is(flResize)) 			RealResize();
 // set render state
+#if 0
 	EDevice->SetRS(D3DRS_TEXTUREFACTOR,	0xffffffff);
 	// fog
 	u32 fog_color;
@@ -369,7 +370,7 @@ void TUI::PrepareRedraw()
 
 	EDevice->SetRS			(D3DRS_FILLMODE, EDevice->dwFillMode);
 	EDevice->SetRS			(D3DRS_SHADEMODE,EDevice->dwShadeMode);
-
+#endif
 	RCache.set_xform_world	(Fidentity);
 }
 
@@ -415,9 +416,9 @@ void TUI::Redraw()
 				RTNormal.create("$user$normal", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_R16G16B16A16_FLOAT);
 				RTDiffuse.create("$user$diffuse", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
 
-				RT.create("$user$rt_color", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
-				View.RTFreez.create(("$user$rt_freez" + xr_string::ToString((u32)UI->ViewID)).c_str(), GetRenderWidth() * EDevice->m_ScreenQuality, GetRenderHeight() * EDevice->m_ScreenQuality, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
-				RTCopy.create("$user$rt_color_copy", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM);
+				RT.create("$user$rt_color", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_B8G8R8X8_UNORM);
+				View.RTFreez.create(("$user$rt_freez" + xr_string::ToString((u32)UI->ViewID)).c_str(), GetRenderWidth() * EDevice->m_ScreenQuality, GetRenderHeight() * EDevice->m_ScreenQuality, DxgiFormat::DXGI_FORMAT_B8G8R8X8_UNORM);
+				RTCopy.create("$user$rt_color_copy", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_B8G8R8X8_UNORM);
 
 				// TODO FORSERX
 				ZB.create("$user$rt_depth", GetRenderWidth(), GetRenderHeight(), DxgiFormat::DXGI_FORMAT_R24G8_TYPELESS);
@@ -456,32 +457,28 @@ void TUI::Redraw()
 			{
 				m_Flags.set(flRedraw, FALSE);
 
-				RCache.set_RT(RTNormal->pRT, 0);
-				RCache.set_RT(RTDiffuse->pRT, 1);
-				RCache.set_RT(RTPostion->pRT, 2);
-
-				RCache.set_ZB(0);
-
-				float ClearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
-				RContext->ClearRenderTargetView(RSwapchainTarget, ClearColor);
-
 				// TODO TO FORSERX
-				//CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_TARGET, 0x0, 1, 0));
+				FLOAT ColorRGBA[4] = { 0.0f,0.0f,0.0f,1 };
+				RContext->ClearRenderTargetView(RTNormal->pRT, ColorRGBA);
+				RContext->ClearRenderTargetView(RTDiffuse->pRT, ColorRGBA);
+				RContext->ClearRenderTargetView(RTPostion->pRT, ColorRGBA);
+				RContext->ClearRenderTargetView(RT->pRT, ColorRGBA);
 
-				RCache.set_RT(RT->pRT);
-				RCache.set_ZB(RDepth);
-
+				RCache.set_RT(RT->pRT, 0);
+				RCache.set_ZB(ZB->pZRT);
+				
 				EDevice->Clear();
-
+				
+				RCache.set_RT(RT->pRT, 0);
 				RCache.set_RT(RTDiffuse->pRT, 1);
 				RCache.set_RT(RTNormal->pRT, 2);
 				RCache.set_RT(RTPostion->pRT, 3);
-
+				
 				RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 				//EDevice->Statistic->RenderDUMP_RT.Begin();
 				EDevice->UpdateView();
 				EDevice->ResetMaterial();
-
+				
 				Tools->RenderEnvironment();
 
 				//. temporary reset filter (      )
@@ -516,20 +513,20 @@ void TUI::Redraw()
 					ELog.DlgMsg(mtError, "Please notify AlexMX!!! Critical error has occured in render routine!!! [Type B]");
 				}
 #endif
-				// draw selection rect
+				 //draw selection rect
 				if (m_SelectionRect) 	DU_impl.DrawSelectionRect(m_SelStart, m_SelEnd);
-
+				
 				// draw axis
 				if (psDeviceFlags.test(rsDrawAxis) && !psDeviceFlags.test(rsDisableAxisCube))
 				DU_impl.DrawAxis(UI->CurrentView().m_Camera.GetTransform());
-
-
+				
+				
 				EDevice->Statistic->RenderDUMP_RT.End();
 				EDevice->Statistic->Show();
 				EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
-
+				
 				g_FontManager->Render();
-
+				
 				EDevice->SetRS(D3DRS_FILLMODE, EDevice->dwFillMode);
 				EDevice->seqRender.Process(rp_Render);
 
@@ -542,8 +539,6 @@ void TUI::Redraw()
 				RCache.set_RT(0, 2);
 				RCache.set_RT(0, 3);
 
-				RCache.set_RT(RSwapchainTarget);
-				RCache.set_ZB(RDepth);
 
 				// TODO DX11 EDITOR !!!
 				/*
@@ -561,13 +556,16 @@ void TUI::Redraw()
 				EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
 				g_bRendering = FALSE;
 				// 
-				 //RCache.set_RT(RSwapchainTarget);
+				ID3D11RenderTargetView* RTV = RSwapchainTarget;
 				 //  Draw(); 
 				   // end draw
 				UI->BeginFrame();
 
 				Draw();
 
+				ImGui::Render();
+
+				RContext->OMSetRenderTargets(1, &RTV, 0);
 				UI->EndFrame();
 				EDevice->End();
 			}
@@ -617,7 +615,7 @@ void TUI::OnFrame()
 	SndLib->OnFrame		();
 	// tools on frame
 	if (m_Flags.is(flUpdateScene)) RealUpdateScene();
-	Tools->OnFrame		();
+	//Tools->OnFrame		();
 
 	// show hint
 	ResetBreak			();
@@ -841,8 +839,8 @@ void TUI::OnDrawUI()
 	UISoundEditorForm::Update();
 	UIMinimapEditorForm::Update();
 	UIIconPicker::Update();
-	UILogForm::Update();
-	EDevice->seqDrawUI.Process(rp_DrawUI);
+	//UILogForm::Update();
+	//EDevice->seqDrawUI.Process(rp_DrawUI);
 }
 
 void TUI::RealResetUI()

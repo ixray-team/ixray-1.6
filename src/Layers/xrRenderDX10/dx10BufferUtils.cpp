@@ -12,7 +12,7 @@ HRESULT	IC CreateBuffer( ID3DBuffer** ppBuffer, const void* pData, UINT DataSize
 	desc.Usage = bDynamic ? D3D_USAGE_DYNAMIC : D3D_USAGE_DEFAULT;
 	desc.BindFlags = bIndexBuffer ? D3D_BIND_INDEX_BUFFER : D3D_BIND_VERTEX_BUFFER;
 	//desc.CPUAccessFlags = 0;
-	desc.CPUAccessFlags = (bDynamic) ? D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ : 0;
+	desc.CPUAccessFlags = (bDynamic) ? D3D11_CPU_ACCESS_WRITE : 0;
 	desc.MiscFlags = 0;
 
 	D3D_SUBRESOURCE_DATA subData;

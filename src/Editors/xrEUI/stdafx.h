@@ -1,6 +1,6 @@
 #pragma once
 #include <d3d11.h>
-using ImTextureID = ID3D11Resource*;
+using ImTextureID = ID3D11ShaderResourceView*;
 #define ImTextureID ImTextureID 
 
 #ifdef XREUI_EXPORTS

@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef _EDITOR
-#	define DEV dxRenderDeviceRender::Instance().Resources
+#	define DEV DEV
 #else
 #	define DEV EDevice->Resources
 #endif

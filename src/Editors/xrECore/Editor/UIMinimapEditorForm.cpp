@@ -22,9 +22,9 @@ UIMinimapEditorForm::UIMinimapEditorForm()
 UIMinimapEditorForm::~UIMinimapEditorForm()
 {
 	for (auto& element : elements)
-		if (element.Texture) element.Texture->Release();
+		if (element.Texture) element.Texture->Unload();
 
-	if (m_BackgroundTexture)m_BackgroundTexture->Release();
+	if (m_BackgroundTexture)m_BackgroundTexture->Unload();
 	selectedElement = nullptr;
 
 	elements.clear();
@@ -125,7 +125,7 @@ void UIMinimapEditorForm::RenderCanvas()
 	}
 
 	ImVec2 bg_display_size(m_BackgroundRenderSize.x * m_Zoom, m_BackgroundRenderSize.y * m_Zoom);
-	ImGui::GetWindowDrawList()->AddImage(m_BackgroundTexture, canvas_p0 + m_BackgroundPosition, canvas_p0 + m_BackgroundPosition + bg_display_size);
+	ImGui::GetWindowDrawList()->AddImage(m_BackgroundTexture->get_SRView(), canvas_p0 + m_BackgroundPosition, canvas_p0 + m_BackgroundPosition + bg_display_size);
 
 	
 	for (int i = 0; i < elements.size(); i++) {
@@ -139,7 +139,7 @@ void UIMinimapEditorForm::RenderCanvas()
 		element_screen_size *= m_Zoom;
 		float handle_size = 5.0f * m_Zoom;
 
-		ImGui::GetWindowDrawList()->AddImage(element.Texture, element_screen_pos, element_screen_pos + element_screen_size, ImVec2(0,0), ImVec2(1, 1), IM_COL32(255, 255, 255, m_ItemsOpacity));
+		ImGui::GetWindowDrawList()->AddImage(element.Texture->get_SRView(), element_screen_pos, element_screen_pos + element_screen_size, ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, m_ItemsOpacity));
 
 		if (element.EdSelected || m_AlwaysDrawBorder)
 		{
@@ -426,7 +426,7 @@ void UIMinimapEditorForm::RenderBoundCanvas()
 	}
 
 	ImVec2 bg_display_size(selectedElement->FileSize.x * m_BZoom, selectedElement->FileSize.y * m_BZoom);
-	ImGui::GetWindowDrawList()->AddImage(selectedElement->Texture, canvas_p0 + m_BoundBackgroundPosition, canvas_p0 + m_BoundBackgroundPosition + bg_display_size);
+	ImGui::GetWindowDrawList()->AddImage(selectedElement->Texture->get_SRView(), canvas_p0 + m_BoundBackgroundPosition, canvas_p0 + m_BoundBackgroundPosition + bg_display_size);
 
 
 	ImVec2 element_screen_pos = canvas_p0 + m_BoundBackgroundPosition;
@@ -713,7 +713,8 @@ void UIMinimapEditorForm::CreateElementPopup()
 			if (LoadTexture(el_new, p) != 0)
 			{
 				u32 mem = 0;
-				el_new.Texture = RImplementation.texture_load("ed\\ed_nodata", mem);
+				el_new.Texture = EDevice->Resources->_CreateTexture("ed\\ed_nodata");
+				el_new.Texture->Load();
 				el_new.FileSize = ImVec2(512,512);
 			}
 			el_new.RenderSize = ImVec2(512, 512);
@@ -733,7 +734,7 @@ void UIMinimapEditorForm::CreateElementPopup()
 			CreatingData.TexturePath.clear();
 			CreatingData.name.clear();
 			if (CreatingData.Texture)
-				CreatingData.Texture->Release();
+				CreatingData.Texture->Unload();
 			CreatingData.Texture = nullptr;
 		}
 
@@ -901,7 +902,7 @@ void UIMinimapEditorForm::ShowMenu()
 			for (; it != elements.end(); ++it) {
 				if (&(*it) == selectedElement) {
 					if (it->Texture)
-						it->Texture->Release();
+						it->Texture->Unload();
 					it->Texture = nullptr;
 
 					elements.erase(it);
@@ -1140,13 +1141,13 @@ void UIMinimapEditorForm::Draw()
 {
 	if (m_TextureRemove)
 	{
-		m_TextureRemove->Release();
+		m_TextureRemove->Unload();
 		m_TextureRemove = nullptr;
 	}
 	if (m_BackgroundTexture == nullptr)
 	{
 		u32 mem = 0;
-		m_BackgroundTexture = RImplementation.texture_load("ui\\ui_nomap", mem);
+		m_BackgroundTexture = EDevice->Resources->_CreateTexture("ui\\ui_nomap");
 		m_BackgroundTexturePath = "ui\\ui_nomap";
 		m_BackgroundSize.x = 512;
 		m_BackgroundSize.y = 512;
@@ -1250,7 +1251,7 @@ int UIMinimapEditorForm::LoadTexture(Element& el, const xr_string texture)
 	}
 
 	if (el.Texture)
-		el.Texture->Release();
+		el.Texture->Unload();
 	el.Texture = nullptr;
 
 	if (texture == "")
@@ -1265,7 +1266,9 @@ int UIMinimapEditorForm::LoadTexture(Element& el, const xr_string texture)
 	ID3DTexture2D* pTexture = nullptr;
 	{
 		R_CHK(DX11CreateTexture(W, H, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, D3DPOOL_MANAGED, &pTexture, 0));
-		el.Texture = pTexture;
+		el.Texture = new CTexture();
+		el.Texture->surface_set(pTexture);
+
 		{
 			D3DLOCKED_RECT rect;
 			R_CHK(DX11LockRect(pTexture, 0, &rect, 0, D3DLOCK_DISCARD));
@@ -1323,7 +1326,8 @@ void UIMinimapEditorForm::LoadBGClick(const xr_string texture)
 		ID3DTexture2D* pTexture = nullptr;
 		{
 			R_CHK(DX11CreateTexture(m_ImageW, m_ImageH, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, D3DPOOL_MANAGED, &pTexture, 0));
-			m_BackgroundTexture = pTexture;
+			m_BackgroundTexture = new CTexture();
+			m_BackgroundTexture->surface_set(pTexture);
 
 			{
 				D3DLOCKED_RECT rect;

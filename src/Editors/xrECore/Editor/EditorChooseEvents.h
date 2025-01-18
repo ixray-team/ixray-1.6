@@ -77,7 +77,7 @@ namespace ChoseEvents
         if (thm->Valid()) thm->FillInfo(info_items);
         xr_delete(thm);
     }
-    void   UpdateObjectTHM(LPCSTR name, ImTextureID&ID)
+    void   UpdateObjectTHM(LPCSTR name, ID3D11Texture2D*&ID)
     {
         EObjectThumbnail* thm = new EObjectThumbnail(name);
         if (thm->Valid())
@@ -107,7 +107,7 @@ namespace ChoseEvents
         if (thm->Valid()) thm->FillInfo(info_items);
         xr_delete(thm);
     }
-    void   UpdateGroupTHM(LPCSTR name, ImTextureID& ID)
+    void   UpdateGroupTHM(LPCSTR name, ID3DTexture2D*& ID)
     {
         EGroupThumbnail* thm = new EGroupThumbnail(name);
         if (thm->Valid())
@@ -180,7 +180,7 @@ namespace ChoseEvents
         LAItemIt _E = lst.end();
         for (; it != _E; it++)			items.push_back(SChooseItem(*(*it)->cName, ""));
     }
-    void   UpdateLAnim(LPCSTR name, ImTextureID& Texture)
+    void   UpdateLAnim(LPCSTR name, ID3DTexture2D*& Texture)
     {
         int frame;
         CLAItem* item = LALib.FindItem(name);
@@ -298,7 +298,7 @@ namespace ChoseEvents
         }
     }
 
-    void   UpdateTextureTHM(LPCSTR name, ImTextureID&Texture)
+    void   UpdateTextureTHM(LPCSTR name, ID3DTexture2D*&Texture)
     {
         if (name && name[0]) {
             ETextureThumbnail* thm = new ETextureThumbnail(name);
@@ -318,7 +318,7 @@ namespace ChoseEvents
         }
     }
 
-    void   UpdateTextureTHMRaw(LPCSTR name, ImTextureID& ID)
+    void   UpdateTextureTHMRaw(LPCSTR name, ID3DTexture2D*& ID)
     {
         if (name && name[0]) {
             ETextureThumbnail* thm = new ETextureThumbnail(name);

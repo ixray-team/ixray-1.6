@@ -11,7 +11,7 @@ uniform float4x4 L_dynamic_xform;
 
 uniform float4x4 m_plmap_xform;
 uniform float4 m_plmap_clamp[2]; // 0.w = factor
-uniform sampler s_material;
+uniform Texture3D s_material;
 
 #define def_aref 0.5f
 #define def_gloss 0.04f
@@ -19,6 +19,12 @@ uniform sampler s_material;
 #ifndef xmaterial
 #define xmaterial 0.25f
 #endif
+
+sampler smp_nofilter; //	Use D3DTADDRESS_CLAMP,	D3DTEXF_POINT,			D3DTEXF_NONE,	D3DTEXF_POINT
+sampler smp_rtlinear; //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
+sampler smp_linear; //	Use	D3DTADDRESS_WRAP,	D3DTEXF_LINEAR,			D3DTEXF_LINEAR,	D3DTEXF_LINEAR
+sampler smp_base; //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
+sampler smp_material;
 
 uniform float4 is_lighting_enable;
 
@@ -114,6 +120,27 @@ struct v_vert
     float2 uv : TEXCOORD0; // (u0,v0)
 };
 
+struct v2p_TL
+{
+    float2 Tex0 : TEXCOORD0;
+    float4 Color : COLOR;
+    float4 HPos : SV_POSITION; // Clip-space position 	(for rasterization)
+};
+
+struct v_TL
+{
+    float4 P : POSITION;
+    float2 Tex0 : TEXCOORD0;
+    float4 Color : COLOR;
+};
+
+struct p_TL
+{
+    float2 Tex0 : TEXCOORD0;
+    float4 Color : COLOR;
+    //	float4 	HPos	: SV_POSITION;	// Clip-space position 	(for rasterization)
+};
+
 struct v_editor
 {
     float4 P : POSITION;
@@ -166,12 +193,12 @@ struct p_bumped_new
     float3 M3 : TEXCOORD4; // nmap 2 eye - 3
 };
 
-uniform sampler2D s_base;
-uniform samplerCUBE s_env;
-uniform sampler2D s_lmap;
-uniform sampler2D s_hemi;
-uniform sampler2D s_att;
-uniform sampler2D s_detail;
+uniform Texture2D s_base;
+uniform TextureCube s_env;
+uniform Texture2D s_lmap;
+uniform Texture2D s_hemi;
+uniform Texture2D s_att;
+uniform Texture2D s_detail;
 
 #define def_distort float(0.05f) // we get -0.5 .. 0.5 range, this is -512 .. 512 for 1024, so scale it
 
@@ -197,10 +224,8 @@ float3 v_sun_wrap(float3 n, float w)
 
 float3 p_hemi(float2 tc)
 {
-    // float3	t_lmh 	= tex2D		(s_hemi, tc);
-    // return  dot	(t_lmh,1.h/3.h);
-    float4 t_lmh = tex2D(s_hemi, tc);
-    return t_lmh.a;
+    float4 t_lmh = s_hemi.Sample(smp_rtlinear, tc);
+    return t_lmh.w;
 }
 
 struct f_editor_gbuffer

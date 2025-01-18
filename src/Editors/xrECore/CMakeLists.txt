@@ -104,8 +104,11 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/Shader.*"
     "../../Layers/xrRender/SH_Atomic.*"
     "../../Layers/xrRender/SH_Constant.*"
+    "../../Layers/xrRender/Utils/*.*"
     "../../Layers/xrRender/SH_Matrix.*"
+    "../../Layers/xrRenderDX10/dx10r_constants*.*"
     "../../Layers/xrRenderDX10/dx11SH_RT.*"
+    "../../Layers/xrRenderDX10/dx11XMLBlendCompiler.*"
     "../../Layers/xrRenderDX10/dx11SH_Texture.*"
     "../../Layers/xrRender/SkeletonAnimated.*"
     "../../Layers/xrRender/SkeletonCustom.*"
@@ -113,11 +116,13 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
     "../../Layers/xrRender/SkeletonX.*"
     "../../Layers/xrRender/stats_manager.*"
     "../../Layers/xrRenderDX10/dx11Texture.*"
+    "../../Layers/xrRenderDX10/dx11PixEventWrapper.*"
     "../../Layers/xrRender/TextureDescrManager.*"
     "../../Layers/xrRender/tga.*"
     "../../Layers/xrRender/tss_def.*"
     "../../Layers/xrRender/xrRender_console.*"
     "../../Layers/xrRenderPC_R4/EditorBlenders/*.*"
+    "../../Layers/xrRenderPC_R4/R_Backend_LOD.cpp"
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_EXT_FILES CONFIGURE_DEPENDS
@@ -183,6 +188,7 @@ target_link_libraries(xrECore PUBLIC MagicFM)
 target_link_libraries(xrECore PUBLIC NvMender2003)
 target_link_libraries(xrECore PUBLIC "d3d11.lib")
 target_link_libraries(xrECore PUBLIC "d3dcompiler.lib")
+target_link_libraries(xrECore PUBLIC "dxguid.lib")
 
 # UnityBuild Preferences
 #if (IXRAY_UNITYBUILD)

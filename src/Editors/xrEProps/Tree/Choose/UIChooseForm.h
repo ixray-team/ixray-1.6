@@ -1,4 +1,6 @@
 #pragma once
+class ID3D11Texture2D;
+
 class XREPROPS_API UIChooseForm :  public IEditorWnd
 {
     friend class UIChooseFormItem;
@@ -9,7 +11,7 @@ class XREPROPS_API UIChooseForm :  public IEditorWnd
     Node m_GeneralNode;*/
     void UpdateSelected(UIChooseFormItem*NewSelected);
     UIChooseFormItem m_RootItem;
-    ImTextureID m_Texture;
+    ID3D11Texture2D* m_Texture;
     ImGuiTextFilter m_Filter;
     UIPropertiesForm* m_Props;
     Flags32  m_Flags;
@@ -31,7 +33,7 @@ protected:
 private:
     SChooseEvents 	E;
     static UIChooseForm* Form;
-    static ImTextureID NullTexture;
+    static ID3D11Texture2D* NullTexture;
 
 public:
     enum Result
@@ -45,7 +47,7 @@ public:
     UIChooseForm();
     virtual ~UIChooseForm();
     virtual void Draw();
-    static void SetNullTexture(ImTextureID Texture);
+    static void SetNullTexture(ID3D11Texture2D* Texture);
     static void Update();
     static bool IsActive();
     static bool GetResult(bool&change,shared_str&result);

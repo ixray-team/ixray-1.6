@@ -21,15 +21,15 @@ private:
 	UIItemListForm*		m_Items;
 	UIPropertiesForm*	m_Props;
 	ref_texture			m_TextureNull;
-	ImTextureID			m_Texture;
+	ref_texture			m_Texture;
 
-	ID3DTexture2D* m_ItemTexture;
+	ref_texture m_ItemTexture;
 	CLAItem* m_CurrentItem;
 	bool m_Modife;
 
 	float m_PointerWeight;
 	bool m_PointerResize;
-	ID3DTexture2D* m_PointerTexture;
+	ref_texture m_PointerTexture;
 	u32* m_PointerRawImage;
 	int m_PointerValue;
 	bool m_RenderAlpha;

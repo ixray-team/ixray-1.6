@@ -408,7 +408,7 @@ public		:
 		u32 m_lmaps = 0; 
 		u32 c_lmaps = 0;
 
-		dxRenderDeviceRender::Instance().ResourcesGetMemoryUsage( m_base, c_base, m_lmaps, c_lmaps );
+		DEVGetMemoryUsage( m_base, c_base, m_lmaps, c_lmaps );
 	}
 
 };
@@ -569,7 +569,7 @@ public:
 	CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		RImplementation.Models->dump();
-		dxRenderDeviceRender::Instance().Resources->Dump(false);
+		DEV->Dump(false);
 	}
 };
 

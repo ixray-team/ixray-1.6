@@ -112,7 +112,6 @@ void XrUIManager::BeginFrame()
 
 void XrUIManager::EndFrame()
 {
-	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	for (size_t i = m_UIArray.size(); i > 0; i--)

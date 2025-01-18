@@ -141,6 +141,9 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 	res_name += RImplementation.getShaderParams();
 	LPCSTR name = res_name.c_str();
 
+
+	xr_string Nasd = _name;
+
 	LPSTR N				= LPSTR		(name);
 	map_VS::iterator I	= m_vs.find	(N);
 	if (I!=m_vs.end())	return I->second;
@@ -177,7 +180,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		FS.r_close				( file );
 
 		// Select target
-		LPCSTR						c_target	= "vs_2_0";
+		LPCSTR						c_target	= "vs_4_0";
 		LPCSTR						c_entry		= "main";
 
 		if (strstr(data, "main_vs_1_1"))	{ c_target = "vs_1_1"; c_entry = "main_vs_1_1";	}
@@ -274,7 +277,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 		FS.r_close(R);
 
 		// Select target
-		LPCSTR						c_target	= "ps_2_0";
+		LPCSTR						c_target	= "ps_4_0";
 		LPCSTR						c_entry		= "main";
 		if (strstr(data,"main_ps_1_1"))			{ c_target = "ps_1_1"; c_entry = "main_ps_1_1";	}
 		if (strstr(data,"main_ps_1_2"))			{ c_target = "ps_1_2"; c_entry = "main_ps_1_2";	}

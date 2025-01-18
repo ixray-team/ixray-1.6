@@ -809,7 +809,7 @@ static HRESULT create_shader(
 			CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
 			VERIFY(pSignatureBlob);
 
-			svs_result->signature = dxRenderDeviceRender::Instance().Resources->_CreateInputSignature(pSignatureBlob);
+			svs_result->signature = DEV->_CreateInputSignature(pSignatureBlob);
 
 			_RELEASE(pSignatureBlob);
 
@@ -970,6 +970,8 @@ HRESULT	CRender::shader_compile(
 		xr_strcat(file, sh_name);
 		FS.update_path(file_name, "$app_data_root$", file);
 	}
+	
+	Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 
 	u32 const RealCodeCRC = crc32(pSrcData, SrcDataLen);
 	if (FS.exist(file_name) && ps_r__common_flags.test(RFLAG_USE_CACHE)) {

@@ -16,6 +16,7 @@
 #include "EditObject.h"
 #include "ui_main.h"
 #include "../Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "../Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 ECORE_API CDrawUtilities DU_impl;
 
@@ -1125,6 +1126,8 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
 
 void CDrawUtilities::DrawGrid()
 {
+    PIX_EVENT(RENDER_GRID);
+
 	VERIFY( EDevice->b_is_Ready );
 	_VertexStream*	Stream	= &RCache.Vertex;
     u32 vBase;

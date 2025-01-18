@@ -186,8 +186,9 @@ inline HRESULT DX11CreateTexture(UINT Width, UINT Height, UINT Levels, DWORD Usa
 	return RDevice->CreateTexture2D(&desc, NULL, ppTexture);
 }
 
+template<class T>
 inline HRESULT DX11LockRect(
-	ID3D11Texture2D*		pTexture,
+	T*		pTexture,
 	UINT					Level,
 	D3DLOCKED_RECT*			pLockedRect,
 	const RECT*				pRect,
@@ -204,8 +205,9 @@ inline HRESULT DX11LockRect(
 	return hr;
 }
 
+template<class T>
 inline HRESULT DX11UnlockRect(
-	ID3D11Texture2D* pTexture,
+	T* pTexture,
 	UINT Level
 )
 {
@@ -222,7 +224,7 @@ inline HRESULT DX11Lock(
 )
 {
 	D3D11_MAPPED_SUBRESOURCE sb;
-	HRESULT hr = RContext->Map(pResource, 0, D3D11_MAP_READ_WRITE, 0, &sb);
+	HRESULT hr = RContext->Map(pResource, 0, D3D11_MAP_WRITE_DISCARD, 0, &sb);
 
 	R_ASSERT(ppbData);
 	*ppbData = sb.pData;

@@ -192,13 +192,23 @@ void CEditorRenderDevice::Clear()
 			color_get_R(EPrefs->scene_clear_color) / 255.f, 
 			color_get_G(EPrefs->scene_clear_color) / 255.f,
 			color_get_B(EPrefs->scene_clear_color) / 255.f, 
-			color_get_A(EPrefs->scene_clear_color) / 255.f
+			1
 		};
 		ClearColor = Fcolor(color[0], color[1], color[2], color[3]);
 	}
 
-	RContext->ClearRenderTargetView( RSwapchainTarget, (float*)&ClearColor );
+	//RContext->ClearRenderTargetView( RTarget, (float*)&ClearColor );
+	//RContext->ClearRenderTargetView(RCache.get_RT(0), (float*)&ClearColor);
 	RContext->ClearDepthStencilView( RDepth, D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0 );
+
+	if (RCache.get_RT())
+	{
+		RContext->ClearRenderTargetView(RCache.get_RT(0), (float*)&ClearColor);
+	}
+	if (RCache.get_ZB())
+	{
+		RContext->ClearDepthStencilView(RCache.get_ZB(), D3D_CLEAR_DEPTH | D3D_CLEAR_STENCIL, 1.0f, 0);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -292,6 +302,7 @@ void CEditorRenderDevice::Destroy()
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::_SetupStates()
 {
+	return;
 	//Caps.Update();
 	for (u32 i=0; i<Caps.raster.dwStages; i++){
 		float fBias = -1.f;
@@ -330,12 +341,12 @@ void CEditorRenderDevice::_Create(IReader* F)
     m_WireShader.create			("editor\\wire");
     m_SelectionShader.create	("editor\\selection");
 
-	dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
-	dx10BufferUtils::CreateConstantBuffer( &m_LightBuffer, sizeof( Flight ) * MAX_EDITOR_LIGHT );
+	//dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
+	//dx10BufferUtils::CreateConstantBuffer( &m_LightBuffer, sizeof( Flight ) * MAX_EDITOR_LIGHT );
 
 	texture_null.create("ed\\ed_nodata");
 	texture_null->Load();
-	UIChooseForm::SetNullTexture(texture_null->pSurface);
+	UIChooseForm::SetNullTexture((ID3D11Texture2D*)texture_null->pSurface);
 
 	// signal another objects
     UI->OnDeviceCreate			();       
@@ -348,11 +359,14 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 	b_is_Ready 						= FALSE;
     m_CurrentShader				= 0;
 
-	m_LightBuffer->Release		();
-	m_LightBuffer				= 0;
+	if (m_LightBuffer)
+	{
+		m_LightBuffer->Release();
+		m_LightBuffer = 0;
 
-	m_MaterialBuffer->Release	();
-	m_MaterialBuffer			= 0;
+		m_MaterialBuffer->Release();
+		m_MaterialBuffer = 0;
+	}
 
     UI->OnDeviceDestroy			();
 
@@ -398,7 +412,7 @@ void CEditorRenderDevice::Reset(bool)
 	UI->ResetEnd(RDevice, RContext);
 	_SetupStates();
 
-	UIChooseForm::SetNullTexture(texture_null->pSurface);
+	UIChooseForm::SetNullTexture((ID3D11Texture2D*)texture_null->pSurface);
 
 	u32 tm_end = TimerAsync();
 	Msg("*** RESET [%d ms]", tm_end - tm_start);
@@ -559,9 +573,9 @@ void CEditorRenderDevice::DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 
 {
 	ref_shader S 			= m_CurrentShader?m_CurrentShader:m_WireShader;
     u32 dwRequired			= S->E[0]->passes.size();
-    RCache.set_Geometry		(geom);
     for (u32 dwPass = 0; dwPass<dwRequired; dwPass++){
     	RCache.set_Shader	(S,dwPass);
+		RCache.set_Geometry(geom);
 		RCache.Render		(pt,vBase,pc);
     }
 }

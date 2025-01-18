@@ -349,7 +349,10 @@ void CTexture::Load		()
 {
 	flags.bLoaded					= true;
 	desc_cache						= 0;
+
+#ifndef _EDITOR
 	if (pSurface)					return;
+#endif
 
 	flags.bUser						= false;
 	flags.MemoryUsage				= 0;
@@ -503,13 +506,15 @@ void CTexture::Load		()
 				// Normal texture
 				u32	mem  = 0;
 				//pSurface = ::RImplementation.texture_load	(*cName,mem);
-				pSurface = ::RImplementation.texture_load	(*cName,mem, true);
+				pSurface = ::RImplementation.texture_load	(*cName,mem, !Device.IsEditorMode());
 
+#ifndef _EDITOR
 				if (GetUsage() == D3D_USAGE_STAGING)
 				{
 					flags.bLoadedAsStaging = TRUE;
 					bCreateView = false;
 				}
+#endif
 
 				// Calc memory usage and preload into vid-mem
 				if (pSurface) 

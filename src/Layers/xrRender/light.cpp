@@ -106,9 +106,7 @@ void light::set_texture		(LPCSTR name)
 
 	s_volumetric.create		("accum_volumetric", name);
 }
-#endif
-
-#if RENDER==R_R1
+#else
 void light::set_texture		(LPCSTR name)
 {
 }
