@@ -108,10 +108,14 @@ void CEditableObject::Render(const Fmatrix& parent, int priority, bool strictB2F
 		if (m_objectFlags.is(eoHOM))
 		{
 			if ((1 == priority) && (false == strictB2F))
+			{
 				RenderEdge(parent, 0, 0, 0x40B64646);
+			}
 
 			if ((2 == priority) && (true == strictB2F))
+			{
 				RenderSelection(parent, 0, 0, 0xA0FFFFFF);
+			}
 
 		}
 		else if (m_objectFlags.is(eoSoundOccluder))
@@ -129,6 +133,8 @@ void CEditableObject::Render(const Fmatrix& parent, int priority, bool strictB2F
 
 			if (IsSkeleton())
 				Engine.External.SetSkinningMode(4);
+
+			EDevice->RenderState = EEditorRenderState::eModel;
 
 			size_t s_id = 0;
 			for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
@@ -164,6 +170,7 @@ void CEditableObject::Render(const Fmatrix& parent, int priority, bool strictB2F
 			}
 
 			Engine.External.SetSkinningMode();
+			EDevice->RenderState = EEditorRenderState::eDefault;
 		}
 	}
 }
@@ -183,7 +190,7 @@ void CEditableObject::RenderEdge(const Fmatrix& parent, CEditableMesh* mesh, CSu
 {
 	if (!(m_LoadState.is(LS_RBUFFERS))) DefferedLoadRP();
 
-	EDevice->SetShader(EDevice->m_WireShader);
+	EDevice->SetShader(EDevice->m_WireShaderEdges);
 	if(mesh) mesh->RenderEdge(parent, surf, color);
 	else for(EditMeshIt _M = m_Meshes.begin();_M!=m_Meshes.end();_M++)
 			(*_M)->RenderEdge(parent, surf, color);
@@ -194,7 +201,7 @@ void CEditableObject::RenderSelection(const Fmatrix& parent, CEditableMesh* mesh
 	if (!(m_LoadState.is(LS_RBUFFERS))) DefferedLoadRP();
 
 	RCache.set_xform_world(parent);
-	EDevice->SetShader(EDevice->m_SelectionShader);
+	EDevice->SetShader(EDevice->m_WireShaderEdges);
 	EDevice->RenderNearer(0.0005);
 	if(mesh) mesh->RenderSelection(parent, surf, color);
 	else for(EditMeshIt _M = m_Meshes.begin();_M!=m_Meshes.end();_M++)

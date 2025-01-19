@@ -30,15 +30,9 @@ const u32 boxcolor = D3DCOLOR_RGBA(255,255,255,0);
 static const int boxvertcount = 48;
 static Fvector boxvert[boxvertcount];
 
-#if 1
-#	define DU_DRAW_RS	EDevice->SetRS
-#	define DU_DRAW_SH_C(a,c){EDevice->SetShader(a);EDevice->SetRS(D3DRS_TEXTUREFACTOR,c);}
-#	define DU_DRAW_SH(a){EDevice->SetShader(a);EDevice->SetRS(D3DRS_TEXTUREFACTOR,0xFFFFFFFF);}
-#else
-#	define DU_DRAW_RS	RCache.dbg_SetRS
-#	define DU_DRAW_SH_C(sh,c){RCache.set_Shader(sh);	RCache.set_c	("tfactor",float(color_get_R(c))/255.f,float(color_get_G(c))/255.f,float(color_get_B(c))/255.f,float(color_get_A(c))/255.f);}
-#	define DU_DRAW_SH(sh){RCache.set_Shader(sh);		RCache.set_c	("tfactor",1,1,1,1);}
-#endif
+#define DU_DRAW_RS	EDevice->SetRS
+#define DU_DRAW_SH_C(sh,c){RCache.set_Shader(sh);	RCache.set_c	("tfactor",float(color_get_R(c))/255.f,float(color_get_G(c))/255.f,float(color_get_B(c))/255.f,float(color_get_A(c))/255.f);}
+#define DU_DRAW_SH(sh){RCache.set_Shader(sh);		RCache.set_c	("tfactor",1,1,1,1);}
 
 #if 1
 #	define FILL_MODE EDevice->dwFillMode

@@ -3,6 +3,7 @@
 
 #include "Blender_Editor_Wire.h"
 
+#include "..\Layers\xrRender\uber_deffer.h"
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -55,9 +56,16 @@ void CBlender_Editor_Wire::Compile	(CBlender_Compile& C)
 		C.PassEnd			();
 	} 
 	else 
+#elif defined(_EDITOR)
+	if (EDevice->RenderState == EEditorRenderState::eModel)
+	{
+		uber_deffer(C, true, "deffer_base", "deffer_base", false, 0, true);
+		C.r_End();
+	}
+	else
 #endif //USE_DX11
 	{
-		C.r_Pass	("editor","simple_color",FALSE,TRUE,TRUE);
-		C.r_End		();
+		C.r_Pass("editor", "simple_color", FALSE, TRUE, TRUE);
+		C.r_End();
 	}
 }

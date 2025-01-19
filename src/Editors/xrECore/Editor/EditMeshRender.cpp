@@ -251,15 +251,18 @@ void CEditableMesh::RenderEdge(const Fmatrix& parent, CSurface* s, u32 color)
 	if (0==m_RenderBuffers) GenerateRenderBuffers();
 //	if (!m_Visible) return;
 	RCache.set_xform_world(parent);
-	EDevice->SetShader(EDevice->m_WireShader);
 	EDevice->RenderNearer(0.001);
 
 	// render
 	EDevice->SetRS(D3DRS_FILLMODE,D3DFILL_WIREFRAME);
-	if (s){
+	if (s)
+	{
 		SurfFacesPairIt sp_it = m_SurfFaces.find(s);
 		if (sp_it!=m_SurfFaces.end()) RenderList(parent,color,true,sp_it->second);
-	}else{
+	}
+	else
+	{
+		EDevice->SetShader(EDevice->m_WireShaderEdges);
 		EDevice->SetRS(D3DRS_TEXTUREFACTOR,	color);
 		for (RBMapPairIt p_it=m_RenderBuffers->begin(); p_it!=m_RenderBuffers->end(); p_it++){
 			RBVector& rb_vec = p_it->second;

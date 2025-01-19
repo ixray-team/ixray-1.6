@@ -61,10 +61,10 @@ uniform sampler2D s_dn_a;
 void main(p_bumped_new I, out f_editor_gbuffer O)
 {
 	if(is_lighting_enable.x < 0.5f) {
-		O.Color = tex2D(s_base, I.tcdh.xy);
+		O.Color = s_base.Sample(smp_base, I.tcdh.xy);
 
 		float2 tcdbump = I.tcdh.xy * dt_params.xy;
-		float4 Detail = tex2D(s_detail, tcdbump);
+		float4 Detail = s_detail.Sample(smp_base, tcdbump);
 		
 		O.Color.xyz *= Detail.xyz * 2.0f;
 
@@ -84,7 +84,7 @@ void main(p_bumped_new I, out f_editor_gbuffer O)
     M.Hemi = I.tcdh.z;
     M.Point = I.position.xyz;
 
-    M.Color = tex2D(s_base, I.tcdh.xy);
+    M.Color = s_base.Sample(smp_base, I.tcdh.xy);
 
     float4 Mask = tex2D(s_mask, I.tcdh.xy);
     Mask /= dot(Mask, 1.0f);

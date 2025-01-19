@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "Blender_Editor_Selection.h"
+#include "..\Layers\xrRender\uber_deffer.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -54,8 +55,15 @@ void	CBlender_Editor_Selection::Compile	(CBlender_Compile& C)
 		C.PassEnd			();
 	} 
 	else 
-#endif //USE_DX11
+#elif defined(_EDITOR)
+	if (EDevice->RenderState == EEditorRenderState::eModel)
 	{
+		uber_deffer(C, true, "deffer_base", "deffer_base", false, 0, true);
+		C.r_End();
+	}
+	else
+#endif
+	{ 
 		C.r_Pass	("editor","simple_color",FALSE,TRUE,FALSE,TRUE,D3DBLEND_SRCALPHA,D3DBLEND_INVSRCALPHA);
 		C.r_End		();
 	}

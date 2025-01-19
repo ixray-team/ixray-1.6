@@ -350,9 +350,7 @@ void CTexture::Load		()
 	flags.bLoaded					= true;
 	desc_cache						= 0;
 
-#ifndef _EDITOR
 	if (pSurface)					return;
-#endif
 
 	flags.bUser						= false;
 	flags.MemoryUsage				= 0;

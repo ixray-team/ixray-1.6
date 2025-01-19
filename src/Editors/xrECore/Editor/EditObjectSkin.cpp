@@ -174,7 +174,9 @@ void CEditableObject::RenderBones(const Fmatrix& parent)
 		        EDevice->SetShader(EDevice->m_SelectionShader);
                 Fmatrix mat	= M;
                 mat.mulA_43	(parent);
-                u32 c 		= (*b_it)->flags.is(CBone::flSelected)?0x80ffffff:0x300000ff;
+                u32 c = (*b_it)->flags.is(CBone::flSelected) ? 0x80ffffff : 0x300000ff;
+                EDevice->SetRS(D3DRS_TEXTUREFACTOR, c);
+
                 if ((*b_it)->shape.Valid()){
                     switch ((*b_it)->shape.type){
                     case SBoneShape::stBox: 	DU_impl.DrawOBB		(mat,(*b_it)->shape.box,c,c);	break;
@@ -182,6 +184,7 @@ void CEditableObject::RenderBones(const Fmatrix& parent)
                     case SBoneShape::stCylinder:DU_impl.DrawCylinder (mat,(*b_it)->shape.cylinder.m_center,(*b_it)->shape.cylinder.m_direction,(*b_it)->shape.cylinder.m_height,(*b_it)->shape.cylinder.m_radius,c,c,TRUE,TRUE);break;
 	                }
                 }
+                EDevice->SetRS(D3DRS_TEXTUREFACTOR, 0xfffffffff);
             }
         }
     }

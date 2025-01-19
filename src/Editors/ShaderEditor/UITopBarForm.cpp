@@ -36,7 +36,7 @@ void UITopBarForm::Draw()
     ImGui::Begin("TOOLBAR", NULL, window_flags);
     {
         m_tUndo->Load();
-        if (ImGui::ImageButton(m_tSave->get_SRView(), ImVec2(20, 20), ImVec2(m_timeUndo > EDevice->TimerAsync() ? 0.5 : 0, 0), ImVec2(m_timeUndo > EDevice->TimerAsync() ? 1 : 0.5, 1), 0))
+        if (ImGui::ImageButton(m_tUndo->get_SRView(), ImVec2(20, 20), ImVec2(m_timeUndo > EDevice->TimerAsync() ? 0.5 : 0, 0), ImVec2(m_timeUndo > EDevice->TimerAsync() ? 1 : 0.5, 1), 0))
         {
             m_timeUndo = EDevice->TimerAsync() + 130;
             ClickUndo();
@@ -49,7 +49,7 @@ void UITopBarForm::Draw()
         ImGui::SameLine();
 
         m_tRedo->Load();
-        if (ImGui::ImageButton(m_tSave->get_SRView(), ImVec2(20, 20), ImVec2(m_timeRedo > EDevice->TimerAsync() ? 0.5 : 0, 0), ImVec2(m_timeRedo > EDevice->TimerAsync() ? 1 : 0.5, 1), 0))
+        if (ImGui::ImageButton(m_tRedo->get_SRView(), ImVec2(20, 20), ImVec2(m_timeRedo > EDevice->TimerAsync() ? 0.5 : 0, 0), ImVec2(m_timeRedo > EDevice->TimerAsync() ? 1 : 0.5, 1), 0))
         {
             m_timeRedo = EDevice->TimerAsync() + 130;
             ClickRedo();
@@ -74,7 +74,7 @@ void UITopBarForm::Draw()
         ImGui::SameLine();
 
         m_tReload->Load();
-        if (ImGui::ImageButton(m_tSave->get_SRView(), ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), 0))
+        if (ImGui::ImageButton(m_tReload->get_SRView(), ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), 0))
         {
             ClickReload();
         }
@@ -86,7 +86,7 @@ void UITopBarForm::Draw()
         ImGui::SameLine();
 
         m_tOpenGameData->Load();
-        if (ImGui::ImageButton(m_tSave->get_SRView(), ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), 0))
+        if (ImGui::ImageButton(m_tOpenGameData->get_SRView(), ImVec2(20, 20), ImVec2(0, 0), ImVec2(1, 1), 0))
         {
             ClickOpenGameData();
         }

@@ -30,6 +30,12 @@ extern ECORE_API CEditorRenderDevice* EDevice;
 
 #define MAX_EDITOR_LIGHT 16
 
+enum class EEditorRenderState
+{
+	eDefault,
+	eModel
+};
+
 class ECORE_API CEditorRenderDevice :
 	public CRenderDevice
 {
@@ -46,6 +52,7 @@ private:
 	void _Destroy(BOOL bKeepTextures);
 
 public:
+	ref_shader m_WireShaderEdges;
 	ref_shader m_WireShader;
 	ref_shader m_WireShaderAxis;
 	ref_shader m_SelectionShader;
@@ -59,6 +66,9 @@ public:
 
 	ID3D11Buffer* m_MaterialBuffer;
 	ID3D11Buffer* m_LightBuffer;
+
+	u32 TFactor = 0;
+	EEditorRenderState RenderState = EEditorRenderState::eDefault;
 
 public:
 	float RadiusRender;

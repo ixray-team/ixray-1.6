@@ -341,6 +341,7 @@ void CEditorRenderDevice::_Create(IReader* F)
 
     m_WireShader.create			("editor\\wire");
 	m_WireShaderAxis.create		("editor_wire_axis");
+	m_WireShaderEdges.create	("editor_wire_edges");
     m_SelectionShader.create	("editor\\selection");
 
 	//dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
@@ -374,6 +375,7 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 
 	m_WireShader.destroy		();
 	m_WireShaderAxis.destroy	();
+	m_WireShaderEdges.destroy	();
 	m_SelectionShader.destroy	();
 	texture_null.destroy		();
 
@@ -628,6 +630,17 @@ void CEditorRenderDevice::SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 	case D3DRS_LASTPIXEL: 
 		R_ASSERT(0);
 		break;   /* TRUE for last-pixel on lines */
+	case D3DRS_TEXTUREFACTOR:
+		RCache.set_c
+		(
+			"tfactor",
+			float(color_get_R(p2)) / 255.f, 
+			float(color_get_G(p2)) / 255.f, 
+			float(color_get_B(p2)) / 255.f, 
+			float(color_get_A(p2)) / 255.f
+		);
+		break; /*case D3DCOLOR used for multi-texture blend */
+
 	case D3DRS_SRCBLEND: break;   /*case D3DBLEND */
 	case D3DRS_DESTBLEND: break;   /*case D3DBLEND */
 	case D3DRS_CULLMODE: break;   /*case D3DCULL */
@@ -652,7 +665,6 @@ void CEditorRenderDevice::SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 	case D3DRS_STENCILREF: break;   /* Reference value used in stencil test */
 	case D3DRS_STENCILMASK: break;   /* Mask value used in stencil test */
 	case D3DRS_STENCILWRITEMASK: break;   /* Write mask applied to values written to stencil buffer */
-	case D3DRS_TEXTUREFACTOR: break;   /*case D3DCOLOR used for multi-texture blend */
 	case D3DRS_WRAP0: break;  /* wrap for 1st texture coord. set */
 	case D3DRS_WRAP1: break;  /* wrap for 2nd texture coord. set */
 	case D3DRS_WRAP2: break;  /* wrap for 3rd texture coord. set */
