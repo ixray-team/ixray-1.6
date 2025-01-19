@@ -47,6 +47,7 @@ private:
 
 public:
 	ref_shader m_WireShader;
+	ref_shader m_WireShaderAxis;
 	ref_shader m_SelectionShader;
 
 	ref_texture texture_null;

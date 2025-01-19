@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "UIChooseForm.h"
+
+XREPROPS_API MakeTexture* CasterCallback = nullptr;
+
 UIChooseForm::EventsMap	UIChooseForm::m_Events;
 UIChooseForm* UIChooseForm::Form = 0;
 ID3D11Texture2D*   UIChooseForm::NullTexture = nullptr;
@@ -125,14 +128,14 @@ void UIChooseForm::Draw()
 			{
 				if (NullTexture || m_Texture)
 				{
-					//if (m_Texture)
-					//{
-					//	ImGui::Image(m_Texture, ImVec2(192, 192));
-					//}
-					//else
-					//{
-					//	ImGui::Image(NullTexture, ImVec2(192, 192));
-					//}
+					if (m_Texture)
+					{
+						ImGui::Image(CasterCallback(m_Texture), ImVec2(192, 192));
+					}
+					else
+					{
+						ImGui::Image(CasterCallback(NullTexture), ImVec2(192, 192));
+					}
 				}
 				else
 				{

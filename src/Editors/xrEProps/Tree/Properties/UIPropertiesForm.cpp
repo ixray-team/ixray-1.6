@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 UIPropertiesForm::UIPropertiesForm():m_Root("",this)
 {
 	m_bModified = false;

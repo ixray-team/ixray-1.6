@@ -169,6 +169,10 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR vs, LPCSTR ps, BOOL aref, 
 
 #ifdef _EDITOR
 	C.r_Pass(vs, ps, FALSE);
+	C.r_dx10Sampler("smp_material");
+
+	C.r_dx10Sampler("smp_base");
+	C.r_dx10Sampler("smp_rtlinear");
 
 	C.r_dx10Texture("s_base", C.L_textures[0].c_str());
 	C.r_dx10Texture("s_bumpX", fnameB);

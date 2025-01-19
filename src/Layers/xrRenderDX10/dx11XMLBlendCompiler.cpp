@@ -19,7 +19,12 @@ CXMLBlend::CXMLBlend(const char* FileName)
 	memcpy(File, FixedName, sizeof(FixedName));
 
 	pCompiler = new CBlender_Compile();
+
+#ifdef _EDITOR
+	Parser.Load("$game_shaders$", "editor", File);
+#else
 	Parser.Load("$game_shaders$", "d3d11", File);
+#endif
 	pCompiler->detail_texture = nullptr;
 	pCompiler->detail_scaler = nullptr;
 }
@@ -227,7 +232,11 @@ bool CXMLBlend::Check(const char* FileName)
 	xr_strconcat(NewName, NewName, ".xml");
 	string_path PathAndFile;
 
+#ifdef _EDITOR
+	FS.update_path(PathAndFile, "$game_shaders$", "editor\\");
+#else
 	FS.update_path(PathAndFile, "$game_shaders$", "d3d11\\");
+#endif
 	xr_strconcat(PathAndFile, PathAndFile, NewName);
 
 	return FS.exist(PathAndFile);

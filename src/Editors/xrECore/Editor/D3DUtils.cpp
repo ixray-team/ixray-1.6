@@ -1110,7 +1110,7 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
 
 	// Render it as line list
 	DU_DRAW_RS	(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
-	DU_DRAW_SH	(EDevice->m_WireShader);
+	DU_DRAW_SH	(EDevice->m_WireShaderAxis);
     DU_DRAW_DP	(D3DPT_LINELIST,vs_TL,vBase,3);
 	DU_DRAW_RS	(D3DRS_SHADEMODE,SHADE_MODE);
 

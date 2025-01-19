@@ -60,6 +60,14 @@ CRenderTarget::CRenderTarget() {
 		accum_spot_geom_create();
 		g_accum_spot.create(D3DFVF_XYZ, g_accum_spot_vb, g_accum_spot_ib);
 	}
+
+	CasterCallback = [](ID3D11Texture2D* Tex)
+	{
+		static CTexture CTex;
+		CTex.surface_set(Tex);
+
+		return CTex.get_SRView();
+	};
 };
 
 CRenderTarget::~CRenderTarget() {

@@ -214,6 +214,12 @@ void	CBlender_LmEbB::Compile(CBlender_Compile& C)
 #else
 
 	IBlender::Compile(C);
+	if (C.bEditor) 
+	{
+		uber_deffer(C, true, "deffer_base", "deffer_base", false, 0, true);
+		C.r_End();
+		return;
+	}
 
 	if (oBlend.value)
 	{

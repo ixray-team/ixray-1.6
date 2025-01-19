@@ -339,6 +339,7 @@ void CEditorRenderDevice::_Create(IReader* F)
 	::RImplementation.OnDeviceCreate	();
 
     m_WireShader.create			("editor\\wire");
+	m_WireShaderAxis.create		("editor_wire_axis");
     m_SelectionShader.create	("editor\\selection");
 
 	//dx10BufferUtils::CreateConstantBuffer( &m_MaterialBuffer, sizeof( Fmaterial ) );
@@ -371,6 +372,7 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
     UI->OnDeviceDestroy			();
 
 	m_WireShader.destroy		();
+	m_WireShaderAxis.destroy	();
 	m_SelectionShader.destroy	();
 	texture_null.destroy		();
 

@@ -32,3 +32,6 @@ inline void not_implemented()
 #include "Tree/Choose/UIChooseFormItem.h"
 #include "Tree/Choose/UIChooseForm.h"
 #include "UIKeyPressForm.h"
+
+using MakeTexture = ImTextureID(ID3D11Texture2D*);
+extern XREPROPS_API MakeTexture* CasterCallback;

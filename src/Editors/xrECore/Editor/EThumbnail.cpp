@@ -59,14 +59,14 @@ void EImageThumbnail::Update(ID3DTexture2D*& Texture)
         return;
     }
 
-    ID3DTexture2D* pTexture = nullptr;
+    ID3D11Texture2D* pTexture = nullptr;
     if (Texture != nullptr)
     {
         R_CHK(Texture->QueryInterface(__uuidof(ID3DTexture2D), (void**)&pTexture));
     }
     else
     {
-        R_CHK(DX11CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UINT, 0, &pTexture, 0));
+        R_CHK(DX11CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, D3D11_USAGE_DYNAMIC, DxgiFormat::DXGI_FORMAT_B8G8R8A8_UNORM, 0, &pTexture, 0));
         Texture = pTexture;
     }
 
