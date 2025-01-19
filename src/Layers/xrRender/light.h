@@ -2,7 +2,7 @@
 #define LAYERS_XRRENDER_LIGHT_H_INCLUDED
 
 #include "../../xrCDB/ISpatial.h"
-#if RENDER!=R_R1
+#if RENDER!=R_R1 && !defined(_EDITOR)
 #	include "light_package.h"
 #	include "light_smapvis.h"
 #endif

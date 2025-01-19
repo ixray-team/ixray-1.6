@@ -10,6 +10,7 @@
 #include "../Layers/xrRender/ResourceManager.h"
 #include "../Layers/xrRender/dxRenderDeviceRender.h"
 #include "../Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "../Layers/xrRenderDX10/StateManager/dx10StateManager.h"
 #include "UI_ToolsCustom.h"
 
 CEditorRenderDevice 	*	EDevice;
@@ -591,6 +592,145 @@ void CEditorRenderDevice::DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32
     	RCache.set_Shader	(S,dwPass);
 		RCache.Render		(pt,baseV,startV,countV,startI,PC);
     }
+}
+
+static CSimulator g_Simulator;
+
+void CEditorRenderDevice::SetRS(D3DRENDERSTATETYPE p1, u32 p2)
+{
+	VERIFY(b_is_Ready);
+
+	static u32 stencilfunc = 0;
+	static u32 stencilref = 0;
+	static u32 stencilmask = 0;
+	static u32 stencilwritemask = 0;
+	static u32 stencilfail = 0;
+	static u32 stencilpass = 0;
+	static u32 stencilzfail = 0;
+
+	switch (p1)
+	{
+	case D3DRS_ZENABLE: 
+		RCache.set_Z(p2);
+		break;    /*case D3DZBUFFERTYPE (or TRUE/FALSE for legacy) */
+	case D3DRS_FILLMODE: 
+		StateManager.SetFillMode(p2);
+		break;    /*case D3DFILLMODE */
+	case D3DRS_SHADEMODE: 
+		R_ASSERT(0);
+		break;    /*case D3DSHADEMODE */
+	case D3DRS_ZWRITEENABLE: 
+		RCache.set_ZWrite(p2);
+		break;   /* TRUE to enable z writes */
+	case D3DRS_ALPHATESTENABLE: 
+		RCache.set_AlphaRef(p2);
+		break;   /* TRUE to enable alpha tests */
+	case D3DRS_LASTPIXEL: 
+		R_ASSERT(0);
+		break;   /* TRUE for last-pixel on lines */
+	case D3DRS_SRCBLEND: break;   /*case D3DBLEND */
+	case D3DRS_DESTBLEND: break;   /*case D3DBLEND */
+	case D3DRS_CULLMODE: break;   /*case D3DCULL */
+	case D3DRS_ZFUNC: break;   /*case D3DCMPFUNC */
+	case D3DRS_ALPHAREF: break;   /*case D3DFIXED */
+	case D3DRS_ALPHAFUNC: break;   /*case D3DCMPFUNC */
+	case D3DRS_DITHERENABLE: break;   /* TRUE to enable dithering */
+	case D3DRS_ALPHABLENDENABLE: break;   /* TRUE to enable alpha blending */
+	case D3DRS_FOGENABLE: break;   /* TRUE to enable fog blending */
+	case D3DRS_SPECULARENABLE: break;   /* TRUE to enable specular */
+	case D3DRS_FOGCOLOR: break;   /*case D3DCOLOR */
+	case D3DRS_FOGTABLEMODE: break;   /*case D3DFOGMODE */
+	case D3DRS_FOGSTART: break;   /* Fog start (for both vertex and pixel fog) */
+	case D3DRS_FOGEND: break;   /* Fog end      */
+	case D3DRS_FOGDENSITY: break;   /* Fog density  */
+	case D3DRS_RANGEFOGENABLE: break;   /* Enables range-based fog */
+	case D3DRS_STENCILENABLE: break;   /* BOOL enable/disable stenciling */
+	case D3DRS_STENCILFAIL: break;   /*case D3DSTENCILOP to do if stencil test fails */
+	case D3DRS_STENCILZFAIL: break;   /*case D3DSTENCILOP to do if stencil test passes and Z test fails */
+	case D3DRS_STENCILPASS: break;   /*case D3DSTENCILOP to do if both stencil and Z tests pass */
+	case D3DRS_STENCILFUNC: break;   /*case D3DCMPFUNC fn.  Stencil Test passes if ((ref & mask) stencilfn (stencil & mask)) is true */
+	case D3DRS_STENCILREF: break;   /* Reference value used in stencil test */
+	case D3DRS_STENCILMASK: break;   /* Mask value used in stencil test */
+	case D3DRS_STENCILWRITEMASK: break;   /* Write mask applied to values written to stencil buffer */
+	case D3DRS_TEXTUREFACTOR: break;   /*case D3DCOLOR used for multi-texture blend */
+	case D3DRS_WRAP0: break;  /* wrap for 1st texture coord. set */
+	case D3DRS_WRAP1: break;  /* wrap for 2nd texture coord. set */
+	case D3DRS_WRAP2: break;  /* wrap for 3rd texture coord. set */
+	case D3DRS_WRAP3: break;  /* wrap for 4th texture coord. set */
+	case D3DRS_WRAP4: break;  /* wrap for 5th texture coord. set */
+	case D3DRS_WRAP5: break;  /* wrap for 6th texture coord. set */
+	case D3DRS_WRAP6: break;  /* wrap for 7th texture coord. set */
+	case D3DRS_WRAP7: break;  /* wrap for 8th texture coord. set */
+	case D3DRS_CLIPPING: break;
+	case D3DRS_LIGHTING: break;
+	case D3DRS_AMBIENT: break;
+	case D3DRS_FOGVERTEXMODE: break;
+	case D3DRS_COLORVERTEX: break;
+	case D3DRS_LOCALVIEWER: break;
+	case D3DRS_NORMALIZENORMALS: break;
+	case D3DRS_DIFFUSEMATERIALSOURCE: break;
+	case D3DRS_SPECULARMATERIALSOURCE: break;
+	case D3DRS_AMBIENTMATERIALSOURCE: break;
+	case D3DRS_EMISSIVEMATERIALSOURCE: break;
+	case D3DRS_VERTEXBLEND: break;
+	case D3DRS_CLIPPLANEENABLE: break;
+	case D3DRS_POINTSIZE: break;   /* float point size */
+	case D3DRS_POINTSIZE_MIN: break;   /* float point size min threshold */
+	case D3DRS_POINTSPRITEENABLE: break;   /* BOOL point texture coord control */
+	case D3DRS_POINTSCALEENABLE: break;   /* BOOL point size scale enable */
+	case D3DRS_POINTSCALE_A: break;   /* float point attenuation A value */
+	case D3DRS_POINTSCALE_B: break;   /* float point attenuation B value */
+	case D3DRS_POINTSCALE_C: break;   /* float point attenuation C value */
+	case D3DRS_MULTISAMPLEANTIALIAS: break;  // BOOL - set to do FSAA with multisample buffer
+	case D3DRS_MULTISAMPLEMASK: break;  //case DWORD - per-sample enable/disable
+	case D3DRS_PATCHEDGESTYLE: break;  // Sets whether patch edges will use float style tessellation
+	case D3DRS_DEBUGMONITORTOKEN: break;  //case DEBUG ONLY - token to debug monitor
+	case D3DRS_POINTSIZE_MAX: break;   /* float point size max threshold */
+	case D3DRS_INDEXEDVERTEXBLENDENABLE: break;
+	case D3DRS_COLORWRITEENABLE: break;  // per-channel write enable
+	case D3DRS_TWEENFACTOR: break;   // float tween factor
+	case D3DRS_BLENDOP: break;   //case D3DBLENDOP setting
+	case D3DRS_POSITIONDEGREE: break;   // NPatch position interpolation degree.case D3DDEGREE_LINEAR orcase D3DDEGREE_CUBIC (default)
+	case D3DRS_NORMALDEGREE: break;   // NPatch normal interpolation degree.case D3DDEGREE_LINEAR (default) orcase D3DDEGREE_QUADRATIC
+	case D3DRS_SCISSORTESTENABLE: break;
+	case D3DRS_SLOPESCALEDEPTHBIAS: break;
+	case D3DRS_ANTIALIASEDLINEENABLE: break;
+	case D3DRS_MINTESSELLATIONLEVEL: break;
+	case D3DRS_MAXTESSELLATIONLEVEL: break;
+	case D3DRS_ADAPTIVETESS_X: break;
+	case D3DRS_ADAPTIVETESS_Y: break;
+	case D3DRS_ADAPTIVETESS_Z: break;
+	case D3DRS_ADAPTIVETESS_W: break;
+	case D3DRS_ENABLEADAPTIVETESSELLATION: break;
+	case D3DRS_TWOSIDEDSTENCILMODE: break;   /* BOOL enable/disable 2 sided stenciling */
+	case D3DRS_CCW_STENCILFAIL: break;   /*case D3DSTENCILOP to do if ccw stencil test fails */
+	case D3DRS_CCW_STENCILZFAIL: break;   /*case D3DSTENCILOP to do if ccw stencil test passes and Z test fails */
+	case D3DRS_CCW_STENCILPASS: break;   /*case D3DSTENCILOP to do if both ccw stencil and Z tests pass */
+	case D3DRS_CCW_STENCILFUNC: break;   /*case D3DCMPFUNC fn.  ccw Stencil Test passes if ((ref & mask) stencilfn (stencil & mask)) is true */
+	case D3DRS_COLORWRITEENABLE1: break;   /* Additional ColorWriteEnables for the devices that supportcase D3DPMISCCAPS_INDEPENDENTWRITEMASKS */
+	case D3DRS_COLORWRITEENABLE2: break;   /* Additional ColorWriteEnables for the devices that supportcase D3DPMISCCAPS_INDEPENDENTWRITEMASKS */
+	case D3DRS_COLORWRITEENABLE3: break;   /* Additional ColorWriteEnables for the devices that supportcase D3DPMISCCAPS_INDEPENDENTWRITEMASKS */
+	case D3DRS_BLENDFACTOR: break;   /*case D3DCOLOR used for a constant blend factor during alpha blending for devices that supportcase D3DPBLENDCAPS_BLENDFACTOR */
+	case D3DRS_SRGBWRITEENABLE: break;   /* Enable rendertarget writes to becase DE-linearized to SRGB (for formats that exposecase D3DUSAGE_QUERY_SRGBWRITE) */
+	case D3DRS_DEPTHBIAS: break;
+	case D3DRS_WRAP8: break;   /* Additional wrap states for vs_3_0+ attributes withcase D3DDECLUSAGE_TEXCOORD */
+	case D3DRS_WRAP9: break;
+	case D3DRS_WRAP10: break;
+	case D3DRS_WRAP11: break;
+	case D3DRS_WRAP12: break;
+	case D3DRS_WRAP13: break;
+	case D3DRS_WRAP14: break;
+	case D3DRS_WRAP15: break;
+	case D3DRS_SEPARATEALPHABLENDENABLE: break;  /* TRUE to enable a separate blending function for the alpha channel */
+	case D3DRS_SRCBLENDALPHA: break;  /* SRC blend factor for the alpha channel whencase D3DRS_SEPARATEDESTALPHAENABLE is TRUE */
+	case D3DRS_DESTBLENDALPHA: break;  /*case DST blend factor for the alpha channel whencase D3DRS_SEPARATEDESTALPHAENABLE is TRUE */
+	case D3DRS_BLENDOPALPHA: break;  /* Blending operation for the alpha channel whencase D3DRS_SEPARATEDESTALPHAENABLE is TRUE */
+
+	default:
+		break;
+	}
+
+	StateManager.Apply();
 }
 
 void CEditorRenderDevice::ReloadTextures()

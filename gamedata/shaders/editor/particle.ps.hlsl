@@ -9,5 +9,5 @@ struct v2p
 // Pixel
 float4 main(v2p I) : COLOR
 {
-    return I.c * tex2D(s_base, I.tc0);
+    return I.c * s_base.Sample(smp_base, I.tc0);
 }

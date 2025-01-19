@@ -207,7 +207,7 @@ void CContentView::DrawHeader()
 		ImVec2 cursorPos = ImGui::GetCursorPos();
 		ImGui::SetCursorPos(ImVec2(cursorPos.x - IconSize.x-10.f, cursorPos.y+(IconSize.y/4)));
 
-		ImGui::Image(IconPtr->Icon->pSurface, IconSize);
+		ImGui::Image(IconPtr->Icon->get_SRView(), IconSize);
 	}
 
 	ImGui::SameLine();
@@ -237,7 +237,7 @@ void CContentView::DrawHeader()
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::ImageButton("##MenuCB", MenuIcon->pSurface, { 15, 15 }))
+	if (ImGui::ImageButton("##MenuCB", MenuIcon->get_SRView(), { 15, 15 }))
 	{
 		ImGui::OpenPopup("MenuCBPpp");
 	}
@@ -673,7 +673,7 @@ bool CContentView::DrawItemByList(const FileOptData& InitFileName, size_t& HorBt
 		OutValue = ImGui::ImageButton
 		(
 			FileName.c_str(),
-			IconPtr->Icon->pSurface, BtnSize,
+			IconPtr->Icon->get_SRView(), BtnSize,
 			ImVec2(0, 0), ImVec2(1, 1),
 			ImVec4(0, 0, 0, 0), IconColor
 		);
@@ -922,7 +922,7 @@ bool CContentView::BeginDragDropAction(xr_path& FilePath, xr_string& FileName, c
 
 	xr_string LabelText = FilePath.has_extension() ? FileName.substr(0, FileName.length() - FilePath.extension().string().length()).c_str() : FileName.c_str();
 
-	ImGui::ImageButton(FilePath.xfilename().c_str(), IconPtr->Icon->pSurface, BtnSize);
+	ImGui::ImageButton(FilePath.xfilename().c_str(), IconPtr->Icon->get_SRView(), BtnSize);
 	ImGui::Text(LabelText.data());
 	ImGui::EndDragDropSource();
 	return true; 
@@ -1004,7 +1004,7 @@ bool CContentView::DrawItemByTile(const FileOptData& InitFileName, size_t& HorBt
 		OutValue = ImGui::ImageButton
 		(
 			FileName.c_str(),
-			IconPtr->Icon->pSurface, BtnSize,
+			IconPtr->Icon->get_SRView(), BtnSize,
 			ImVec2(0, 0), ImVec2(1, 1),
 			ImVec4(0, 0, 0, 0), IconColor
 		);
@@ -1327,7 +1327,9 @@ CContentView::IconData & CContentView::GetTexture(const xr_string & IconPath)
 
 				EObjectThumbnail* m_Thm = (EObjectThumbnail*)ImageLib.CreateThumbnail(NewPath.data(), EImageThumbnail::ETObject);
 				CTexture* TempTexture = new CTexture();
-				m_Thm->Update(TempTexture->pSurface);
+				ID3D11Texture2D* tex = nullptr;
+				m_Thm->Update(tex);
+				TempTexture->surface_set(tex);
 
 				if(TempTexture->pSurface != nullptr) {
 					Icons[IconPath] = {TempTexture, false};
@@ -1349,7 +1351,10 @@ CContentView::IconData & CContentView::GetTexture(const xr_string & IconPath)
 				EGroupThumbnail* m_Thm = new EGroupThumbnail(NewPath.data());
 				//EObjectThumbnail* m_Thm = (EObjectThumbnail*)ImageLib.CreateThumbnail(NewPath.data(), EImageThumbnail::ETTexture);
 				CTexture* TempTexture = new CTexture();
-				m_Thm->Update(TempTexture->pSurface);
+
+				ID3D11Texture2D* tex = nullptr;
+				m_Thm->Update(tex);
+				TempTexture->surface_set(tex);
 
 				if (TempTexture->pSurface != nullptr) {
 					Icons[IconPath] = { TempTexture, false };
@@ -1367,14 +1372,14 @@ CContentView::IconData & CContentView::GetTexture(const xr_string & IconPath)
 				CTexture* TempTexture = new CTexture();
 				ID3DTexture2D* pTexture = nullptr;
 				Icons[IconPath] = { TempTexture, false };
-				R_CHK(REDevice->CreateTexture(BtnSize.x, BtnSize.x, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+				R_CHK(DX11CreateTexture(BtnSize.x, BtnSize.x, 1, 0, DxgiFormat::DXGI_FORMAT_R8G8B8A8_UNORM, 0, &pTexture, 0));
 				{
 					D3DLOCKED_RECT rect;
-					R_CHK(pTexture->LockRect(0, &rect, 0, D3DLOCK_DISCARD));
+					R_CHK(DX11LockRect(pTexture, 0, &rect, 0, D3DLOCK_DISCARD));
 					memcpy(rect.pBits, Pixels.data(), Pixels.size());
-					R_CHK(pTexture->UnlockRect(0));
+					R_CHK(DX11UnlockRect(pTexture, 0));
 
-					TempTexture->pSurface = pTexture;
+					TempTexture->surface_set(pTexture);
 				}
 			}
 			else if (IconPath.ends_with(".tga"))

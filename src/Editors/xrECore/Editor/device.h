@@ -128,13 +128,8 @@ public:
 	void DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 startV, u32 pc);
 	void DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
 
-	IC void SetRS(D3DRENDERSTATETYPE p1, u32 p2)
-	{
-		VERIFY(b_is_Ready);
+	void SetRS(D3DRENDERSTATETYPE p1, u32 p2);
 
-		R_ASSERT2(0, "Implement");
-	//	CHK_DX(REDevice->SetRenderState(p1,p2));
-	}
 
 	IC void SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 	{

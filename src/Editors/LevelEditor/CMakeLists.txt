@@ -12,6 +12,8 @@ file(GLOB_RECURSE ELE_SOURCE_ENGINE_FILES CONFIGURE_DEPENDS "Engine/*.*")
 file(GLOB_RECURSE ELE_SOURCE_RENDER_FILES CONFIGURE_DECORENDS
     "../../Layers/xrRender/DetailManager*"
     "../../Layers/xrRender/stats_manager*"
+	"../../Layers/xrRenderDX10/dx10BufferUtils.*"
+	"../../Layers/xrRenderDX10/dx10DetailManager_VS.*"
 )
 set(ELE_SRC_FILES)
 

@@ -59,8 +59,13 @@ void CDetailManager::hw_Render(light*L)
 	float scale = 1.f / float(quant);
 	Fvector4 wave, wave_old, consts;
 
+#ifndef _EDITOR 
 	auto LodHQ = RImplementation.phase == RImplementation.PHASE_NORMAL ? SE_R2_NORMAL_HQ : SE_R2_DETAIL_SHADOW_HQ;
 	auto LodLQ = RImplementation.phase == RImplementation.PHASE_NORMAL ? SE_R2_NORMAL_LQ : SE_R2_DETAIL_SHADOW_LQ;
+#else
+	auto LodHQ = SE_R2_NORMAL_HQ;
+	auto LodLQ = SE_R2_NORMAL_LQ;
+#endif
 
 	// Wave0
 	{
@@ -93,8 +98,10 @@ void CDetailManager::hw_Render(light*L)
 
 void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, const Fvector4& wave_old, const Fvector4& wind_old, u32 var_id, u32 lod_id, light*L)
 {
+#ifndef _EDITOR 
 	if (RImplementation.phase == CRender::PHASE_SMAP && var_id == 0)
 		return;
+#endif
 
 	static shared_str strConsts("consts");
 	static shared_str strWave("wave");
@@ -110,8 +117,15 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 	u32 iOffset	= 0;
 
 	// Iterate
+
+#ifndef _EDITOR 
 	for (CDetail& Object : objects)
 	{
+#else
+	for (CDetail* D : objects)
+	{
+		CDetail& Object = *D;
+#endif
 		for ( u32 iPass=0; iPass<Object.shader->E[lod_id]->passes.size(); ++iPass)
 		{
 			// Setup matrices + colors (and flush it as necessary)
@@ -133,15 +147,17 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 			for (auto& S : Object.m_items[var_id][render_key])
 			{
 				CDetail::SlotItem& Instance = *S.get();
-
+#ifndef _EDITOR
 				if (RImplementation.pOutdoorSector && PortalTraverser.i_marker != RImplementation.pOutdoorSector->r_marker)
 					continue;
 
 				if (RImplementation.phase == CRender::PHASE_SMAP && L)
 				{
-					if(L->position.distance_to_sqr(Instance.mRotY.c) >= _sqr(L->range))
+					if (L->position.distance_to_sqr(Instance.mRotY.c) >= _sqr(L->range))
 						continue;
 				}
+#endif // !_EDITOR
+
 				static Fmatrix* c_storage = NULL;
 				if (dwBatch == 0)
 					RCache.get_ConstantDirect(strArray, hw_BatchSize*sizeof(Fmatrix), (void**)&c_storage, 0, 0);
