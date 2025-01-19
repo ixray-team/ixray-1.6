@@ -50,7 +50,8 @@ void dx10StateManager::Reset()
 
 	m_bOverrideScissoring = false;
 	m_bOverrideScissoringValue = FALSE;
-   m_uiSampleMask = 0xffffffff;
+	m_uiSampleMask = 0xffffffff;
+	m_uiFillMode = 0;
 }
 
 void dx10StateManager::UnmapConstants()
@@ -99,7 +100,7 @@ void dx10StateManager::SetBlendState(ID3DBlendState* pBlendState)
 
 void dx10StateManager::SetStencilRef(UINT uiStencilRef)
 {
-	if ( m_uiStencilRef != uiStencilRef)
+	if (m_uiStencilRef != uiStencilRef)
 	{
 		m_uiStencilRef = uiStencilRef;
 		m_bDSSNeedApply = true;
@@ -108,17 +109,17 @@ void dx10StateManager::SetStencilRef(UINT uiStencilRef)
 
 void dx10StateManager::SetAlphaRef(UINT uiAlphaRef)
 {
-	if ( m_uiAlphaRef != uiAlphaRef)
+	if (m_uiAlphaRef != uiAlphaRef)
 	{
 		m_uiAlphaRef = uiAlphaRef;
-		if (m_cAlphaRef) RCache.set_c( m_cAlphaRef, (float)m_uiAlphaRef/255.0f );
+		if (m_cAlphaRef) RCache.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
 	}
 }
 
 void dx10StateManager::BindAlphaRef(R_constant* C)
 {
 	m_cAlphaRef = C;
-	if (m_cAlphaRef) RCache.set_c( m_cAlphaRef, (float)m_uiAlphaRef/255.0f );
+	if (m_cAlphaRef) RCache.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
 }
 
 void dx10StateManager::ValidateRDesc()
@@ -164,7 +165,7 @@ void dx10StateManager::ValidateBDesc()
 void dx10StateManager::Apply()
 {
 	//	Apply rasterizer state
-	if ( m_bRSNeedApply || m_bRSChanged )
+	if (m_bRSNeedApply || m_bRSChanged)
 	{
 		if (m_bRSChanged)
 		{
@@ -177,7 +178,7 @@ void dx10StateManager::Apply()
 	}
 
 	//	Apply depth stencil state
-	if ( m_bDSSNeedApply || m_bDSSChanged )
+	if (m_bDSSNeedApply || m_bDSSChanged)
 	{
 		if (m_bDSSChanged)
 		{
@@ -190,7 +191,7 @@ void dx10StateManager::Apply()
 	}
 
 	//	Apply blend state
-	if ( m_bBSNeedApply || m_bBSChanged )
+	if (m_bBSNeedApply || m_bBSChanged)
 	{
 		if (m_bBSChanged)
 		{
@@ -198,7 +199,7 @@ void dx10StateManager::Apply()
 			m_bBSChanged = false;
 		}
 
-		static const FLOAT BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
+		static const FLOAT BlendFactor[4] = { 0.000f, 0.000f, 0.000f, 0.000f };
 
 		RContext->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
 		m_bBSNeedApply = false;
@@ -212,20 +213,20 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 	// Simple filter
 	//if (stencil_enable		!= _enable)		{ stencil_enable=_enable;		CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILENABLE,		_enable				)); }
 	BOOL	BEnable = (BOOL)Enable;
-	if (m_DSDesc.StencilEnable!=BEnable)
+	if (m_DSDesc.StencilEnable != BEnable)
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.StencilEnable = BEnable;
 	}
-	
+
 	if (!m_DSDesc.StencilEnable)	return;
 
 	//if (stencil_func		!= _func)		{ stencil_func=_func;			CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILFUNC,		_func				)); }
-	D3D_COMPARISON_FUNC	SFunc = 
+	D3D_COMPARISON_FUNC	SFunc =
 		dx10StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
 
-	if ((m_DSDesc.FrontFace.StencilFunc!=SFunc)
-		|| (m_DSDesc.BackFace.StencilFunc!=SFunc))
+	if ((m_DSDesc.FrontFace.StencilFunc != SFunc)
+		|| (m_DSDesc.BackFace.StencilFunc != SFunc))
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.FrontFace.StencilFunc = SFunc;
@@ -237,7 +238,7 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 
 	//if (stencil_mask		!= _mask)		{ stencil_mask=_mask;			CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILMASK,		_mask				)); }
 	UINT8	SMask = (UINT8)Mask;
-	if( m_DSDesc.StencilReadMask != SMask )
+	if (m_DSDesc.StencilReadMask != SMask)
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.StencilReadMask = SMask;
@@ -245,17 +246,17 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 
 	//if (stencil_writemask	!= _writemask)	{ stencil_writemask=_writemask;	CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILWRITEMASK,	_writemask			)); }
 	SMask = (UINT8)WriteMask;
-	if( m_DSDesc.StencilWriteMask != SMask)
+	if (m_DSDesc.StencilWriteMask != SMask)
 	{
 		m_bDSSChanged = true;
-      m_DSDesc.StencilWriteMask = SMask;
+		m_DSDesc.StencilWriteMask = SMask;
 	}
 
 	//if (stencil_fail		!= _fail)		{ stencil_fail=_fail;			CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILFAIL,		_fail				)); }
-	D3D_STENCIL_OP	SOp = 
+	D3D_STENCIL_OP	SOp =
 		dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(Fail));
-	if ((m_DSDesc.FrontFace.StencilFailOp!=SOp)
-		|| (m_DSDesc.BackFace.StencilFailOp!=SOp))
+	if ((m_DSDesc.FrontFace.StencilFailOp != SOp)
+		|| (m_DSDesc.BackFace.StencilFailOp != SOp))
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.FrontFace.StencilFailOp = SOp;
@@ -264,8 +265,8 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 
 	//if (stencil_pass		!= _pass)		{ stencil_pass=_pass;			CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILPASS,		_pass				)); }
 	SOp = dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(Pass));
-	if ((m_DSDesc.FrontFace.StencilPassOp!=SOp)
-		|| (m_DSDesc.BackFace.StencilPassOp!=SOp))
+	if ((m_DSDesc.FrontFace.StencilPassOp != SOp)
+		|| (m_DSDesc.BackFace.StencilPassOp != SOp))
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.FrontFace.StencilPassOp = SOp;
@@ -274,8 +275,8 @@ void dx10StateManager::SetStencil(u32 Enable, u32 Func, u32 Ref, u32 Mask, u32 W
 
 	//if (stencil_zfail		!= _zfail)		{ stencil_zfail=_zfail;			CHK_DX(RDevice->SetRenderState	( D3DRS_STENCILZFAIL,		_zfail				)); }
 	SOp = dx10StateUtils::ConvertStencilOp(D3DSTENCILOP(ZFail));
-	if ((m_DSDesc.FrontFace.StencilDepthFailOp!=SOp)
-		|| (m_DSDesc.BackFace.StencilDepthFailOp!=SOp))
+	if ((m_DSDesc.FrontFace.StencilDepthFailOp != SOp)
+		|| (m_DSDesc.BackFace.StencilDepthFailOp != SOp))
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.FrontFace.StencilDepthFailOp = SOp;
@@ -294,9 +295,9 @@ void dx10StateManager::SetDepthFunc(u32 Func)
 	//	CHK_DX(RDevice->SetRenderState( D3DRS_ZFUNC, _func));
 	//}
 
-	D3D_COMPARISON_FUNC	DFunc = 
+	D3D_COMPARISON_FUNC	DFunc =
 		dx10StateUtils::ConvertCmpFunction(D3DCMPFUNC(Func));
-	if (m_DSDesc.DepthFunc!=DFunc)
+	if (m_DSDesc.DepthFunc != DFunc)
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.DepthFunc = DFunc;
@@ -315,10 +316,20 @@ void dx10StateManager::SetDepthEnable(u32 Enable)
 	//}
 
 	BOOL	BEnable = (BOOL)Enable;
-	if (m_DSDesc.DepthEnable!=BEnable)
+	if (m_DSDesc.DepthEnable != BEnable)
 	{
 		m_bDSSChanged = true;
 		m_DSDesc.DepthEnable = BEnable;
+	}
+}
+
+void dx10StateManager::SetDepthWrite(u32 Enable)
+{
+	D3D11_DEPTH_WRITE_MASK MEnable = (D3D11_DEPTH_WRITE_MASK)Enable;
+	if (m_DSDesc.DepthWriteMask != MEnable)
+	{
+		m_bDSSChanged = true;
+		m_DSDesc.DepthWriteMask = MEnable;
 	}
 }
 
@@ -337,27 +348,43 @@ void dx10StateManager::SetColorWriteEnable(u32 WriteMask)
 	UINT8	WMask = (UINT8)WriteMask;
 
 	bool	bNeedUpdate = false;
-	for (int i=0; i<4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		if (m_BDesc.RenderTarget[i].RenderTargetWriteMask!=WMask)
+		if (m_BDesc.RenderTarget[i].RenderTargetWriteMask != WMask)
 			bNeedUpdate = true;
 	}
 
 	if (bNeedUpdate)
 	{
 		m_bBSChanged = true;
-		for (int i=0; i<4; ++i)
+		for (int i = 0; i < 4; ++i)
 			m_BDesc.RenderTarget[i].RenderTargetWriteMask = WMask;
 	}
 }
 
-void dx10StateManager::SetSampleMask( u32 SampleMask )
+void dx10StateManager::SetSampleMask(u32 SampleMask)
 {
-   if( m_uiSampleMask != SampleMask )
-   {
-      m_uiSampleMask = SampleMask;
+	if (m_uiSampleMask != SampleMask)
+	{
+		m_uiSampleMask = SampleMask;
 		m_bBSNeedApply = true;
-   }
+	}
+}
+
+void dx10StateManager::SetFillMode(u32 Mode)
+{
+	if (m_uiFillMode != Mode)
+	{
+		m_uiFillMode = Mode;
+		m_bRSChanged = true;
+
+		if (Mode == D3DFILL_POINT)
+			FATAL("No point support.");
+		else if (Mode == D3DFILL_WIREFRAME)
+			m_RDesc.FillMode == D3D11_FILL_WIREFRAME;
+		else if (Mode == D3DFILL_SOLID)
+			m_RDesc.FillMode == D3D11_FILL_SOLID;
+	}
 }
 
 void dx10StateManager::SetCullMode(u32 Mode)
@@ -365,9 +392,9 @@ void dx10StateManager::SetCullMode(u32 Mode)
 	ValidateRDesc();
 	//if (cull_mode		!= _mode)		{ cull_mode = _mode;			CHK_DX(RDevice->SetRenderState	( D3DRS_CULLMODE,			_mode				)); }
 
-	D3D_CULL_MODE	CMode = 
+	D3D_CULL_MODE	CMode =
 		dx10StateUtils::ConvertCullMode((D3DCULL)Mode);
-	if (m_RDesc.CullMode!=CMode)
+	if (m_RDesc.CullMode != CMode)
 	{
 		m_bRSChanged = true;
 		m_RDesc.CullMode = CMode;
@@ -378,10 +405,10 @@ void dx10StateManager::SetMultisample(u32 Enable)
 {
 	ValidateRDesc();
 
-	if (m_RDesc.MultisampleEnable!=BOOL(Enable))
+	if (m_RDesc.MultisampleEnable != BOOL(Enable))
 	{
 		m_bRSChanged = true;
-		m_RDesc.MultisampleEnable=BOOL(Enable);
+		m_RDesc.MultisampleEnable = BOOL(Enable);
 	}
 }
 
@@ -389,7 +416,7 @@ void dx10StateManager::EnableScissoring(BOOL bEnable)
 {
 	ValidateRDesc();
 
-	if (m_RDesc.ScissorEnable!=bEnable)
+	if (m_RDesc.ScissorEnable != bEnable)
 	{
 		m_bRSChanged = true;
 		m_RDesc.ScissorEnable = bEnable;
@@ -413,7 +440,7 @@ void dx10StateManager::OverrideScissoring(bool bOverride, BOOL bValue)
 				m_pRState->GetDesc(&tmpDesc);
 			else
 				dx10StateUtils::ResetDescription(tmpDesc);
-			
+
 			m_RDesc.ScissorEnable = tmpDesc.ScissorEnable;
 		}
 	}

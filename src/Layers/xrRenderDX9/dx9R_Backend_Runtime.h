@@ -179,6 +179,11 @@ IC  void CBackend::set_ZFunc(u32 _func)
 	}
 }
 
+IC	void CBackend::set_ZWrite(u32 _enable)
+{
+	CHK_DX(RDevice->SetRenderState(D3DRS_ZWRITEENABLE, _enable));
+}
+
 IC  void CBackend::set_AlphaRef (u32 _value)
 {
 	if (alpha_ref != _value)

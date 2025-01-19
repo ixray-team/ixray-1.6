@@ -426,15 +426,14 @@ IC  void CBackend::set_ZFunc(u32 _func)
 	//}
 }
 
+IC	void CBackend::set_ZWrite(u32 _enable)
+{
+	StateManager.SetDepthWrite(_enable);
+}
+
 IC  void CBackend::set_AlphaRef(u32 _value)
 {
-	//	TODO: DX10: Implement rasterizer state update to support alpha ref
-	VERIFY(!"Not implemented.");
-	//if (alpha_ref != _value)
-	//{ 
-	//	alpha_ref = _value;
-	//	CHK_DX(RDevice->SetRenderState(D3DRS_ALPHAREF,_value));
-	//}
+	StateManager.SetAlphaRef(_value);
 }
 
 IC void	CBackend::set_ColorWriteEnable(u32 _mask )

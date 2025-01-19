@@ -323,6 +323,7 @@ public:
 	IC  void						set_Stencil			(u32 _enable, u32 _func=D3DCMP_ALWAYS, u32 _ref=0x00, u32 _mask=0x00, u32 _writemask=0x00, u32 _fail=D3DSTENCILOP_KEEP, u32 _pass=D3DSTENCILOP_KEEP, u32 _zfail=D3DSTENCILOP_KEEP);
 	IC  void						set_Z				(u32 _enable);
 	IC  void						set_ZFunc			(u32 _func);
+	IC  void						set_ZWrite			(u32 _enable);
 	IC  void						set_AlphaRef		(u32 _value);
 	IC  void						set_ColorWriteEnable(u32 _mask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 	IC  void						set_CullMode		(u32 _mode);
