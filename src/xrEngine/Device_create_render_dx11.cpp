@@ -216,6 +216,7 @@ bool CreateD3D11()
 				infoQueue->PushStorageFilter(&NewFilter);
 				infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, true);
 				infoQueue->SetBreakOnID(D3D11_MESSAGE_ID_DEVICE_DRAW_RENDERTARGETVIEW_NOT_SET, false);
+				infoQueue->SetBreakOnID(D3D11_MESSAGE_ID_CORRUPTED_MULTITHREADING, false);
 			}
 		}
 	}

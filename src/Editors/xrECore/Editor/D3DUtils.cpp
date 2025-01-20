@@ -31,8 +31,8 @@ static const int boxvertcount = 48;
 static Fvector boxvert[boxvertcount];
 
 #define DU_DRAW_RS	EDevice->SetRS
-#define DU_DRAW_SH_C(sh,c){RCache.set_Shader(sh);	RCache.set_c	("tfactor",float(color_get_R(c))/255.f,float(color_get_G(c))/255.f,float(color_get_B(c))/255.f,float(color_get_A(c))/255.f);}
-#define DU_DRAW_SH(sh){RCache.set_Shader(sh);		RCache.set_c	("tfactor",1,1,1,1);}
+#define DU_DRAW_SH_C(sh,c){EDevice->SetShader(sh);	RCache.set_c	("tfactor",float(color_get_R(c))/255.f,float(color_get_G(c))/255.f,float(color_get_B(c))/255.f,float(color_get_A(c))/255.f);}
+#define DU_DRAW_SH(sh){ EDevice->SetShader(sh);		RCache.set_c	("tfactor",1,1,1,1);}
 
 #if 1
 #	define FILL_MODE EDevice->dwFillMode
