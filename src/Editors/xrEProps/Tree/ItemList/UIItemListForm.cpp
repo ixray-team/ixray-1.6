@@ -458,7 +458,7 @@ void UIItemListForm::DrawItem(Node* Node)
 	{
 		if (m_Flags.test(fMultiSelect))
 		{
-			if (!ImGui::GetIO().KeyCtrl)
+			if (!ImGui::GetIO().KeyCtrl && !ImGui::GetIO().KeyShift)
 			{
 				ClearSelectedItems();
 			}
@@ -477,12 +477,38 @@ void UIItemListForm::DrawItem(Node* Node)
 			}
 			else
 			{
-				Node->Object->selected = true;
-				m_SelectedItems.push_back(Node->Object);
-				if (!OnItemFocusedEvent.empty())
-					OnItemFocusedEvent(Node->Object);
-				if (!OnItemsFocusedEvent.empty())
-					OnItemsFocusedEvent(m_SelectedItems);
+				if (ImGui::GetIO().KeyShift && !m_SelectedItems.empty())
+				{
+					ListItem* LastItem = m_SelectedItems.back();
+					auto Begin = std::find(m_Items.begin(), m_Items.end(), LastItem);
+					auto End = std::find(m_Items.begin(), m_Items.end(), Node->Object);
+
+					ptrdiff_t Dis = std::distance(Begin, End);
+					if (Dis < 0)
+					{
+						std::swap(Begin, End);
+					}
+
+					for (auto Iter = Begin; Iter < End; Iter++)
+					{
+						ListItem* NodeObj = *Iter;
+						NodeObj->selected = true;
+						m_SelectedItems.push_back(NodeObj);
+						if (!OnItemFocusedEvent.empty())
+							OnItemFocusedEvent(NodeObj);
+						if (!OnItemsFocusedEvent.empty())
+							OnItemsFocusedEvent(m_SelectedItems);
+					}
+				}
+				else
+				{
+					Node->Object->selected = true;
+					m_SelectedItems.push_back(Node->Object);
+					if (!OnItemFocusedEvent.empty())
+						OnItemFocusedEvent(Node->Object);
+					if (!OnItemsFocusedEvent.empty())
+						OnItemsFocusedEvent(m_SelectedItems);
+				}
 			}
 		}
 		else
