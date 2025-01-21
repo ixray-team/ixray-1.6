@@ -62,12 +62,9 @@ float4 main(vf I, float4 pos2d : SV_POSITION) : SV_Target
 	sincos(L_sky_color.w, rotation.x, rotation.y);
 	vreflect.xz = float2(vreflect.x * rotation.y - vreflect.z * rotation.x, vreflect.x * rotation.x + vreflect.z * rotation.y);
 	
-	// true remapping. Slow.
-	float3 vreflectabs = abs(vreflect);
-	float vreflectmax = max(vreflectabs.x, max(vreflectabs.y, vreflectabs.z));
-	
-	vreflect /= vreflectmax;
-	vreflect.y = vreflect.y * 2.0f - 1.0f;
+#ifndef USE_FULL_SKY_SPHERE
+	RemapVector(vreflect);
+#endif
 
 	float3 env0 = s_env0.SampleLevel(smp_rtlinear, vreflect, 0).xyz;
 	float3 env1 = s_env1.SampleLevel(smp_rtlinear, vreflect, 0).xyz;
@@ -127,6 +124,6 @@ float4 main(vf I, float4 pos2d : SV_POSITION) : SV_Target
 	alpha = max(alpha, leaves.w * fLeavesFactor);
 #endif
 	
-	return PushGamma(lerp(float4(final, alpha), fog_color, calc_fogging(I.pos.xyz)));
+	return PushGamma(lerp(float4(final, PopGamma(alpha)), fog_color, calc_fogging(I.pos.xyz)));
 }
 
