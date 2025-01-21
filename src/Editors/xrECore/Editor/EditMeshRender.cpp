@@ -342,6 +342,7 @@ void CEditableMesh::RenderSkeleton(const Fmatrix&, CSurface* S)
 			u8 bone_count = (u8)SV.bones.size();
 			float total = SV.bones[0].w;
 			float max_weight = SV.bones[0].w + SV.bones[1 % bone_count].w + SV.bones[2 % bone_count].w;
+#if 0
 			u16 max_bone_id = std::max(SV.bones[0].id, std::max(SV.bones[1 % bone_count].id,
 				std::max(SV.bones[2 % bone_count].id, SV.bones[3 % bone_count].id)));
 		
@@ -368,15 +369,18 @@ void CEditableMesh::RenderSkeleton(const Fmatrix&, CSurface* S)
 				pv->ind = color_rgba(75 * 3, 75 * 3, 75 * 3, 75 * 3);
 			}
 			else
+#endif
 			{
 				pv->weight0 = SV.bones[0].w / max_weight;
 				pv->weight1 = SV.bones[1 % bone_count].w / max_weight;
 				pv->weight2 = SV.bones[2 % bone_count].w / max_weight;
-				pv->ind = color_rgba(
+				pv->ind = color_rgba
+				(
 					SV.bones[0].id * 3, 
 					SV.bones[1 % bone_count].id * 3,
 					SV.bones[2 % bone_count].id * 3,
-					SV.bones[3 % bone_count].id * 3);
+					SV.bones[3 % bone_count].id * 3
+				);
 			}
 		}
 
