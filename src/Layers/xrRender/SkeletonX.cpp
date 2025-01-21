@@ -473,7 +473,7 @@ void CSkeletonX::_Load	(const char* N, IReader *data, u32& dwVertCount)
 
 				sw_bones_cnt		= _max(sw_bones_cnt, mid);
 			}
-#ifdef _EDITOR
+#if 0
 			// software
 			crc						= crc32	(data->pointer(),size);
 			Vertices1W.create		(crc,dwVertCount,(vertBoned1W*)data->pointer());

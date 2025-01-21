@@ -304,8 +304,8 @@ void CEditableMesh::RenderSkeleton(const Fmatrix&, CSurface* S)
 	ref_constant array = RCache.get_c("sbones_array");
 
 	const BoneVec& boneVec = m_Parent->m_Bones;
-	u16 count = (u16)std::min(75ull, boneVec.size());
-	for (u16 mid = 0; mid < count; mid++)
+
+	for (u16 mid = 0; mid < boneVec.size(); mid++)
 	{
 		u32 id = u32(mid * 3);
 		const Fmatrix& M = boneVec[mid]->_RenderTransform();
@@ -314,19 +314,11 @@ void CEditableMesh::RenderSkeleton(const Fmatrix&, CSurface* S)
 		RCache.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
 	}
 
-	RCache.set_ca(&*array, 225, Fidentity._11, Fidentity._21, Fidentity._31, Fidentity._41);
-	RCache.set_ca(&*array, 226, Fidentity._12, Fidentity._22, Fidentity._32, Fidentity._42);
-	RCache.set_ca(&*array, 227, Fidentity._13, Fidentity._23, Fidentity._33, Fidentity._43);
-
 	IntVec& face_lst = sp_it->second;
 	_VertexStream* Stream = &RCache.Vertex;
 	u32 vBase;
 
 	size_t FaceCount = face_lst.size();
-	//if (S->m_Flags.is(CSurface::sf2Sided))
-	//{
-	//	FaceCount *= 2;
-	//}
 
 	svertRender* pv = (svertRender*)Stream->Lock(FaceCount * 3, m_Parent->vs_SkeletonGeom->vb_stride, vBase);
 
@@ -376,10 +368,10 @@ void CEditableMesh::RenderSkeleton(const Fmatrix&, CSurface* S)
 				pv->weight2 = SV.bones[2 % bone_count].w / max_weight;
 				pv->ind = color_rgba
 				(
-					SV.bones[0].id * 3, 
-					SV.bones[1 % bone_count].id * 3,
-					SV.bones[2 % bone_count].id * 3,
-					SV.bones[3 % bone_count].id * 3
+					SV.bones[0].id, 
+					SV.bones[1 % bone_count].id,
+					SV.bones[2 % bone_count].id,
+					SV.bones[3 % bone_count].id
 				);
 			}
 		}
